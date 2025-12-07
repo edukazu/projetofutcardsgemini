@@ -3,35 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fut Cards MVP - Campo de Batalha</title>
-    <style>
-        /* CSS Básico para simular o campo */
-        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; }
-        #game-container { border: 2px solid green; width: 800px; height: 300px; display: flex; margin-top: 20px; position: relative; }
-        .territory { flex-grow: 1; border-right: 1px dashed #ccc; display: flex; align-items: center; justify-content: center; font-weight: bold; }
-        .territory:last-child { border-right: none; }
-        #ball-indicator { position: absolute; top: 50%; width: 20px; height: 20px; background-color: red; border-radius: 50%; transform: translate(-50%, -50%); transition: left 0.5s; }
-        #score-board { margin-bottom: 10px; font-size: 1.2em; }
-    </style>
+    <title>Fut Cards MVP - Campo de Batalha Estilizado</title>
+    <link rel="stylesheet" href="style.css"> 
 </head>
 <body>
-    <h1>Campo de Batalha de Cartas</h1>
-    <div id="score-board">Placar: 0 x 0 | Posse: MEIO-CAMPO</div>
+    <div id="app-window"> <h1>Fut Cards MVP: Batalha Territorial</h1>
+        <div id="score-board"></div>
+        
+        <div id="pitch-wrapper"> <div id="pitch-container">
+                <div class="field-zone goal-zone goal-left" id="zone-0"></div>
+                <div class="field-zone defense-zone" id="zone-1">DEFESA IA</div>
+                <div class="field-zone midfield-zone" id="zone-2">MEIO-CAMPO</div>
+                <div class="field-zone attack-zone" id="zone-3">ATAQUE JOGADOR</div>
+                <div class="field-zone goal-zone goal-right" id="zone-4"></div>
+                
+                <div id="ball-indicator"></div>
+            </div>
+        </div>
 
-    <div id="game-container">
-        <div class="territory" id="territory-1">DEFESA A</div>
-        <div class="territory" id="territory-2">MEIO-CAMPO A</div>
-        <div class="territory" id="territory-3">MEIO-CAMPO</div>
-        <div class="territory" id="territory-4">MEIO-CAMPO B</div>
-        <div class="territory" id="territory-5">DEFESA B</div>
-        <div id="ball-indicator"></div>
+        <button onclick="game.startBattle()">Iniciar Próxima Batalha</button>
+        <div id="game-info"></div>
     </div>
-
-    <button onclick="game.startBattle()">Iniciar Próxima Batalha</button>
-
+    
     <script src="game.js"></script>
     <script>
-        // Inicializa o jogo e renderiza o estado inicial
         const game = new Game();
         game.render();
     </script>

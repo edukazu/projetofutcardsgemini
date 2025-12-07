@@ -1,0 +1,203 @@
+/* style.css - Versão Final de Layout V4 */
+
+/* ---------------------------------- */
+/* BASE: Fundo da Página, Janela e Rolagem */
+/* ---------------------------------- */
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    /* Fundo da tela (grama externa) */
+    background-color: #388E3C; /* Verde escuro para área externa total */
+    color: #fff;
+    overflow: hidden; 
+}
+
+#app-window {
+    /* Cor que substitui o branco: Um cinza/verde escuro para o tema de jogo */
+    background-color: #333d47; 
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 95%; 
+    max-width: 1200px;
+    max-height: 95vh; 
+    overflow-y: hidden; /* Remove rolagem */
+    color: #e0f2f1; /* Cor do texto dentro da janela escura */
+}
+
+h1 {
+    color: #e0f2f1; /* Título claro */
+    margin-bottom: 5px;
+}
+
+#score-board {
+    /* Mantido o fundo claro para destaque */
+    margin: 10px 0 20px 0;
+    padding: 12px 25px;
+    border: 3px solid #00796b;
+    border-radius: 8px;
+    font-size: 1.4em;
+    font-weight: bold;
+    background-color: #e0f2f1;
+    color: #004d40;
+}
+
+button {
+    padding: 12px 20px;
+    margin: 15px 0;
+    background-color: #00796b;
+    color: white;
+    border: none;
+    border-radius: 50px; 
+    cursor: pointer;
+    font-size: 1.1em;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #004d40;
+}
+
+#game-info {
+    margin-top: 10px;
+    font-weight: bold;
+    color: #e0f2f1; /* Texto de informação claro */
+    min-height: 20px;
+}
+
+/* ---------------------------------- */
+/* CAMPO DE FUTEBOL (Visão Completa e Gols) */
+/* ---------------------------------- */
+
+#pitch-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 20px 0; /* Espaço para ver a "grama externa" (body color) */
+}
+
+#pitch-container {
+    width: 90%; 
+    max-width: 1000px;
+    height: 55vh; 
+    min-height: 500px; 
+    
+    background-color: #4CAF50; /* Grama principal */
+    /* A borda branca é a Linha Lateral/Fundo do campo principal */
+    border: 3px solid white; 
+    position: relative;
+    display: flex;
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.5); /* Sombra mais forte */
+}
+
+/* Faixas de Grama */
+.defense-zone, .attack-zone {
+    background-color: #4CAF50;
+}
+.midfield-zone {
+    background-color: #66BB6A;
+}
+
+/* Zonas Lógicas (Defesa, Meio, Ataque) */
+.field-zone {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    z-index: 2;
+    position: relative;
+    padding: 0;
+    overflow: hidden; /* Garante que o conteúdo não vaze */
+}
+
+/* Zonas de Gol (Externas ao Campo Principal) */
+/* Para simular a área do Gol, tornaremos essas zonas transparentes
+   para que a cor do BODY (verde escuro) apareça, e usaremos
+   uma linha para delimitar a 'área de fundo'. */
+.goal-zone {
+    flex-grow: 0.1; /* Mantém o tamanho pequeno */
+    background-color: transparent; /* Permite ver a grama externa do body */
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 0; /* Garante que está no fundo */
+    color: #fff;
+    font-size: 0.9em;
+    text-shadow: none;
+}
+
+.goal-left {
+    border-right: 3px solid white; /* Linha de Fundo do Gol (IA) */
+    align-items: flex-end;
+}
+.goal-right {
+    border-left: 3px solid white; /* Linha de Fundo do Gol (Jogador) */
+    align-items: flex-end;
+}
+
+/* Linha Central e Círculo (Mantido) */
+#pitch-container::before {
+    /* Linha Central */
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 2px;
+    height: 100%;
+    background-color: white;
+    transform: translateX(-50%);
+    z-index: 1;
+}
+
+#pitch-container::after {
+    /* Círculo Central */
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 120px;
+    height: 120px;
+    border: 2px solid white;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+}
+
+/* Linhas de Divisão das Zonas Lógicas */
+.defense-zone::after, .attack-zone::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 2px;
+    height: 100%;
+    background-color: white;
+    opacity: 0.5;
+    z-index: 3;
+}
+
+/* Indicador da Bola */
+#ball-indicator {
+    position: absolute;
+    top: 50%;
+    width: 25px;
+    height: 25px;
+    background: radial-gradient(circle at 30% 30%, white, red); 
+    border: 3px solid #333;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: left 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    z-index: 10;
+}
