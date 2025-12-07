@@ -3,30 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fut Cards MVP - Campo de Batalha Estilizado</title>
-    <link rel="stylesheet" href="style.css"> 
+    <title>Fut Cards MVP - Arena</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="app-window"> <h1>Fut Cards MVP: Batalha Territorial</h1>
-        <div id="score-board"></div>
-        
-        <div id="pitch-wrapper"> <div id="pitch-container">
+
+    <div id="app-window">
+        <header>
+            <h1>Fut Cards: Batalha Territorial</h1>
+            <div id="score-board">
+                JOGADOR 0 x 0 IA <br>
+                <span id="possession-display">Posse: NEUTRA (Meio-Campo)</span>
+            </div>
+        </header>
+
+        <div id="pitch-wrapper">
+            <div id="pitch-container">
                 <div class="field-zone goal-zone goal-left" id="zone-0"></div>
-                <div class="field-zone defense-zone" id="zone-1">DEFESA IA</div>
-                <div class="field-zone midfield-zone" id="zone-2">MEIO-CAMPO</div>
-                <div class="field-zone attack-zone" id="zone-3">ATAQUE JOGADOR</div>
+
+                <div class="field-zone defense-zone" id="zone-1"></div>
+
+                <div class="field-zone midfield-zone" id="zone-2"></div>
+
+                <div class="field-zone attack-zone" id="zone-3"></div>
+
                 <div class="field-zone goal-zone goal-right" id="zone-4"></div>
                 
                 <div id="ball-indicator"></div>
             </div>
         </div>
 
-        <button onclick="game.startBattle()">Iniciar Próxima Batalha</button>
-        <div id="game-info"></div>
+        <div id="controls-area">
+            <button onclick="game.startBattle()" id="btn-battle">⚔️ Iniciar Batalha</button>
+            <div id="game-info">Pressione o botão para iniciar...</div>
+        </div>
     </div>
     
     <script src="game.js"></script>
     <script>
+        // Inicializa o jogo ao carregar a página
         const game = new Game();
         game.render();
     </script>

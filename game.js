@@ -1,154 +1,160 @@
-// game.js
+/**
+ * game.js - Lógica Principal do Fut Cards MVP
+ */
 
 class Card {
-    // ... (Mantém a mesma estrutura de Card)
     constructor(name, position, attack, defense) {
         this.name = name;
-        this.position = position;
-        this.attack = attack; 
-        this.defense = defense; 
+        this.position = position; // 'GOLEIRO', 'DEFENSOR', 'MEIO-CAMPISTA', 'ATACANTE'
+        this.attack = attack;
+        this.defense = defense;
     }
 }
 
 class Game {
     constructor() {
-        // Zonas de campo: 0 (Gol IA) a 4 (Gol Jogador)
-        this.fieldTerritories = [
-            'Gol IA', 'Defesa IA', 'Meio-Campo', 'Ataque Jogador', 'Gol Jogador'
-        ];
+        // Zonas mapeadas pelos IDs do HTML
+        // 0: Gol IA | 1: Defesa IA | 2: Meio | 3: Ataque Jogador | 4: Gol Jogador
+        this.territories = ['Gol IA', 'Defesa IA', 'Meio-Campo', 'Ataque Jogador', 'Gol Jogador'];
         
-        this.ballPositionIndex = 2; // Inicia no Meio-Campo (2).
-        this.possession = 0; // 1: Jogador (Time A), -1: IA (Time B), 0: Neutro
-        this.scoreA = 0; // Jogador
-        this.scoreB = 0; // IA
+        this.ballPositionIndex = 2; // Começa no Meio (Index 2)
+        this.possession = 0; // 0: Neutro, 1: Jogador, -1: IA
+        
+        this.scorePlayer = 0;
+        this.scoreIA = 0;
 
-        // Cartas de exemplo (usaremos 1 de cada posição)
-        this.teamA = [
-            new Card('Atacante A', 'ATACANTE', 15, 8),
-            new Card('Meia A', 'MEIO-CAMPISTA', 10, 10),
-            new Card('Defensor A', 'DEFENSOR', 5, 12),
-            new Card('Goleiro A', 'GOLEIRO', 1, 15) 
+        // Times (Dados Mockados para teste)
+        this.playerTeam = [
+            new Card('Atacante Jr', 'ATACANTE', 85, 30),
+            new Card('Meia Silva', 'MEIO-CAMPISTA', 70, 60),
+            new Card('Zagueirão', 'DEFENSOR', 40, 80),
+            new Card('Paredão', 'GOLEIRO', 10, 85)
         ];
-        this.teamB = [
-            new Card('Atacante B', 'ATACANTE', 14, 7),
-            new Card('Meia B', 'MEIO-CAMPISTA', 9, 11),
-            new Card('Defensor B', 'DEFENSOR', 6, 11),
-            new Card('Goleiro B', 'GOLEIRO', 2, 14)
+
+        this.iaTeam = [
+            new Card('Robo-Atak', 'ATACANTE', 80, 35),
+            new Card('Robo-Mid', 'MEIO-CAMPISTA', 65, 65),
+            new Card('Robo-Def', 'DEFENSOR', 45, 75),
+            new Card('Robo-Goal', 'GOLEIRO', 12, 82)
         ];
-        
-        // Define quem é o time do Jogador para fins de exibição
-        this.playerTeam = this.teamA;
-        this.iaTeam = this.teamB;
     }
-    
-    // ... (Função startBattle - A lógica de seleção de cartas precisa ser mais inteligente aqui)
-    
+
     startBattle() {
-        console.log(`--- Nova Batalha em ${this.fieldTerritories[this.ballPositionIndex]} ---`);
-
-        let attackingTeam, defendingTeam;
-        let direction; // 1: Jogador avança, -1: IA avança
-
-        // 1. Define quem ataca e quem defende com base na posse atual
-        if (this.possession >= 0) {
-            attackingTeam = this.playerTeam;
-            defendingTeam = this.iaTeam;
-            direction = 1; // Jogador avança para a direita (Zona 4)
-        } else {
-            attackingTeam = this.iaTeam;
-            defendingTeam = this.playerTeam;
-            direction = -1; // IA avança para a esquerda (Zona 0)
+        // Se alguém marcou gol na rodada anterior, reseta para o meio
+        if (this.ballPositionIndex === 0 || this.ballPositionIndex === 4) {
+            this.resetAfterGoal();
+            return;
         }
+
+        console.log("--- Iniciando Batalha ---");
         
-        // 2. Seleciona cartas (Simplificado: atacante e defensor aleatórios)
-        const attacker = attackingTeam[Math.floor(Math.random() * attackingTeam.length)];
-        const defender = defendingTeam[Math.floor(Math.random() * defendingTeam.length)];
+        // 1. Identificar quem ataca e quem defende
+        // Se posse for 0 (neutra), sorteia quem tenta atacar primeiro ou define padrão
+        let attackerTeam, defenderTeam;
+        let direction; // 1 (Direita/Jogador) ou -1 (Esquerda/IA)
 
-        // --- Adição de Lógica de Batalha por ZONA ---
-        // Exemplo: Ataque é mais forte na Zona de Ataque, Defesa é mais forte na Defesa.
-        let zoneModifier = 1;
-        if (this.ballPositionIndex === 1 || this.ballPositionIndex === 3) { // Zona de Defesa ou Ataque
-            zoneModifier = 1.2; 
-        } else if (this.ballPositionIndex === 0 || this.ballPositionIndex === 4) { // Zona de Gol (Goleiro!)
-            // Nesta fase a batalha é entre um atacante e o goleiro
-            const goalie = defendingTeam.find(c => c.position === 'GOLEIRO') || defender;
-            zoneModifier = 0.5; // Dificulta muito o ataque
-            // Garantimos que o defensor é o goleiro se estiver na zona de gol (simplificando)
-            // Para o MVP, usaremos o defensor aleatório, mas podemos aprimorar isso depois.
+        if (this.possession === 0) {
+            // Disputa inicial: 50/50
+            if (Math.random() > 0.5) {
+                this.possession = 1; // Jogador ganha a posse inicial
+            } else {
+                this.possession = -1; // IA ganha a posse inicial
+            }
         }
 
-        // 3. Calcula os valores de batalha com modificador da zona
-        const attackValue = (attacker.attack * zoneModifier) + (Math.random() * 5); 
-        const defenseValue = defender.defense + (Math.random() * 5); 
-
-        // 4. Define o resultado
-        if (attackValue > defenseValue) {
-            this.handleAttackWin(attacker.name, direction);
+        if (this.possession === 1) {
+            attackerTeam = this.playerTeam;
+            defenderTeam = this.iaTeam;
+            direction = 1; // Tenta ir para zona 4
         } else {
-            this.handleDefenseWin(defender.name, direction);
+            attackerTeam = this.iaTeam;
+            defenderTeam = this.playerTeam;
+            direction = -1; // Tenta ir para zona 0
         }
 
-        this.render(); 
-    }
+        // 2. Selecionar Cartas (Lógica Simplificada Aleatória por enquanto)
+        const attacker = attackerTeam[Math.floor(Math.random() * attackerTeam.length)];
+        const defender = defenderTeam[Math.floor(Math.random() * defenderTeam.length)];
 
-    /**
-     * Lógica quando o atacante ganha a batalha (avanço de território).
-     */
-    handleAttackWin(attackerName, direction) {
-        let currentZone = this.ballPositionIndex;
+        // 3. Calcular Resultado (Ataque vs Defesa + Fator Sorte)
+        const attackRoll = attacker.attack + (Math.random() * 20);
+        const defenseRoll = defender.defense + (Math.random() * 20);
+
+        let message = `${attacker.name} (Atk) vs ${defender.name} (Def)`;
         
-        if (currentZone === 4 && direction === 1) { // Jogador faz Gol (na zona 4)
-            this.scoreA++;
-            this.ballPositionIndex = 2; 
-            this.possession = 0; 
-            document.getElementById('game-info').textContent = `GOOOL do Jogador! ${attackerName} marcou.`;
-        } else if (currentZone === 0 && direction === -1) { // IA faz Gol (na zona 0)
-            this.scoreB++;
-            this.ballPositionIndex = 2; 
-            this.possession = 0; 
-            document.getElementById('game-info').textContent = `GOOOL da IA! ${attackerName} marcou.`;
-        } else {
-            // Avança um território (Zona 1 -> 2 -> 3 ou 3 -> 2 -> 1)
+        if (attackRoll > defenseRoll) {
+            // Ataque venceu: Avança
             this.ballPositionIndex += direction;
-            // O atacante mantém a posse ou ganha, se estava neutra
-            this.possession = direction;
-            document.getElementById('game-info').textContent = `${attackerName} avança para ${this.fieldTerritories[this.ballPositionIndex]}!`;
-        }
-    }
+            message += ` -> Ataque Venceu! Avança para ${this.territories[this.ballPositionIndex]}`;
+            
+            // Verifica Gol
+            if (this.ballPositionIndex === 4) {
+                this.scorePlayer++;
+                message = "GOL DO JOGADOR!!!";
+                this.possession = 0; // Posse reseta
+            } else if (this.ballPositionIndex === 0) {
+                this.scoreIA++;
+                message = "GOL DA IA!!!";
+                this.possession = 0; // Posse reseta
+            }
 
-    /**
-     * Lógica quando o defensor ganha a batalha (mantém a posição ou retoma a posse).
-     */
-    handleDefenseWin(defenderName, direction) {
-        // Se a posse estava na mão do atacante, o defensor rouba a posse (inverte a direção).
-        if (this.possession !== 0) {
-            this.possession *= -1; // Inverte a posse (-1 para 1 ou 1 para -1)
-            document.getElementById('game-info').textContent = `${defenderName} rouba a bola! Posse agora é do ${this.possession > 0 ? 'JOGADOR' : 'IA'}.`;
         } else {
-            // Se a posse era 0 (neutra), o defensor mantém a posse neutra.
-            document.getElementById('game-info').textContent = `${defenderName} segura a posição no Meio-Campo.`;
+            // Defesa venceu: Rouba a bola (inverte posse) ou mantém se for neutro
+            this.possession *= -1; 
+            message += ` -> Defesa Venceu! Posse invertida.`;
         }
+
+        this.updateInfo(message);
+        this.render();
     }
 
-    /**
-     * Atualiza a interface do usuário (Placar e Posição da Bola).
-     */
+    resetAfterGoal() {
+        this.ballPositionIndex = 2; // Volta para o meio
+        this.possession = 0;
+        this.updateInfo("Bola no centro. Nova saída!");
+        this.render();
+    }
+
+    updateInfo(msg) {
+        document.getElementById('game-info').textContent = msg;
+    }
+
     render() {
         // Atualiza Placar
-        const possessionText = this.possession > 0 ? 'JOGADOR' : (this.possession < 0 ? 'IA' : 'NEUTRA');
-        document.getElementById('score-board').textContent = 
-            `JOGADOR ${this.scoreA} x ${this.scoreB} IA | Posse: ${possessionText} (${this.fieldTerritories[this.ballPositionIndex]})`;
+        let posText = "NEUTRA";
+        if (this.possession === 1) posText = "JOGADOR";
+        if (this.possession === -1) posText = "IA";
 
-        // Atualiza a posição visual da bola
-        const territoryElements = document.querySelectorAll('.field-zone');
-        // Usa a largura total do container para calcular a posição relativa
-        const containerWidth = 900; // Deve ser o mesmo valor de #pitch-container.width no CSS
+        document.getElementById('score-board').innerHTML = 
+            `JOGADOR ${this.scorePlayer} x ${this.scoreIA} IA <br>` +
+            `<span id="possession-display">Posse: ${posText} (${this.territories[this.ballPositionIndex]})</span>`;
+
+        // Atualiza Posição da Bola Visualmente
+        this.moveBallVisual();
+    }
+
+    moveBallVisual() {
+        const container = document.getElementById('pitch-container');
+        const ball = document.getElementById('ball-indicator');
         
-        // As 5 zonas são distribuídas. Precisamos encontrar o centro da zona atual.
-        // Cada zona tem 180px (900/5). O centro da zona i é i * 180 + 90.
-        const zoneWidth = containerWidth / this.fieldTerritories.length;
-        let newLeft = (this.ballPositionIndex * zoneWidth) + (zoneWidth / 2);
+        // Zonas HTML (0 a 4)
+        const zones = [
+            document.getElementById('zone-0'), // Gol IA
+            document.getElementById('zone-1'), // Defesa IA
+            document.getElementById('zone-2'), // Meio
+            document.getElementById('zone-3'), // Ataque Jogador
+            document.getElementById('zone-4')  // Gol Jogador
+        ];
 
-        document.getElementById('ball-indicator').style.left = `${newLeft}px`;
+        const targetZone = zones[this.ballPositionIndex];
+        
+        // Calcula o centro da zona alvo relativo ao container do campo
+        // OffsetLeft dá a posição da zona dentro do container pai
+        // OffsetWidth dá a largura da zona
+        
+        const zoneCenter = targetZone.offsetLeft + (targetZone.offsetWidth / 2);
+        
+        // Aplica a posição à bola
+        ball.style.left = `${zoneCenter}px`;
     }
 }
