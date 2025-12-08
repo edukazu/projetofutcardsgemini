@@ -3,84 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fut Cards - Full Screen Arena</title>
+    <title>Fut Cards - A Batalha Tática</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <main id="game-area">
-        <div id="pitch-container">
-            <div class="goal-structure goal-left" id="zone-0">
-                <div class="net"></div>
-            </div>
-
-            <div class="field-zone defense-zone" id="zone-1"></div>
-            <div class="field-zone midfield-zone" id="zone-2"></div>
-            <div class="field-zone attack-zone" id="zone-3"></div>
-
-            <div class="goal-structure goal-right" id="zone-4">
-                <div class="net"></div>
-            </div>
-            
-            <div id="ball-indicator"></div>
-        </div>
-    </main>
-
-    <footer id="ui-footer">
+    <section id="start-screen">
         
-        <div class="footer-group score-group">
-            <div class="team-score">
-                <span class="label">JOGADOR</span>
-                <span class="value" id="score-player">0</span>
-            </div>
-            <div class="score-divider">X</div>
-            <div class="team-score">
-                <span class="value" id="score-ia">0</span>
-                <span class="label">IA</span>
-            </div>
+        <div class="background-effects">
+            <div class="floating-card c1"></div>
+            <div class="floating-card c2"></div>
+            <div class="floating-card c3"></div>
+            <div class="floating-card c4"></div>
+            <div class="spotlight"></div>
         </div>
 
-        <div class="footer-group action-group">
-            <div id="possession-display">Posse: NEUTRA</div>
-            <button onclick="game.startBattle()" id="btn-battle">
-                ⚔️ BATALHAR
+        <div class="menu-content">
+            <h1 class="game-title">FUT CARDS <br><span class="highlight">ARENA</span></h1>
+            <p class="game-subtitle">Monte sua estratégia. Vença o duelo.</p>
+
+            <div class="team-selection">
+                <h3>ESCOLHA SEU MANTO</h3>
+                <div class="teams-grid">
+                    <div class="team-option selected" id="select-team-blue" onclick="selectTeam('blue')">
+                        <div class="team-color-strip blue-strip"></div>
+                        <div class="team-info">
+                            <strong>AZUL REAL</strong>
+                            <small>Formação 4-4-2</small>
+                        </div>
+                    </div>
+
+                    <div class="team-option" id="select-team-red" onclick="selectTeam('red')">
+                        <div class="team-color-strip red-strip"></div>
+                        <div class="team-info">
+                            <strong>VERMELHO FURIOSO</strong>
+                            <small>Formação 4-3-3</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="player-input-group">
+                <label>NOME DO TREINADOR</label>
+                <input type="text" id="player-name-input" placeholder="Digite seu nome..." value="Treinador 1" autocomplete="off">
+            </div>
+
+            <button id="btn-start-game" onclick="startGameFlow()">
+                ENTRAR EM CAMPO
             </button>
+            
+            <p class="version">Fut Cards MVP v1.0</p>
         </div>
+    </section>
 
-        <div class="footer-group log-group">
-            <div id="game-info">Arena pronta. Inicie a batalha!</div>
-        </div>
+    <div id="main-game-wrapper" class="hidden fade-in-ready">
+        
+        <main id="game-area">
+            <div id="pitch-container">
+                <div class="goal-structure goal-left" id="zone-0">
+                    <div class="net"></div>
+                </div>
 
-    </footer>
+                <div class="field-zone defense-zone" id="zone-1"></div>
+                <div class="field-zone midfield-zone" id="zone-2"></div>
+                <div class="field-zone attack-zone" id="zone-3"></div>
+
+                <div class="goal-structure goal-right" id="zone-4">
+                    <div class="net"></div>
+                </div>
+                
+                <div id="ball-indicator"></div>
+            </div>
+        </main>
+
+        <footer id="ui-footer">
+            <div class="footer-group score-group">
+                <div class="team-score">
+                    <span class="label" id="label-player-name">JOGADOR</span>
+                    <span class="value" id="score-player">0</span>
+                </div>
+                <div class="score-divider">X</div>
+                <div class="team-score">
+                    <span class="value" id="score-ia">0</span>
+                    <span class="label">IA</span>
+                </div>
+            </div>
+
+            <div class="footer-group action-group">
+                <div id="possession-display">Posse: NEUTRA</div>
+                <button onclick="game.startBattle()" id="btn-battle">
+                    ⚔️ BATALHAR
+                </button>
+            </div>
+
+            <div class="footer-group log-group">
+                <div id="game-info">Arena pronta. Inicie a batalha!</div>
+            </div>
+        </footer>
+    </div>
 
     <script src="cards.js"></script>
     <script src="game.js"></script>
     
     <script>
-        // Inicialização
-        const game = new Game();
-        
-        // Adaptador visual para o footer
-        game.render = function() {
-            // Atualiza Placar
-            document.getElementById('score-player').textContent = this.scorePlayer;
-            document.getElementById('score-ia').textContent = this.scoreIA;
-            
-            // Atualiza Posse e Zona
-            let posText = "NEUTRA";
-            if (this.possession === 1) posText = "JOGADOR";
-            if (this.possession === -1) posText = "IA";
-            
-            let zoneText = this.territories[this.ballPositionIndex];
-            
-            document.getElementById('possession-display').innerHTML = 
-                `<span>${posText}</span> <small>(${zoneText})</small>`;
+        // Lógica de UI do Menu
+        let selectedTeamColor = 'blue';
 
-            this.moveBallVisual();
-            this.updateCamera(); // Garante o zoom correto a cada renderização
-        };
+        function selectTeam(color) {
+            selectedTeamColor = color;
+            document.querySelectorAll('.team-option').forEach(el => el.classList.remove('selected'));
+            document.getElementById(`select-team-${color}`).classList.add('selected');
+        }
 
-        game.render();
+        function startGameFlow() {
+            const startScreen = document.getElementById('start-screen');
+            const gameWrapper = document.getElementById('main-game-wrapper');
+            const playerName = document.getElementById('player-name-input').value || "Treinador";
+
+            // 1. Inicia Animação de Saída (Fade Out)
+            startScreen.classList.add('fade-out');
+
+            // 2. Aguarda a animação (800ms) antes de trocar o DOM
+            setTimeout(() => {
+                startScreen.classList.add('hidden');
+                gameWrapper.classList.remove('hidden');
+                
+                // Pequeno delay para o Fade In do jogo
+                setTimeout(() => {
+                    gameWrapper.classList.add('visible');
+                }, 50);
+
+                // 3. Inicializa Lógica do Jogo
+                window.game = new Game({
+                    playerTeamColor: selectedTeamColor,
+                    playerName: playerName
+                });
+                
+            }, 800);
+        }
     </script>
 </body>
 </html>

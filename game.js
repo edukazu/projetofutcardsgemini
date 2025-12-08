@@ -1,9 +1,9 @@
 /**
- * game.js - V7: Zoom Fix & Logic
+ * game.js - Com suporte a Inicialização via Menu
  */
 
 class Game {
-    constructor() {
+    constructor(config = {}) {
         this.territories = ['Gol IA', 'Defesa IA', 'Meio-Campo', 'Ataque Jogador', 'Gol Jogador'];
         this.ballPositionIndex = 2; // Começa no Meio
         this.possession = 0; 
@@ -13,11 +13,19 @@ class Game {
 
         this.teams = TEAMS_DATA;
         
-        // Garante que o DOM carregou antes de montar
+        // Configurações do Menu
+        this.playerName = config.playerName || "JOGADOR";
+        this.playerColor = config.playerTeamColor || 'blue'; 
+
+        // Atualiza o nome no HTML
+        const labelName = document.getElementById('label-player-name');
+        if(labelName) labelName.textContent = this.playerName.toUpperCase();
+
+        // Inicia o tabuleiro
         setTimeout(() => {
             this.initBoard();
             this.renderUI();
-            this.setCamera('OVERVIEW'); // Garante estado inicial
+            this.setCamera('OVERVIEW'); 
         }, 100);
     }
 
@@ -31,12 +39,10 @@ class Game {
                 container.className = 'cards-container';
                 container.id = `cards-zone-${i}`;
 
-                // Coluna Jogador (Esquerda)
                 const clusterPlayer = document.createElement('div');
                 clusterPlayer.className = 'team-cluster cluster-player';
                 clusterPlayer.id = `cluster-player-zone-${i}`;
 
-                // Coluna IA (Direita)
                 const clusterIA = document.createElement('div');
                 clusterIA.className = 'team-cluster cluster-ia';
                 clusterIA.id = `cluster-ia-zone-${i}`;
@@ -61,10 +67,16 @@ class Game {
 
         const card = document.createElement('div');
         card.className = 'card-token';
-        // Define cor baseada no time
-        card.style.backgroundColor = teamType === 'player' ? this.teams.player.color : this.teams.ia.color;
         
-        // Conteúdo da Carta
+        let bgColor;
+        if (this.playerColor === 'red') {
+             bgColor = teamType === 'player' ? this.teams.ia.color : this.teams.player.color;
+        } else {
+             bgColor = teamType === 'player' ? this.teams.player.color : this.teams.ia.color;
+        }
+
+        card.style.backgroundColor = bgColor;
+        
         card.innerHTML = `
             <span style="margin-bottom:5px">${playerData.role}</span>
             <small style="font-size:0.6rem; opacity:0.8">${playerData.name}</small>
@@ -76,7 +88,6 @@ class Game {
         container.appendChild(card);
     }
 
-    // --- CICLO DE BATALHA ---
     async startBattle() {
         if (this.isBattling) return; 
         this.isBattling = true;
@@ -85,22 +96,13 @@ class Game {
         btn.disabled = true;
         btn.textContent = "Batalhando...";
 
-        // 1. ZOOM IN: Foca na zona da bola
-        console.log("Zoom In...");
         this.setCamera('FOCUS');
-        
-        // Pausa dramática para o zoom chegar
         await this.wait(1200); 
 
-        // 2. Resolve a rodada (Lógica simples por enquanto)
         this.resolveRound();
         this.renderUI();
-
-        // Pausa para ver o resultado da jogada de perto
         await this.wait(1500);
 
-        // 3. ZOOM OUT: Volta para visão geral
-        console.log("Zoom Out...");
         this.setCamera('OVERVIEW');
         
         this.isBattling = false;
@@ -115,7 +117,6 @@ class Game {
             return;
         }
 
-        // Lógica Provisória: 50% de chance para cada lado se neutro
         let direction = 0;
         if (this.possession === 0) direction = Math.random() > 0.5 ? 1 : -1;
         else direction = this.possession;
@@ -129,7 +130,7 @@ class Game {
 
         if (this.ballPositionIndex === 4) {
             this.scorePlayer++;
-            this.updateInfo("GOL DO JOGADOR!");
+            this.updateInfo(`GOL DO ${this.playerName}!`);
             this.possession = 0;
         } else if (this.ballPositionIndex === 0) {
             this.scoreIA++;
@@ -146,27 +147,17 @@ class Game {
         this.updateInfo("Bola no centro.");
     }
 
-    // --- CONTROLE DA CÂMERA (FIXED) ---
     setCamera(mode) {
         const pitch = document.getElementById('pitch-container');
         if (!pitch) return;
 
-        // Remove classes antigas de foco para resetar
         pitch.classList.remove(
-            'camera-focus-goal-left',
-            'camera-focus-defense',
-            'camera-focus-mid',
-            'camera-focus-attack',
-            'camera-focus-goal-right'
+            'camera-focus-goal-left', 'camera-focus-defense', 'camera-focus-mid', 'camera-focus-attack', 'camera-focus-goal-right'
         );
 
-        if (mode === 'OVERVIEW') {
-            // Ao remover as classes acima, o CSS volta para o estado padrão (scale 0.9)
-            return;
-        }
+        if (mode === 'OVERVIEW') return;
 
         if (mode === 'FOCUS') {
-            // Adiciona a classe específica
             switch (this.ballPositionIndex) {
                 case 0: pitch.classList.add('camera-focus-goal-left'); break;
                 case 1: pitch.classList.add('camera-focus-defense'); break;
@@ -181,8 +172,10 @@ class Game {
         document.getElementById('score-player').textContent = this.scorePlayer;
         document.getElementById('score-ia').textContent = this.scoreIA;
         
-        let posText = this.possession === 0 ? "NEUTRA" : (this.possession === 1 ? "JOGADOR" : "IA");
+        let playerLabel = this.playerName.split(' ')[0].toUpperCase();
+        let posText = this.possession === 0 ? "NEUTRA" : (this.possession === 1 ? playerLabel : "IA");
         let zoneText = this.territories[this.ballPositionIndex];
+        
         document.getElementById('possession-display').innerHTML = `<span>${posText}</span> <small>${zoneText}</small>`;
 
         this.moveBallVisual();
@@ -191,12 +184,9 @@ class Game {
     moveBallVisual() {
         const ball = document.getElementById('ball-indicator');
         const targetZone = document.getElementById(`zone-${this.ballPositionIndex}`);
-        
         if (!ball || !targetZone) return;
 
         let newLeft = targetZone.offsetLeft + (targetZone.offsetWidth / 2);
-        
-        // Ajuste para Gols
         if (this.ballPositionIndex === 0) newLeft = -40;
         else if (this.ballPositionIndex === 4) newLeft = document.getElementById('pitch-container').offsetWidth + 40;
 
