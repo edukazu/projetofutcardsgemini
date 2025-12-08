@@ -1,5 +1,5 @@
 /**
- * game.js - V28: Gameplay Completo e Visual Premium
+ * game.js - V29: Correção de Travamento e Animação de Moeda
  */
 
 class Game {
@@ -15,14 +15,19 @@ class Game {
         this.playerName = config.playerName || "JOGADOR";
         this.playerColor = config.playerTeamColor || 'blue';
         
-        // Deep clone para não sujar o original
+        // Deep clone e Seleção de Times
         if (this.playerColor === 'red') {
             this.teams = { player: JSON.parse(JSON.stringify(TEAMS_DATA.catalonia)), ia: JSON.parse(JSON.stringify(TEAMS_DATA.royal)) };
         } else {
             this.teams = { player: JSON.parse(JSON.stringify(TEAMS_DATA.royal)), ia: JSON.parse(JSON.stringify(TEAMS_DATA.catalonia)) };
         }
         
-        // Init Stamina
+        // Safety check
+        if (!this.teams.player || !this.teams.ia) {
+            console.error("ERRO CRÍTICO: Times não carregaram. Verifique cards.js");
+            return;
+        }
+
         this.teams.player.players.forEach(p => p.currentStamina = 100);
         this.teams.ia.players.forEach(p => p.currentStamina = 100);
 
@@ -51,6 +56,7 @@ class Game {
         }
         this.teams.player.players.forEach(p => this.createCardElement(p, 'player'));
         this.teams.ia.players.forEach(p => this.createCardElement(p, 'ia'));
+        this.renderUI();
     }
 
     createCardElement(playerData, teamType) {
@@ -59,15 +65,30 @@ class Game {
         if (container) container.appendChild(this.createCardDOM(playerData, teamType, 'token'));
     }
 
+    // --- CARA OU COROA COM ANIMAÇÃO ---
     coinToss() {
-        this.updateInfo("Jogando a moeda...");
+        const overlay = document.getElementById('coin-overlay');
+        const coin = document.getElementById('coin');
+        
+        overlay.classList.add('active');
+        coin.classList.remove('flipping');
+        
+        // Força reflow para reiniciar animação
+        void coin.offsetWidth;
+        coin.classList.add('flipping');
+        
+        this.updateInfo("Sorteando saída de bola...");
+
         setTimeout(() => {
             const playerWon = Math.random() > 0.5;
             this.possession = playerWon ? 1 : -1;
-            this.updateInfo(playerWon ? `Saída: ${this.playerName}!` : "Saída: Computador!");
+            
+            overlay.classList.remove('active');
+            this.updateInfo(playerWon ? `Venceu: ${this.playerName}!` : "Venceu: Computador!");
+            
             this.renderUI();
             this.setCamera('OVERVIEW');
-        }, 1000);
+        }, 2500); // Tempo da animação
     }
 
     // --- GAME LOOP ---
@@ -95,7 +116,6 @@ class Game {
         const pPool = this.teams.player.players.filter(p => p.zone === zoneIndex);
         const iPool = this.teams.ia.players.filter(p => p.zone === zoneIndex);
         
-        // Fallback se vazio
         const pCard = pPool.length > 0 ? pPool[Math.floor(Math.random() * pPool.length)] : this.teams.player.players[0];
         const iCard = iPool.length > 0 ? iPool[Math.floor(Math.random() * iPool.length)] : this.teams.ia.players[0];
 
@@ -118,7 +138,7 @@ class Game {
         if (isAttackZone) {
             actionMenu.appendChild(this.createActionButton('CHUTAR', 'btn-shoot', 'FIN vs GLK', () => this.resolveDuel('shoot', duelData)));
         }
-        this.updateInfo("Escolha sua jogada!");
+        this.updateInfo("Sua vez! Escolha a jogada.");
     }
 
     createActionButton(text, cssClass, subtext, callback) {
@@ -183,13 +203,13 @@ class Game {
             this.ballPositionIndex += this.possession;
             if (this.ballPositionIndex > 3) this.ballPositionIndex = 3;
             if (this.ballPositionIndex < 1) this.ballPositionIndex = 1;
-            this.updateInfo("Avançou!");
+            this.updateInfo("Sucesso! Avançando...");
         }
     }
 
     handleFailure(action) {
         this.possession *= -1;
-        this.updateInfo("Perdeu a posse!");
+        this.updateInfo("Falha! Posse perdida.");
     }
 
     resetAfterGoal() {
@@ -206,8 +226,12 @@ class Game {
         pContainer.innerHTML = ''; iaContainer.innerHTML = '';
         
         let pCard, iCard;
-        // Identifica qual carta é do player para por na esquerda
-        if (this.teams.player.players.find(p => p.id === attCard.id)) {
+        // Identifica carta do player pelo ID do time (Royal ou Catalonia)
+        // Se eu sou Royal, minha carta tem ID que começa com 'rmd'.
+        // Mas a lógica genérica é: verificar se a carta está na lista 'this.teams.player.players'
+        const isPlayerAttacker = this.teams.player.players.some(p => p.id === attCard.id);
+        
+        if (isPlayerAttacker) {
             pCard = attCard; iCard = defCard;
         } else {
             pCard = defCard; iCard = attCard;
@@ -221,7 +245,8 @@ class Game {
 
     closeDuelOverlay() { document.getElementById('battle-overlay').classList.remove('active'); }
 
-    // --- CARD FACTORY (Igual ao anterior V23) ---
+    // --- CARD FACTORY (Igual V24) ---
+    // (Mantido igual para economizar espaço visual, mas essencial estar aqui)
     createCardDOM(playerData, teamType, mode = 'token') {
         const card = document.createElement('div');
         card.className = mode === 'full' ? 'card-full' : 'card-token';
@@ -266,7 +291,7 @@ class Game {
         return card;
     }
     
-    // Auxiliares (Mesmos da V15+)
+    // Auxiliares
     renderSquadScreen() { /* Código anterior */ }
     showCardDetails(p, c) { /* Código anterior */ }
     setCamera(mode) {

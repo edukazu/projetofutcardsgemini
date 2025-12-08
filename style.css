@@ -1,4 +1,4 @@
-/* style.css - Versão V28: Completo (Menu, Jogo, Cartas, Batalha) */
+/* style.css - Versão Final V29: Fix Travamento & Moeda */
 
 /* 1. RESET */
 * { box-sizing: border-box; }
@@ -6,6 +6,8 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; 
 .hidden { display: none !important; }
 .d-none { display: none !important; }
 .fade-out { opacity: 0; transform: scale(1.1); transition: opacity 0.5s ease, transform 0.5s ease; pointer-events: none; }
+.fade-in-ready { opacity: 0; transition: opacity 1s ease; }
+.fade-in-ready.visible { opacity: 1; }
 
 /* 2. MENU SCREEN */
 #start-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% 30%, #1b5e20 0%, #051b0a 70%); z-index: 1000; display: flex; justify-content: center; align-items: center; overflow: hidden; }
@@ -44,6 +46,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; 
 .squad-header { height: 80px; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; background: rgba(0,0,0,0.3); border-bottom: 1px solid rgba(255,255,255,0.1); }
 .squad-header h2 { font-family: 'Arial Black'; letter-spacing: 1px; color: #eceff1; margin: 0; }
 .squad-stats { font-size: 1rem; color: #b0bec5; }
+.squad-stats span { margin-left: 20px; }
 .squad-stats b { color: #ffd700; }
 .squad-content { flex-grow: 1; display: flex; overflow: hidden; }
 .squad-grid-container { flex-grow: 1; padding: 40px; display: flex; flex-wrap: wrap; justify-content: center; align-content: center; gap: 30px; overflow-y: auto; }
@@ -63,7 +66,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; 
 .btn-primary { padding: 15px 50px; background: linear-gradient(90deg, #ffd700, #ffb300); color: #000; border: none; border-radius: 30px; cursor: pointer; font-weight: bold; font-size: 1.1rem; box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3); transition: transform 0.2s; }
 .btn-primary:hover { transform: scale(1.05); }
 
-/* 4. GAMEPLAY */
+/* 4. GAMEPLAY LAYOUT */
 #main-game-wrapper { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; z-index: 1; background-color: #1b5e20; }
 #game-area { flex-grow: 1; height: 0; display: flex; justify-content: center; align-items: center; position: relative; background-image: radial-gradient(#2e7d32 1px, transparent 1px); background-size: 30px 30px; padding: 0 50px; overflow: hidden; }
 #pitch-container { width: 100%; max-width: 1400px; height: 75%; min-height: 450px; background-image: linear-gradient(to right, #43a047 0%, #43a047 50%, #4caf50 50%, #4caf50 100%); background-size: 10% 100%; border: 5px solid #fff; position: relative; display: flex; overflow: visible; box-shadow: 0 30px 60px rgba(0,0,0,0.6); transition: all 1.2s cubic-bezier(0.25, 1, 0.5, 1); transform-origin: center center; transform: scale(0.9); }
@@ -78,19 +81,14 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; 
 .goal-right { right: -84px; border-left: none; }
 #ball-indicator { position: absolute; top: 50%; width: 30px; height: 30px; background: radial-gradient(circle at 35% 35%, #fff, #d50000); border: 2px solid #333; border-radius: 50%; box-shadow: 2px 5px 15px rgba(0,0,0,0.8); transform: translate(-50%, -50%); transition: left 1s cubic-bezier(0.34, 1.56, 0.64, 1); z-index: 20; }
 
-/* 5. CARDS (TOKEN & FULL) */
+/* 5. CARDS */
 .cards-container { position: absolute; width: 100%; height: 100%; padding: 10px; z-index: 5; pointer-events: none; display: flex; justify-content: center; gap: 20%; align-items: center; }
 .team-cluster { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 10px; max-height: 100%; }
 
 /* Token */
-.card-token {
-    width: 80px; height: 110px; border-radius: 6px; border: 2px solid rgba(255,255,255,0.3); background: linear-gradient(135deg, #333, #111);
-    display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 3px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.5); position: relative; overflow: hidden; flex-shrink: 0; transition: all 0.3s ease-out; margin-top: 0;
-    pointer-events: auto; cursor: pointer;
-}
+.card-token { width: 80px; height: 110px; border-radius: 6px; border: 2px solid rgba(255,255,255,0.3); background: linear-gradient(135deg, #333, #111); display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 3px; box-shadow: 0 4px 8px rgba(0,0,0,0.5); position: relative; overflow: hidden; flex-shrink: 0; transition: all 0.3s ease-out; margin-top: 0; pointer-events: auto; cursor: pointer; }
 .card-token .card-top-info { position: absolute; top: 2px; left: 4px; display: flex; flex-direction: column; align-items: center; z-index: 2; }
-.card-token .card-ovr { font-family: 'Arial Black'; font-size: 0.9rem; color: #fff; text-shadow: 1px 1px 0 #000; line-height: 1; }
+.card-token .card-ovr { font-family: 'Arial Black', sans-serif; font-size: 0.9rem; color: #fff; text-shadow: 1px 1px 0 #000; line-height: 1; }
 .card-token .card-pos { font-size: 0.5rem; font-weight: normal; opacity: 0.9; }
 .card-token .card-image { width: 50px; height: 50px; margin-top: 10px; opacity: 0.8; display: flex; justify-content: center; align-items: flex-end; }
 .card-token .card-image svg { width: auto; height: 100%; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5)); }
@@ -99,11 +97,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; 
 .card-token .card-stats-grid, .card-token .card-left-col, .card-token .card-right-col { display: none; }
 
 /* Full Card */
-.card-full {
-    width: 180px; height: 260px; border-radius: 12px; border: 3px solid rgba(255,255,255,0.5);
-    background: linear-gradient(135deg, #333, #111); display: flex; flex-direction: column; position: relative; overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.8); cursor: pointer; transition: transform 0.2s; color: #fff;
-}
+.card-full { width: 180px; height: 260px; border-radius: 12px; border: 3px solid rgba(255,255,255,0.5); background: linear-gradient(135deg, #333, #111); display: flex; flex-direction: column; position: relative; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.8); cursor: pointer; transition: transform 0.2s; color: #fff; }
 .card-full .card-content { display: flex; flex-direction: column; height: 100%; padding: 10px; z-index: 2; position: relative; }
 .card-full .card-header { display: flex; flex-direction: row; height: 68%; position: relative; }
 .card-full .card-left-col { display: flex; flex-direction: column; width: 30%; align-items: center; justify-content: flex-start; padding-top: 2px; gap: 4px; z-index: 5; }
@@ -115,13 +109,12 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; 
 .card-full .card-image svg { width: 100%; height: auto; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.6)); }
 .card-full .card-name-box { text-align: center; border-bottom: 1px solid rgba(255,255,255,0.3); margin-bottom: 5px; padding-bottom: 2px; z-index: 10; position: relative; margin-top: auto; background: rgba(0,0,0,0.2); border-radius: 4px; }
 .card-full .card-name { font-family: 'Arial Black'; font-size: 1rem; letter-spacing: 0.5px; text-transform: uppercase; text-shadow: 1px 1px 2px black; }
-.card-full .card-stats-grid { width: 100%; margin-top: 2px; }
+.card-full .card-stats-grid { width: 100%; margin-top: 2px; flex-shrink: 0; }
 .card-full .card-stats-row { display: flex; justify-content: space-between; padding: 0 5px; font-size: 0.75rem; font-weight: bold; margin-bottom: 2px; }
 .card-full .stat-item { display: flex; gap: 3px; }
 .card-full .stat-label { font-weight: normal; opacity: 0.8; }
 .card-full .stat-val { font-weight: bold; color: #ffd700; }
 
-/* Styles */
 .bg-royal { background: linear-gradient(135deg, #f5f5f5, #bdbdbd 40%, #d4af37 100%); color: #222 !important; }
 .bg-royal .card-ovr, .bg-royal .card-name { color: #111 !important; text-shadow: none !important; }
 .bg-royal .stat-val { color: #000 !important; }
@@ -132,23 +125,30 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; 
 .bg-catalonia .card-image svg { fill: #fff; }
 .bg-catalonia .card-crest-icon { color: #fff; }
 
-/* Hover */
 .card-full:hover { transform: translateY(-10px) scale(1.05); box-shadow: 0 20px 40px rgba(0,0,0,0.9); border-color: #ffd700; z-index: 100; }
 .team-cluster:has(.card-token:nth-child(5)) { gap: 0; }
 .team-cluster:has(.card-token:nth-child(5)) .card-token:not(:first-child) { margin-top: -25px; }
 .team-cluster:has(.card-token:nth-child(5)) .card-token:hover { transform: scale(1.15) translateY(-20px); z-index: 100; box-shadow: 0 15px 30px rgba(0,0,0,0.9); border-color: #ffd700; }
 .team-cluster:not(:has(.card-token:nth-child(5))) .card-token:hover { border-color: #ffd700; }
 
-/* Footer & Zoom */
 #pitch-container.camera-focus-mid { transform: scale(1.4); }
 #pitch-container.camera-focus-defense { transform: scale(1.5) translateX(25%); }
 #pitch-container.camera-focus-attack { transform: scale(1.5) translateX(-25%); }
 #pitch-container.camera-focus-goal-left { transform: scale(1.8) translateX(35%); }
 #pitch-container.camera-focus-goal-right { transform: scale(1.8) translateX(-35%); }
-#ui-footer { height: 100px; flex-shrink: 0; background-color: #263238; border-top: 5px solid #004d40; display: flex; align-items: center; justify-content: space-between; padding: 0 30px; box-shadow: 0 -10px 30px rgba(0,0,0,0.5); z-index: 50; }
+
+/* CORREÇÃO DO TRAVAMENTO: FOOTER ACIMA DE TUDO (Z-INDEX 200) */
+#ui-footer { 
+    height: 100px; flex-shrink: 0; 
+    background-color: #263238; border-top: 5px solid #004d40; 
+    display: flex; align-items: center; justify-content: space-between; 
+    padding: 0 20px; /* Ajuste de padding para caber o placar */
+    box-shadow: 0 -10px 30px rgba(0,0,0,0.5); 
+    z-index: 200; /* CRÍTICO: Maior que o overlay */
+}
 .footer-group { display: flex; align-items: center; }
-.score-group { width: 25%; }
-.team-score { display: flex; flex-direction: column; align-items: center; }
+.score-group { width: 25%; justify-content: flex-start; /* Alinha placar à esquerda */ }
+.team-score { display: flex; flex-direction: column; align-items: center; margin-right: 15px; }
 .team-score .label { font-size: 0.8rem; color: #b0bec5; font-weight: bold; }
 .team-score .value { font-size: 2rem; font-weight: bold; color: #fff; line-height: 1; }
 #score-player { color: #64ffda; }
@@ -162,7 +162,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; 
 .log-group { width: 25%; justify-content: flex-end; }
 #game-info { font-size: 1rem; color: #cfd8dc; text-align: right; }
 
-/* 6. BATTLE OVERLAY (NOVO) */
+/* 6. BATTLE OVERLAY */
 #battle-overlay {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(0, 20, 0, 0.85); z-index: 100;
@@ -185,3 +185,27 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; 
 .btn-defense { background: linear-gradient(to bottom, #9E9E9E, #616161); }
 .btn-action:hover { transform: translateY(-2px); filter: brightness(1.1); }
 .btn-action:active { transform: translateY(2px); box-shadow: none; }
+
+/* 8. COIN ANIMATION */
+#coin-overlay {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.7); z-index: 300;
+    display: flex; justify-content: center; align-items: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.5s;
+}
+#coin-overlay.active { opacity: 1; pointer-events: auto; }
+#coin {
+    width: 150px; height: 150px; position: relative; transform-style: preserve-3d;
+}
+#coin.flipping { animation: flipCoin 2s ease-out forwards; }
+.coin-face {
+    position: absolute; width: 100%; height: 100%; border-radius: 50%; backface-visibility: hidden;
+    display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 1.5rem;
+    border: 5px solid #ffd700; box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+}
+.coin-heads { background: #004d98; color: white; transform: rotateY(0deg); }
+.coin-tails { background: #d32f2f; color: white; transform: rotateY(180deg); }
+@keyframes flipCoin {
+    0% { transform: rotateY(0); }
+    100% { transform: rotateY(1800deg); } /* Gira 5 vezes */
+}
