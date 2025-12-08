@@ -53,30 +53,31 @@
 
     </footer>
 
-    <script src="cards.js"></script> <script src="game.js"></script>
-
+    <script src="cards.js"></script>
+    <script src="game.js"></script>
+    
     <script>
-        // Adaptador para atualizar a nova UI na barra inferior
+        // Inicialização
         const game = new Game();
         
+        // Adaptador visual para o footer
         game.render = function() {
             // Atualiza Placar
             document.getElementById('score-player').textContent = this.scorePlayer;
             document.getElementById('score-ia').textContent = this.scoreIA;
             
-            // Atualiza Posse
+            // Atualiza Posse e Zona
             let posText = "NEUTRA";
             if (this.possession === 1) posText = "JOGADOR";
             if (this.possession === -1) posText = "IA";
             
-            // Texto da zona atual
             let zoneText = this.territories[this.ballPositionIndex];
             
             document.getElementById('possession-display').innerHTML = 
                 `<span>${posText}</span> <small>(${zoneText})</small>`;
 
-            // Move a bola
             this.moveBallVisual();
+            this.updateCamera(); // Garante o zoom correto a cada renderização
         };
 
         game.render();
