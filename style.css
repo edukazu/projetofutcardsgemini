@@ -1,4 +1,4 @@
-/* style.css - V7: Big Cards & Fixed Zoom */
+/* style.css - Versão Final V10: Interação Corrigida & Pilha Inteligente */
 
 /* RESET E BASE */
 * { box-sizing: border-box; }
@@ -32,7 +32,7 @@ body {
     width: 100%; 
     max-width: 1400px;
     height: 75%; 
-    min-height: 500px; /* Aumentei um pouco a altura mínima para caberem as cartas grandes */
+    min-height: 500px;
     
     /* Grama */
     background-image: linear-gradient(to right, #43a047 0%, #43a047 50%, #4caf50 50%, #4caf50 100%);
@@ -45,11 +45,10 @@ body {
     box-shadow: 0 30px 60px rgba(0,0,0,0.6);
 
     /* Animação de Câmera */
-    /* Transition all garante que transform e outras props animem juntas */
     transition: all 1.2s cubic-bezier(0.25, 1, 0.5, 1); 
     transform-origin: center center;
     
-    /* ESTADO PADRÃO (ZOOM OUT / OVERVIEW) */
+    /* ESTADO PADRÃO (OVERVIEW) */
     transform: scale(0.9); 
 }
 
@@ -92,19 +91,21 @@ body {
     z-index: 20;
 }
 
-/* --- VISUAL DAS CARTAS (BIG CARDS) --- */
+/* --- VISUAL DAS CARTAS & PILHA INTELIGENTE --- */
 .cards-container {
     position: absolute;
     width: 100%;
     height: 100%;
     padding: 10px;
     z-index: 5;
-    pointer-events: none; /* Permite clicar através do container */
     
-    /* CENTRALIZAÇÃO */
+    /* IMPORTANTE: Permite clicar através do container (para o campo), 
+       mas precisamos reativar o clique nos filhos (.card-token) */
+    pointer-events: none; 
+    
     display: flex;
-    justify-content: center; /* Centraliza os dois grupos no meio da zona */
-    gap: 15%; /* Espaço vazio entre os dois times (o "front" da batalha) */
+    justify-content: center; 
+    gap: 20%; 
     align-items: center;
 }
 
@@ -114,16 +115,27 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 15px; /* Espaço vertical entre cartas do mesmo time */
+    gap: 10px; /* Padrão: Com espaçamento */
+    max-height: 100%;
 }
 
-/* TOKEN DA CARTA (DOBRADO DE TAMANHO) */
+/* --- LÓGICA DE PILHA (Só ativa se tiver 5 ou mais cartas) --- */
+.team-cluster:has(.card-token:nth-child(5)) {
+    gap: 0; /* Remove gap na lotação */
+}
+
+/* Aplica margem negativa APENAS se estiver no modo pilha (5+ cartas) */
+.team-cluster:has(.card-token:nth-child(5)) .card-token:not(:first-child) {
+    margin-top: -25px; /* Sobreposição suave */
+}
+
+/* TOKEN DA CARTA */
 .card-token {
-    width: 90px;  /* Aumentado de 45px */
-    height: 120px; /* Aumentado de 60px */
+    width: 90px;
+    height: 120px;
     border-radius: 8px;
     border: 3px solid #fff;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.7);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
     
     display: flex;
     flex-direction: column;
@@ -138,43 +150,39 @@ body {
     
     position: relative;
     background-color: #444;
-    transition: transform 0.3s;
+    transition: all 0.3s ease-out;
+    margin-top: 0;
+
+    /* --- CORREÇÃO DE INTERAÇÃO --- */
+    pointer-events: auto; /* Permite que o mouse interaja com a carta */
+    cursor: pointer;      /* Muda cursor para mãozinha */
 }
 
-/* Detalhe visual na carta para parecer mais "Card" */
+/* Detalhe visual na carta */
 .card-token::after {
     content: '';
-    width: 80%; height: 50%;
-    background-color: rgba(255,255,255,0.1);
+    width: 80%; height: 45%;
+    background-color: rgba(255,255,255,0.15);
     margin-top: 5px;
     border-radius: 4px;
 }
 
+/* EFEITO DE HOVER OTIMIZADO */
+.card-token:hover {
+    /* Usa Transform para não empurrar as outras cartas no layout */
+    transform: scale(1.15) translateY(-15px);
+    
+    z-index: 100; /* Traz para frente */
+    box-shadow: 0 15px 30px rgba(0,0,0,0.9);
+    border-color: #ffd700; /* Borda Dourada */
+}
+
 /* --- SISTEMA DE CÂMERA (ZOOM DINÂMICO) --- */
-/* A especificidade aqui é importante para sobrescrever o scale(0.9) padrão */
-
-/* ZOOM IN: Quando a batalha acontece */
-#pitch-container.camera-focus-mid {
-    transform: scale(1.4); /* Zoom no meio */
-}
-
-#pitch-container.camera-focus-defense {
-    /* Foca na esquerda (Defesa IA) */
-    transform: scale(1.5) translateX(25%); 
-}
-
-#pitch-container.camera-focus-attack {
-    /* Foca na direita (Defesa Jogador) */
-    transform: scale(1.5) translateX(-25%);
-}
-
-#pitch-container.camera-focus-goal-left {
-    transform: scale(1.8) translateX(35%);
-}
-
-#pitch-container.camera-focus-goal-right {
-    transform: scale(1.8) translateX(-35%);
-}
+#pitch-container.camera-focus-mid { transform: scale(1.4); }
+#pitch-container.camera-focus-defense { transform: scale(1.5) translateX(25%); }
+#pitch-container.camera-focus-attack { transform: scale(1.5) translateX(-25%); }
+#pitch-container.camera-focus-goal-left { transform: scale(1.8) translateX(35%); }
+#pitch-container.camera-focus-goal-right { transform: scale(1.8) translateX(-35%); }
 
 /* --- UI BARRA INFERIOR --- */
 #ui-footer {
@@ -189,7 +197,6 @@ body {
     z-index: 50;
 }
 
-/* (Mantendo estilos anteriores do footer) */
 .footer-group { display: flex; align-items: center; }
 .score-group { width: 25%; }
 .team-score { display: flex; flex-direction: column; align-items: center; }
