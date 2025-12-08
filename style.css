@@ -1,4 +1,4 @@
-/* style.css - Versão Final V24: Layouts Corrigidos */
+/* style.css - Versão Final V25 */
 
 /* ========================================= */
 /* 1. RESET E BASE */
@@ -120,54 +120,53 @@ body {
 .card-token .card-top-info { position: absolute; top: 2px; left: 4px; display: flex; flex-direction: column; align-items: center; z-index: 2; }
 .card-token .card-ovr { font-family: 'Arial Black', sans-serif; font-size: 0.9rem; color: #fff; text-shadow: 1px 1px 0 #000; line-height: 1; }
 .card-token .card-pos { font-size: 0.5rem; font-weight: normal; opacity: 0.9; }
-.card-token .card-image { width: 50px; height: 50px; margin-top: 5px; opacity: 0.7; }
+.card-token .card-image { width: 50px; height: 50px; margin-top: 5px; opacity: 0.7; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>'); background-size: contain; background-repeat: no-repeat; background-position: center bottom; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5)); }
 .card-token .card-name-box { width: 100%; background: rgba(0,0,0,0.6); padding: 2px 0; border-radius: 2px; text-align: center; z-index: 2; margin-top: auto; margin-bottom: 2px; }
 .card-token .card-name { display: block; font-size: 0.6rem; font-weight: bold; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-transform: uppercase; }
 .card-token .card-stats-grid, .card-token .card-left-col, .card-token .card-right-col { display: none; }
 
-/* --- FULL PREMIUM CARD (MENU) - Layout Corrigido --- */
+/* --- FULL PREMIUM CARD (MENU) - Layout Fixo --- */
 .card-full {
     width: 180px; height: 260px; border-radius: 12px; border: 3px solid rgba(255,255,255,0.5);
     background: linear-gradient(135deg, #333, #111); display: flex; flex-direction: column; position: relative; overflow: hidden;
     box-shadow: 0 10px 30px rgba(0,0,0,0.8); cursor: pointer; transition: transform 0.2s; color: #fff;
 }
 
-.card-full .card-content { display: flex; flex-direction: column; height: 100%; padding: 10px; z-index: 2; }
+.card-full .card-content { display: flex; flex-direction: column; height: 100%; padding: 10px; z-index: 2; position: relative; }
 
-/* CABEÇALHO (Altura Fixa) */
-.card-full .card-header { display: flex; flex-direction: row; height: 68%; position: relative; }
+/* CABEÇALHO COM POSICIONAMENTO ABSOLUTO PARA O ROSTO */
+.card-full .card-header { display: flex; flex-direction: row; height: 100%; position: relative; }
 
-/* Coluna Esquerda: OVR, POS, Flag, Crest */
+/* Coluna Esquerda: Infos */
 .card-full .card-left-col { 
-    display: flex; flex-direction: column; width: 30%; align-items: center; justify-content: flex-start; 
-    padding-top: 2px; gap: 4px; z-index: 5;
+    display: flex; flex-direction: column; width: 35%; align-items: flex-start; 
+    padding-top: 5px; gap: 6px; z-index: 5;
 }
-.card-full .card-ovr { font-family: 'Arial Black'; font-size: 1.8rem; line-height: 1; text-shadow: 2px 2px 0 #000; }
-.card-full .card-pos { font-size: 0.8rem; font-weight: bold; margin-bottom: 3px; }
-.card-full .card-flag-img { width: 30px; height: 20px; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.5); object-fit: cover; }
-.card-full .card-crest-icon { width: 35px; height: 35px; filter: drop-shadow(0 3px 3px rgba(0,0,0,0.5)); margin-top: 5px;}
+.card-full .card-ovr { font-family: 'Arial Black'; font-size: 1.8rem; line-height: 1; text-shadow: 2px 2px 0 #000; margin-left: 2px; }
+.card-full .card-pos { font-size: 0.8rem; font-weight: bold; margin-bottom: 3px; margin-left: 5px; }
+.card-full .card-flag-img { width: 30px; height: 20px; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.5); object-fit: cover; margin-left: 5px; }
+.card-full .card-crest-icon { width: 45px; height: 45px; filter: drop-shadow(0 3px 3px rgba(0,0,0,0.5)); margin-top: 5px; margin-left: 0px; }
 
-/* Direita: Rosto (Agora sem invadir o nome) */
+/* Direita: Rosto (Posicionado no Topo/Direita) */
 .card-full .card-image { 
-    width: 70%; height: 100%; 
-    display: flex; align-items: flex-end; justify-content: center;
-    position: relative; 
-    bottom: 0; /* Removido o top negativo para não empurrar */
-    overflow: hidden; /* Corta o que sobrar */
+    position: absolute; 
+    right: -10px; 
+    top: 5px; /* Sobe o rosto para o topo */
+    width: 100px; 
+    height: 120px;
+    z-index: 1;
 }
-/* O SVG preenche mas não estoura */
-.card-full .card-image svg { width: 110%; height: auto; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.6)); margin-bottom: -5px;}
+/* O SVG agora ocupa o espaço certo */
+.card-full .card-image svg { width: 100%; height: auto; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.6)); }
 
-/* Rodapé: Nome */
+/* Rodapé */
 .card-full .card-name-box { 
     text-align: center; border-bottom: 1px solid rgba(255,255,255,0.3); 
-    margin-bottom: 5px; padding-bottom: 2px; z-index: 10; position: relative; 
-    background: rgba(0,0,0,0.2); border-radius: 4px; /* Fundo suave para leitura */
+    margin-bottom: 5px; padding-bottom: 2px; z-index: 10; position: relative; margin-top: auto;
+    background: rgba(0,0,0,0.2); border-radius: 4px;
 }
 .card-full .card-name { font-family: 'Arial Black'; font-size: 1rem; letter-spacing: 0.5px; text-transform: uppercase; text-shadow: 1px 1px 2px black; }
-
-/* Stats Grid */
-.card-full .card-stats-grid { width: 100%; margin-top: 2px; }
+.card-full .card-stats-grid { width: 100%; margin-top: 2px; flex-shrink: 0; }
 .card-full .card-stats-row { display: flex; justify-content: space-between; padding: 0 5px; font-size: 0.75rem; font-weight: bold; margin-bottom: 2px; }
 .card-full .stat-item { display: flex; gap: 3px; }
 .card-full .stat-label { font-weight: normal; opacity: 0.8; }
