@@ -1,11 +1,11 @@
 /**
- * game.js - Com suporte a Inicialização via Menu
+ * game.js - V15: Com Tela de Gestão de Elenco
  */
 
 class Game {
     constructor(config = {}) {
         this.territories = ['Gol IA', 'Defesa IA', 'Meio-Campo', 'Ataque Jogador', 'Gol Jogador'];
-        this.ballPositionIndex = 2; // Começa no Meio
+        this.ballPositionIndex = 2; 
         this.possession = 0; 
         this.scorePlayer = 0;
         this.scoreIA = 0;
@@ -13,22 +13,129 @@ class Game {
 
         this.teams = TEAMS_DATA;
         
-        // Configurações do Menu
+        // Configurações
         this.playerName = config.playerName || "JOGADOR";
         this.playerColor = config.playerTeamColor || 'blue'; 
+        
+        // Flag para não renderizar o campo imediatamente se estivermos no menu de elenco
+        this.autoStart = config.autoStart !== undefined ? config.autoStart : true;
 
-        // Atualiza o nome no HTML
         const labelName = document.getElementById('label-player-name');
         if(labelName) labelName.textContent = this.playerName.toUpperCase();
 
-        // Inicia o tabuleiro
-        setTimeout(() => {
-            this.initBoard();
-            this.renderUI();
-            this.setCamera('OVERVIEW'); 
-        }, 100);
+        if (this.autoStart) {
+            setTimeout(() => {
+                this.initBoard();
+                this.renderUI();
+                this.setCamera('OVERVIEW'); 
+            }, 100);
+        }
     }
 
+    // --- NOVA FUNÇÃO: RENDERIZAR TELA DE ELENCO ---
+    renderSquadScreen() {
+        const grid = document.getElementById('squad-grid');
+        grid.innerHTML = ''; // Limpa
+
+        // Pega os jogadores do time do jogador
+        const myTeam = this.teams.player; // Assumindo que o player joga com o time 'player' definido no cards.js
+        // Se a cor for red, inverte (lógica do MVP anterior)
+        // Mas para simplificar a visualização, vamos mostrar sempre o elenco 'player' do JSON
+        
+        // Atualiza cabeçalho
+        document.getElementById('team-ovr-display').textContent = "86"; // Exemplo, poderia calcular a média
+        document.getElementById('team-form-display').textContent = myTeam.formation;
+
+        // Renderiza cada carta na Grid
+        myTeam.players.forEach(p => {
+            const card = this.createCardDOM(p, 'player');
+            
+            // Adiciona evento de Mouse para ver detalhes
+            card.onmouseenter = () => this.showCardDetails(p, card);
+            
+            grid.appendChild(card);
+        });
+
+        // Mostra o primeiro jogador como default nos detalhes
+        if (myTeam.players.length > 0) {
+            this.showCardDetails(myTeam.players[0]);
+        }
+    }
+
+    // Cria o HTML da carta (Reutilizável para Campo e Menu)
+    createCardDOM(playerData, teamType) {
+        const card = document.createElement('div');
+        card.className = 'card-token';
+        
+        // Lógica de Cor
+        let isRoyal = false;
+        if (this.playerColor === 'blue') {
+            isRoyal = (teamType === 'player');
+        } else {
+            isRoyal = (teamType === 'ia');
+        }
+
+        if (isRoyal) card.classList.add('bg-royal');
+        else card.classList.add('bg-catalonia');
+        
+        card.innerHTML = `
+            <div class="card-ovr">
+                ${playerData.ovr}
+                <span class="card-pos">${playerData.role}</span>
+            </div>
+            <div class="card-image"></div>
+            <div class="card-info">
+                <span class="card-name">${playerData.name}</span>
+            </div>
+        `;
+        return card;
+    }
+
+    // Atualiza o Painel Lateral
+    showCardDetails(playerData, cardElement) {
+        // 1. Atualiza Textos
+        document.getElementById('detail-name').textContent = playerData.name;
+        document.getElementById('detail-role').textContent = `${playerData.role} | OVR ${playerData.ovr}`;
+
+        // 2. Clone da Carta para o Preview
+        const previewContainer = document.getElementById('detail-card-preview');
+        previewContainer.innerHTML = '';
+        const previewCard = this.createCardDOM(playerData, 'player'); 
+        previewContainer.appendChild(previewCard);
+
+        // 3. Gera Barras de Atributos
+        const statsContainer = document.getElementById('stat-bars-container');
+        statsContainer.innerHTML = '';
+
+        // Lista de atributos para mostrar
+        const attributes = [
+            { label: 'DRI', val: playerData.dri || 50 },
+            { label: 'PAS', val: playerData.pas || 50 },
+            { label: 'FIN', val: playerData.fin || 50 },
+            { label: 'DEF', val: playerData.des || 50 }, // Usando DES como geral de defesa
+            { label: 'STA', val: playerData.sta || 99 }
+        ];
+
+        attributes.forEach(attr => {
+            // Cor da barra baseada no valor
+            let color = '#d32f2f'; // Ruim
+            if(attr.val > 70) color = '#fbc02d'; // Médio
+            if(attr.val > 85) color = '#388e3c'; // Bom
+
+            const row = document.createElement('div');
+            row.className = 'stat-row';
+            row.innerHTML = `
+                <span class="stat-label">${attr.label}</span>
+                <div class="stat-bar-bg">
+                    <div class="stat-bar-fill" style="width: ${attr.val}%; background-color: ${color}"></div>
+                </div>
+                <span class="stat-value">${attr.val}</span>
+            `;
+            statsContainer.appendChild(row);
+        });
+    }
+
+    // --- LÓGICA DO JOGO EM CAMPO ---
     initBoard() {
         document.querySelectorAll('.cards-container').forEach(e => e.remove());
 
@@ -65,26 +172,7 @@ class Game {
         const container = document.getElementById(clusterId);
         if (!container) return;
 
-        const card = document.createElement('div');
-        card.className = 'card-token';
-        
-        let bgColor;
-        if (this.playerColor === 'red') {
-             bgColor = teamType === 'player' ? this.teams.ia.color : this.teams.player.color;
-        } else {
-             bgColor = teamType === 'player' ? this.teams.player.color : this.teams.ia.color;
-        }
-
-        card.style.backgroundColor = bgColor;
-        
-        card.innerHTML = `
-            <span style="margin-bottom:5px">${playerData.role}</span>
-            <small style="font-size:0.6rem; opacity:0.8">${playerData.name}</small>
-            <div style="margin-top:auto; font-size:0.7rem">
-                A:${playerData.att} D:${playerData.def}
-            </div>
-        `;
-
+        const card = this.createCardDOM(playerData, teamType);
         container.appendChild(card);
     }
 

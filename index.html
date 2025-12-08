@@ -9,7 +9,6 @@
 <body>
 
     <section id="start-screen">
-        
         <div class="background-effects">
             <div class="floating-card c1"></div>
             <div class="floating-card c2"></div>
@@ -32,7 +31,6 @@
                             <small>Formação 4-4-2</small>
                         </div>
                     </div>
-
                     <div class="team-option" id="select-team-red" onclick="selectTeam('red')">
                         <div class="team-color-strip red-strip"></div>
                         <div class="team-info">
@@ -48,30 +46,54 @@
                 <input type="text" id="player-name-input" placeholder="Digite seu nome..." value="Treinador 1" autocomplete="off">
             </div>
 
-            <button id="btn-start-game" onclick="startGameFlow()">
-                ENTRAR EM CAMPO
+            <button id="btn-start-game" onclick="goToSquadScreen()">
+                GERENCIAR ELENCO
             </button>
             
-            <p class="version">Fut Cards MVP v1.0</p>
+            <p class="version">Fut Cards MVP v1.2</p>
         </div>
     </section>
 
-    <div id="main-game-wrapper" class="hidden fade-in-ready">
-        
-        <main id="game-area">
-            <div id="pitch-container">
-                <div class="goal-structure goal-left" id="zone-0">
-                    <div class="net"></div>
+    <section id="squad-screen" class="hidden">
+        <header class="squad-header">
+            <h2 id="squad-title">SEU TIME TITULAR</h2>
+            <div class="squad-stats">
+                <span>OVR DO TIME: <b id="team-ovr-display">86</b></span>
+                <span>FORMAÇÃO: <b id="team-form-display">4-3-3</b></span>
+            </div>
+        </header>
+
+        <div class="squad-content">
+            <div class="squad-grid-container" id="squad-grid">
                 </div>
 
+            <aside class="player-details-panel">
+                <div id="detail-card-preview">
+                    </div>
+                <div class="detail-stats-box">
+                    <h3 id="detail-name">SELECIONE UM JOGADOR</h3>
+                    <p id="detail-role">Para ver seus atributos</p>
+                    
+                    <div class="stat-bars" id="stat-bars-container">
+                        </div>
+                </div>
+            </aside>
+        </div>
+
+        <div class="squad-footer">
+            <button class="btn-secondary" onclick="backToMenu()">VOLTAR</button>
+            <button class="btn-primary" onclick="goToMatch()">IR PARA O JOGO ⚽</button>
+        </div>
+    </section>
+
+    <div id="main-game-wrapper" class="hidden">
+        <main id="game-area">
+            <div id="pitch-container">
+                <div class="goal-structure goal-left" id="zone-0"><div class="net"></div></div>
                 <div class="field-zone defense-zone" id="zone-1"></div>
                 <div class="field-zone midfield-zone" id="zone-2"></div>
                 <div class="field-zone attack-zone" id="zone-3"></div>
-
-                <div class="goal-structure goal-right" id="zone-4">
-                    <div class="net"></div>
-                </div>
-                
+                <div class="goal-structure goal-right" id="zone-4"><div class="net"></div></div>
                 <div id="ball-indicator"></div>
             </div>
         </main>
@@ -91,13 +113,11 @@
 
             <div class="footer-group action-group">
                 <div id="possession-display">Posse: NEUTRA</div>
-                <button onclick="game.startBattle()" id="btn-battle">
-                    ⚔️ BATALHAR
-                </button>
+                <button onclick="game.startBattle()" id="btn-battle">⚔️ BATALHAR</button>
             </div>
 
             <div class="footer-group log-group">
-                <div id="game-info">Arena pronta. Inicie a batalha!</div>
+                <div id="game-info">Arena pronta.</div>
             </div>
         </footer>
     </div>
@@ -106,7 +126,7 @@
     <script src="game.js"></script>
     
     <script>
-        // Lógica de UI do Menu
+        // Lógica de Navegação entre Telas
         let selectedTeamColor = 'blue';
 
         function selectTeam(color) {
@@ -115,31 +135,47 @@
             document.getElementById(`select-team-${color}`).classList.add('selected');
         }
 
-        function startGameFlow() {
+        function goToSquadScreen() {
             const startScreen = document.getElementById('start-screen');
-            const gameWrapper = document.getElementById('main-game-wrapper');
+            const squadScreen = document.getElementById('squad-screen');
             const playerName = document.getElementById('player-name-input').value || "Treinador";
 
-            // 1. Inicia Animação de Saída (Fade Out)
-            startScreen.classList.add('fade-out');
+            // Inicia o Jogo (Instância) mas pausa na tela de Squad
+            window.game = new Game({
+                playerTeamColor: selectedTeamColor,
+                playerName: playerName,
+                autoStart: false // Nova flag para não renderizar o campo ainda
+            });
 
-            // 2. Aguarda a animação (800ms) antes de trocar o DOM
+            // Animação
+            startScreen.classList.add('fade-out');
             setTimeout(() => {
                 startScreen.classList.add('hidden');
+                squadScreen.classList.remove('hidden');
+                
+                // Renderiza a tela de elenco
+                window.game.renderSquadScreen();
+            }, 500);
+        }
+
+        function backToMenu() {
+            location.reload(); // Maneira mais segura de resetar tudo no MVP
+        }
+
+        function goToMatch() {
+            const squadScreen = document.getElementById('squad-screen');
+            const gameWrapper = document.getElementById('main-game-wrapper');
+
+            squadScreen.classList.add('fade-out');
+            setTimeout(() => {
+                squadScreen.classList.add('hidden');
                 gameWrapper.classList.remove('hidden');
                 
-                // Pequeno delay para o Fade In do jogo
-                setTimeout(() => {
-                    gameWrapper.classList.add('visible');
-                }, 50);
-
-                // 3. Inicializa Lógica do Jogo
-                window.game = new Game({
-                    playerTeamColor: selectedTeamColor,
-                    playerName: playerName
-                });
-                
-            }, 800);
+                // Agora sim inicia o tabuleiro
+                window.game.initBoard();
+                window.game.renderUI();
+                window.game.setCamera('OVERVIEW');
+            }, 500);
         }
     </script>
 </body>

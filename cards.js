@@ -1,48 +1,60 @@
-// cards.js - Banco de dados das cartas e times
+// cards.js - Banco de Dados Oficial (Fictício)
 
 const TEAMS_DATA = {
     player: {
-        name: "JOGADOR",
-        formation: "4-4-2",
-        color: "#0288d1", // Azul
+        id: "team_royal",
+        name: "ROYAL MADRID",
+        shortName: "RMD",
+        formation: "4-3-3",
+        colorPrimary: "#e0e0e0", // Branco
+        colorSecondary: "#d4af37", // Dourado
         players: [
-            // Zona 0: Goleiro
-            { name: "Paredão", role: "GK", att: 10, def: 85, zone: 0 },
-            // Zona 1: Defesa (4 jogadores)
-            { name: "Capitão", role: "DEF", att: 40, def: 80, zone: 1 },
-            { name: "Xerife", role: "DEF", att: 35, def: 78, zone: 1 },
-            { name: "Lateral D", role: "DEF", att: 50, def: 70, zone: 1 },
-            { name: "Lateral E", role: "DEF", att: 50, def: 70, zone: 1 },
-            // Zona 2: Meio-Campo (4 jogadores)
-            { name: "Maestro", role: "MID", att: 75, def: 60, zone: 2 },
-            { name: "Volante", role: "MID", att: 60, def: 75, zone: 2 },
-            { name: "Ala D", role: "MID", att: 70, def: 55, zone: 2 },
-            { name: "Ala E", role: "MID", att: 70, def: 55, zone: 2 },
-            // Zona 3: Ataque (2 jogadores)
-            { name: "Artilheiro", role: "ATT", att: 88, def: 30, zone: 3 },
-            { name: "Veloz", role: "ATT", att: 82, def: 35, zone: 3 }
+            // GOLEIRO
+            { id: "rmd_gk", name: "Courtois", role: "GK", ovr: 90, ref: 92, pos: 88, zone: 4 },
+            
+            // DEFESA (Linha de 4)
+            { id: "rmd_lb", name: "Mendy", role: "DEF", ovr: 83, des: 82, int: 78, zone: 3 },
+            { id: "rmd_cb1", name: "Rüdiger", role: "DEF", ovr: 87, des: 88, int: 84, zone: 3 },
+            { id: "rmd_cb2", name: "Militão", role: "DEF", ovr: 86, des: 86, int: 85, zone: 3 },
+            { id: "rmd_rb", name: "Carvajal", role: "DEF", ovr: 85, des: 84, int: 83, zone: 3 },
+
+            // MEIO-CAMPO (Trio Poderoso)
+            { id: "rmd_cm1", name: "Valverde", role: "MID", ovr: 88, pas: 85, dri: 84, des: 80, sta: 95, zone: 2 },
+            { id: "rmd_cm2", name: "Bell", role: "MID", ovr: 90, pas: 88, dri: 89, fin: 85, sta: 90, zone: 2 },
+            { id: "rmd_cm3", name: "Tchouaméni", role: "MID", ovr: 84, pas: 82, des: 85, sta: 88, zone: 2 },
+
+            // ATAQUE (Trio Rápido)
+            { id: "rmd_lw", name: "V. Junior", role: "ATT", ovr: 90, dri: 92, fin: 86, pas: 80, sta: 85, zone: 1 },
+            { id: "rmd_st", name: "Mbappé", role: "ATT", ovr: 91, dri: 93, fin: 90, sta: 88, zone: 1 },
+            { id: "rmd_rw", name: "Rodrygo", role: "ATT", ovr: 86, dri: 88, fin: 82, pas: 81, sta: 82, zone: 1 }
         ]
     },
     ia: {
-        name: "COMPUTADOR",
-        formation: "4-3-3",
-        color: "#d32f2f", // Vermelho
+        id: "team_cata",
+        name: "FC CATALONIA",
+        shortName: "FCB",
+        formation: "4-3-3", 
+        colorPrimary: "#004d98", // Azul
+        colorSecondary: "#a50044", // Grená
         players: [
-            // Zona 4: Goleiro
-            { name: "Robo-GK", role: "GK", att: 10, def: 88, zone: 4 },
-            // Zona 3: Defesa (4 jogadores - Enfrentam o Ataque do Jogador)
-            { name: "Robo-Zag1", role: "DEF", att: 40, def: 82, zone: 3 },
-            { name: "Robo-Zag2", role: "DEF", att: 40, def: 80, zone: 3 },
-            { name: "Robo-Lat1", role: "DEF", att: 55, def: 72, zone: 3 },
-            { name: "Robo-Lat2", role: "DEF", att: 55, def: 72, zone: 3 },
-            // Zona 2: Meio-Campo (3 jogadores - Enfrentam o Meio do Jogador)
-            { name: "Robo-Mid1", role: "MID", att: 72, def: 65, zone: 2 },
-            { name: "Robo-Mid2", role: "MID", att: 70, def: 68, zone: 2 },
-            { name: "Robo-Mid3", role: "MID", att: 75, def: 60, zone: 2 },
-            // Zona 1: Ataque (3 jogadores - Enfrentam a Defesa do Jogador)
-            { name: "Robo-Att1", role: "ATT", att: 85, def: 30, zone: 1 },
-            { name: "Robo-Att2", role: "ATT", att: 84, def: 32, zone: 1 },
-            { name: "Robo-Att3", role: "ATT", att: 80, def: 35, zone: 1 }
+            // GOLEIRO
+            { id: "fcb_gk", name: "Ter Stegen", role: "GK", ovr: 89, ref: 90, pos: 91, zone: 0 },
+
+            // DEFESA
+            { id: "fcb_lb", name: "Balde", role: "DEF", ovr: 81, des: 78, int: 75, zone: 1 },
+            { id: "fcb_cb1", name: "Araújo", role: "DEF", ovr: 86, des: 87, int: 83, zone: 1 },
+            { id: "fcb_cb2", name: "Cubarsí", role: "DEF", ovr: 78, des: 79, int: 80, zone: 1 },
+            { id: "fcb_rb", name: "Koundé", role: "DEF", ovr: 85, des: 86, int: 84, zone: 1 },
+
+            // MEIO-CAMPO
+            { id: "fcb_cm1", name: "De Jong", role: "MID", ovr: 87, pas: 89, dri: 88, des: 75, sta: 85, zone: 2 },
+            { id: "fcb_cm2", name: "Pedri", role: "MID", ovr: 86, pas: 88, dri: 89, sta: 80, zone: 2 },
+            { id: "fcb_cm3", name: "Gavi", role: "MID", ovr: 83, pas: 82, des: 80, sta: 90, zone: 2 },
+
+            // ATAQUE
+            { id: "fcb_lw", name: "Raphinha", role: "ATT", ovr: 84, dri: 85, fin: 80, pas: 80, sta: 88, zone: 3 },
+            { id: "fcb_st", name: "Lewan", role: "ATT", ovr: 88, dri: 80, fin: 92, sta: 75, zone: 3 },
+            { id: "fcb_rw", name: "L. Yamal", role: "ATT", ovr: 82, dri: 87, fin: 78, pas: 82, sta: 80, zone: 3 }
         ]
     }
 };
