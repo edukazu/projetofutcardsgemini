@@ -26,17 +26,11 @@
                 <div class="teams-grid">
                     <div class="team-option selected" id="select-team-blue" onclick="selectTeam('blue')">
                         <div class="team-color-strip blue-strip"></div>
-                        <div class="team-info">
-                            <strong>AZUL REAL</strong>
-                            <small>Formação 4-4-2</small>
-                        </div>
+                        <div class="team-info"><strong>AZUL REAL</strong><small>Formação 4-4-2</small></div>
                     </div>
                     <div class="team-option" id="select-team-red" onclick="selectTeam('red')">
                         <div class="team-color-strip red-strip"></div>
-                        <div class="team-info">
-                            <strong>VERMELHO FURIOSO</strong>
-                            <small>Formação 4-3-3</small>
-                        </div>
+                        <div class="team-info"><strong>VERMELHO FURIOSO</strong><small>Formação 4-3-3</small></div>
                     </div>
                 </div>
             </div>
@@ -46,11 +40,8 @@
                 <input type="text" id="player-name-input" placeholder="Digite seu nome..." value="Treinador 1" autocomplete="off">
             </div>
 
-            <button id="btn-start-game" onclick="goToSquadScreen()">
-                GERENCIAR ELENCO
-            </button>
-            
-            <p class="version">Fut Cards MVP v1.2</p>
+            <button id="btn-start-game" onclick="goToSquadScreen()">GERENCIAR ELENCO</button>
+            <p class="version">Fut Cards MVP v1.3</p>
         </div>
     </section>
 
@@ -64,18 +55,13 @@
         </header>
 
         <div class="squad-content">
-            <div class="squad-grid-container" id="squad-grid">
-                </div>
-
+            <div class="squad-grid-container" id="squad-grid"></div>
             <aside class="player-details-panel">
-                <div id="detail-card-preview">
-                    </div>
+                <div id="detail-card-preview"></div>
                 <div class="detail-stats-box">
-                    <h3 id="detail-name">SELECIONE UM JOGADOR</h3>
-                    <p id="detail-role">Para ver seus atributos</p>
-                    
-                    <div class="stat-bars" id="stat-bars-container">
-                        </div>
+                    <h3 id="detail-name">SELECIONE</h3>
+                    <p id="detail-role">Para ver atributos</p>
+                    <div class="stat-bars" id="stat-bars-container"></div>
                 </div>
             </aside>
         </div>
@@ -100,25 +86,15 @@
 
         <footer id="ui-footer">
             <div class="footer-group score-group">
-                <div class="team-score">
-                    <span class="label" id="label-player-name">JOGADOR</span>
-                    <span class="value" id="score-player">0</span>
-                </div>
+                <div class="team-score"><span class="label" id="label-player-name">JOGADOR</span><span class="value" id="score-player">0</span></div>
                 <div class="score-divider">X</div>
-                <div class="team-score">
-                    <span class="value" id="score-ia">0</span>
-                    <span class="label">IA</span>
-                </div>
+                <div class="team-score"><span class="value" id="score-ia">0</span><span class="label">IA</span></div>
             </div>
-
             <div class="footer-group action-group">
                 <div id="possession-display">Posse: NEUTRA</div>
                 <button onclick="game.startBattle()" id="btn-battle">⚔️ BATALHAR</button>
             </div>
-
-            <div class="footer-group log-group">
-                <div id="game-info">Arena pronta.</div>
-            </div>
+            <div class="footer-group log-group"><div id="game-info">Arena pronta.</div></div>
         </footer>
     </div>
 
@@ -126,56 +102,26 @@
     <script src="game.js"></script>
     
     <script>
-        // Lógica de Navegação entre Telas
         let selectedTeamColor = 'blue';
-
         function selectTeam(color) {
             selectedTeamColor = color;
             document.querySelectorAll('.team-option').forEach(el => el.classList.remove('selected'));
             document.getElementById(`select-team-${color}`).classList.add('selected');
         }
-
         function goToSquadScreen() {
             const startScreen = document.getElementById('start-screen');
             const squadScreen = document.getElementById('squad-screen');
             const playerName = document.getElementById('player-name-input').value || "Treinador";
-
-            // Inicia o Jogo (Instância) mas pausa na tela de Squad
-            window.game = new Game({
-                playerTeamColor: selectedTeamColor,
-                playerName: playerName,
-                autoStart: false // Nova flag para não renderizar o campo ainda
-            });
-
-            // Animação
+            window.game = new Game({ playerTeamColor: selectedTeamColor, playerName: playerName, autoStart: false });
             startScreen.classList.add('fade-out');
-            setTimeout(() => {
-                startScreen.classList.add('hidden');
-                squadScreen.classList.remove('hidden');
-                
-                // Renderiza a tela de elenco
-                window.game.renderSquadScreen();
-            }, 500);
+            setTimeout(() => { startScreen.classList.add('hidden'); squadScreen.classList.remove('hidden'); window.game.renderSquadScreen(); }, 500);
         }
-
-        function backToMenu() {
-            location.reload(); // Maneira mais segura de resetar tudo no MVP
-        }
-
+        function backToMenu() { location.reload(); }
         function goToMatch() {
             const squadScreen = document.getElementById('squad-screen');
             const gameWrapper = document.getElementById('main-game-wrapper');
-
             squadScreen.classList.add('fade-out');
-            setTimeout(() => {
-                squadScreen.classList.add('hidden');
-                gameWrapper.classList.remove('hidden');
-                
-                // Agora sim inicia o tabuleiro
-                window.game.initBoard();
-                window.game.renderUI();
-                window.game.setCamera('OVERVIEW');
-            }, 500);
+            setTimeout(() => { squadScreen.classList.add('hidden'); gameWrapper.classList.remove('hidden'); window.game.initBoard(); window.game.renderUI(); window.game.setCamera('OVERVIEW'); }, 500);
         }
     </script>
 </body>

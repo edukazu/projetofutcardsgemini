@@ -1,5 +1,5 @@
 /**
- * game.js - V15: Com Tela de Gestão de Elenco
+ * game.js - V18: Correção de Seleção de Times e Nomes
  */
 
 class Game {
@@ -11,15 +11,31 @@ class Game {
         this.scoreIA = 0;
         this.isBattling = false; 
 
-        this.teams = TEAMS_DATA;
-        
-        // Configurações
+        // CONFIGURAÇÕES
         this.playerName = config.playerName || "JOGADOR";
         this.playerColor = config.playerTeamColor || 'blue'; 
-        
-        // Flag para não renderizar o campo imediatamente se estivermos no menu de elenco
         this.autoStart = config.autoStart !== undefined ? config.autoStart : true;
 
+        // --- CORREÇÃO DA SELEÇÃO DE TIMES ---
+        // Aqui definimos quem é quem baseado na cor escolhida no menu
+        // Blue = Royal Madrid (Padrão)
+        // Red = FC Catalonia
+        
+        if (this.playerColor === 'red') {
+            // Jogador escolheu Vermelho (Catalonia)
+            this.teams = {
+                player: TEAMS_DATABASE.catalonia, // Jogador recebe Catalonia
+                ia: TEAMS_DATABASE.royal          // IA recebe Royal
+            };
+        } else {
+            // Jogador escolheu Azul (Royal) - Padrão
+            this.teams = {
+                player: TEAMS_DATABASE.royal,     // Jogador recebe Royal
+                ia: TEAMS_DATABASE.catalonia      // IA recebe Catalonia
+            };
+        }
+
+        // Atualiza UI do nome
         const labelName = document.getElementById('label-player-name');
         if(labelName) labelName.textContent = this.playerName.toUpperCase();
 
@@ -32,95 +48,117 @@ class Game {
         }
     }
 
-    // --- NOVA FUNÇÃO: RENDERIZAR TELA DE ELENCO ---
+    // --- SQUAD SCREEN ---
     renderSquadScreen() {
         const grid = document.getElementById('squad-grid');
-        grid.innerHTML = ''; // Limpa
+        grid.innerHTML = ''; 
 
-        // Pega os jogadores do time do jogador
-        const myTeam = this.teams.player; // Assumindo que o player joga com o time 'player' definido no cards.js
-        // Se a cor for red, inverte (lógica do MVP anterior)
-        // Mas para simplificar a visualização, vamos mostrar sempre o elenco 'player' do JSON
+        const myTeam = this.teams.player;
         
-        // Atualiza cabeçalho
-        document.getElementById('team-ovr-display').textContent = "86"; // Exemplo, poderia calcular a média
+        let totalOvr = 0;
+        myTeam.players.forEach(p => totalOvr += p.ovr);
+        const avgOvr = Math.round(totalOvr / myTeam.players.length);
+
+        document.getElementById('team-ovr-display').textContent = avgOvr;
         document.getElementById('team-form-display').textContent = myTeam.formation;
 
-        // Renderiza cada carta na Grid
         myTeam.players.forEach(p => {
-            const card = this.createCardDOM(p, 'player');
-            
-            // Adiciona evento de Mouse para ver detalhes
+            const card = this.createCardDOM(p, 'player', 'full');
             card.onmouseenter = () => this.showCardDetails(p, card);
-            
             grid.appendChild(card);
         });
 
-        // Mostra o primeiro jogador como default nos detalhes
         if (myTeam.players.length > 0) {
             this.showCardDetails(myTeam.players[0]);
         }
     }
 
-    // Cria o HTML da carta (Reutilizável para Campo e Menu)
-    createCardDOM(playerData, teamType) {
+    // --- CARD FACTORY ---
+    createCardDOM(playerData, teamType, mode = 'token') {
         const card = document.createElement('div');
-        card.className = 'card-token';
+        card.className = mode === 'full' ? 'card-full' : 'card-token';
         
-        // Lógica de Cor
-        let isRoyal = false;
-        if (this.playerColor === 'blue') {
-            isRoyal = (teamType === 'player');
-        } else {
-            isRoyal = (teamType === 'ia');
-        }
+        // Lógica de Cor (Visual)
+        // Precisamos saber se esse time Específico é o Royal ou Catalonia para aplicar o CSS certo
+        // Usamos o ID do time para garantir
+        
+        let cssClass = '';
+        // Verifica se o ID do time atual é o do Royal
+        const teamId = (teamType === 'player') ? this.teams.player.id : this.teams.ia.id;
 
-        if (isRoyal) card.classList.add('bg-royal');
-        else card.classList.add('bg-catalonia');
+        if (teamId === 'team_royal') {
+            cssClass = 'bg-royal';
+        } else {
+            cssClass = 'bg-catalonia';
+        }
+        card.classList.add(cssClass);
         
-        card.innerHTML = `
-            <div class="card-ovr">
-                ${playerData.ovr}
-                <span class="card-pos">${playerData.role}</span>
-            </div>
-            <div class="card-image"></div>
-            <div class="card-info">
-                <span class="card-name">${playerData.name}</span>
-            </div>
-        `;
+        if (mode === 'token') {
+            // TOKEN
+            card.innerHTML = `
+                <div class="card-top-info">
+                    <span class="card-ovr">${playerData.ovr}</span>
+                    <span class="card-pos">${playerData.role}</span>
+                </div>
+                <div class="card-image"></div>
+                <div class="card-name-box">
+                    <span class="card-name">${playerData.name}</span>
+                </div>
+            `;
+        } else {
+            // FULL CARD
+            card.innerHTML = `
+                <div class="card-content">
+                    <div class="card-header">
+                        <div class="card-left-col">
+                            <span class="card-ovr">${playerData.ovr}</span>
+                            <span class="card-pos">${playerData.role}</span>
+                        </div>
+                        <div class="card-image"></div>
+                    </div>
+                    <div class="card-name-box">
+                        <span class="card-name">${playerData.name}</span>
+                    </div>
+                    <div class="card-stats-grid">
+                        <div class="card-stats-row">
+                            <div class="stat-item"><span class="stat-val">${playerData.dri || 50}</span><span class="stat-label">DRI</span></div>
+                            <div class="stat-item"><span class="stat-val">${playerData.pas || 50}</span><span class="stat-label">PAS</span></div>
+                        </div>
+                        <div class="card-stats-row">
+                            <div class="stat-item"><span class="stat-val">${playerData.fin || 50}</span><span class="stat-label">FIN</span></div>
+                            <div class="stat-item"><span class="stat-val">${playerData.des || 50}</span><span class="stat-label">DEF</span></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
         return card;
     }
 
-    // Atualiza o Painel Lateral
     showCardDetails(playerData, cardElement) {
-        // 1. Atualiza Textos
         document.getElementById('detail-name').textContent = playerData.name;
         document.getElementById('detail-role').textContent = `${playerData.role} | OVR ${playerData.ovr}`;
 
-        // 2. Clone da Carta para o Preview
         const previewContainer = document.getElementById('detail-card-preview');
         previewContainer.innerHTML = '';
-        const previewCard = this.createCardDOM(playerData, 'player'); 
+        const previewCard = this.createCardDOM(playerData, 'player', 'full'); 
         previewContainer.appendChild(previewCard);
 
-        // 3. Gera Barras de Atributos
         const statsContainer = document.getElementById('stat-bars-container');
         statsContainer.innerHTML = '';
 
-        // Lista de atributos para mostrar
         const attributes = [
             { label: 'DRI', val: playerData.dri || 50 },
             { label: 'PAS', val: playerData.pas || 50 },
             { label: 'FIN', val: playerData.fin || 50 },
-            { label: 'DEF', val: playerData.des || 50 }, // Usando DES como geral de defesa
+            { label: 'DEF', val: playerData.des || 50 },
             { label: 'STA', val: playerData.sta || 99 }
         ];
 
         attributes.forEach(attr => {
-            // Cor da barra baseada no valor
-            let color = '#d32f2f'; // Ruim
-            if(attr.val > 70) color = '#fbc02d'; // Médio
-            if(attr.val > 85) color = '#388e3c'; // Bom
+            let color = '#d32f2f'; 
+            if(attr.val > 70) color = '#fbc02d'; 
+            if(attr.val > 85) color = '#388e3c'; 
 
             const row = document.createElement('div');
             row.className = 'stat-row';
@@ -135,7 +173,7 @@ class Game {
         });
     }
 
-    // --- LÓGICA DO JOGO EM CAMPO ---
+    // --- GAMEPLAY ---
     initBoard() {
         document.querySelectorAll('.cards-container').forEach(e => e.remove());
 
@@ -172,7 +210,7 @@ class Game {
         const container = document.getElementById(clusterId);
         if (!container) return;
 
-        const card = this.createCardDOM(playerData, teamType);
+        const card = this.createCardDOM(playerData, teamType, 'token');
         container.appendChild(card);
     }
 
