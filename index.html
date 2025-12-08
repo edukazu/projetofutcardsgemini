@@ -25,7 +25,6 @@
             <div class="team-selection">
                 <h3>ESCOLHA SEU MANTO</h3>
                 <div class="teams-grid">
-                    <!-- Royal Madrid -->
                     <div class="team-option selected" id="select-team-blue" onclick="selectTeam('blue')">
                         <div class="team-color-strip blue-strip"></div>
                         <div class="team-info">
@@ -33,7 +32,6 @@
                             <small>Formação 4-3-3</small>
                         </div>
                     </div>
-                    <!-- FC Catalonia -->
                     <div class="team-option" id="select-team-red" onclick="selectTeam('red')">
                         <div class="team-color-strip red-strip"></div>
                         <div class="team-info">
@@ -50,11 +48,11 @@
             </div>
 
             <button id="btn-start-game" onclick="goToSquadScreen()">GERENCIAR ELENCO</button>
-            <p class="version">Fut Cards MVP v1.3</p>
+            <p class="version">Fut Cards MVP v1.4</p>
         </div>
     </section>
 
-    <!-- TELA 2: ELENCO -->
+    <!-- TELA 2: GESTÃO DE ELENCO -->
     <section id="squad-screen" class="hidden">
         <header class="squad-header">
             <h2 id="squad-title">SEU TIME TITULAR</h2>
@@ -82,7 +80,20 @@
         </div>
     </section>
 
-    <!-- TELA 3: JOGO -->
+    <!-- TELA 3: JOGO (Com Overlay) -->
+    
+    <!-- Overlay de Duelo (Fica invisível até a batalha) -->
+    <div id="battle-overlay">
+        <div class="duel-stage">
+            <div id="duel-card-player"></div>
+            <div class="duel-vs-badge">VS</div>
+            <div id="duel-card-ia"></div>
+        </div>
+        <div class="duel-result-box" id="duel-feedback">
+            Preparando Duelo...
+        </div>
+    </div>
+
     <div id="main-game-wrapper" class="hidden">
         <main id="game-area">
             <div id="pitch-container">
@@ -97,42 +108,84 @@
 
         <footer id="ui-footer">
             <div class="footer-group score-group">
-                <div class="team-score"><span class="label" id="label-player-name">JOGADOR</span><span class="value" id="score-player">0</span></div>
+                <div class="team-score">
+                    <span class="label" id="label-player-name">JOGADOR</span>
+                    <span class="value" id="score-player">0</span>
+                </div>
                 <div class="score-divider">X</div>
-                <div class="team-score"><span class="value" id="score-ia">0</span><span class="label">IA</span></div>
+                <div class="team-score">
+                    <span class="value" id="score-ia">0</span>
+                    <span class="label">IA</span>
+                </div>
             </div>
+
             <div class="footer-group action-group">
                 <div id="possession-display">Posse: NEUTRA</div>
-                <button onclick="game.startBattle()" id="btn-battle">⚔️ BATALHAR</button>
+                
+                <!-- Botão de Início de Turno -->
+                <button onclick="game.startTurn()" id="btn-battle">⚔️ INICIAR RODADA</button>
+                
+                <!-- Menu de Ações (Escondido inicialmente) -->
+                <div id="action-menu" class="d-none"></div>
             </div>
-            <div class="footer-group log-group"><div id="game-info">Arena pronta.</div></div>
+
+            <div class="footer-group log-group">
+                <div id="game-info">Arena pronta.</div>
+            </div>
         </footer>
     </div>
 
+    <!-- SCRIPTS -->
     <script src="cards.js"></script>
     <script src="game.js"></script>
     
     <script>
+        // Lógica de Navegação da UI
         let selectedTeamColor = 'blue';
+
         function selectTeam(color) {
             selectedTeamColor = color;
             document.querySelectorAll('.team-option').forEach(el => el.classList.remove('selected'));
             document.getElementById(`select-team-${color}`).classList.add('selected');
         }
+
         function goToSquadScreen() {
             const startScreen = document.getElementById('start-screen');
             const squadScreen = document.getElementById('squad-screen');
             const playerName = document.getElementById('player-name-input').value || "Treinador";
-            window.game = new Game({ playerTeamColor: selectedTeamColor, playerName: playerName, autoStart: false });
+
+            // Inicia Game mas pausa renderização do campo
+            window.game = new Game({
+                playerTeamColor: selectedTeamColor,
+                playerName: playerName,
+                autoStart: false 
+            });
+
             startScreen.classList.add('fade-out');
-            setTimeout(() => { startScreen.classList.add('hidden'); squadScreen.classList.remove('hidden'); window.game.renderSquadScreen(); }, 500);
+            setTimeout(() => {
+                startScreen.classList.add('hidden');
+                squadScreen.classList.remove('hidden');
+                window.game.renderSquadScreen();
+            }, 500);
         }
-        function backToMenu() { location.reload(); }
+
+        function backToMenu() {
+            location.reload(); 
+        }
+
         function goToMatch() {
             const squadScreen = document.getElementById('squad-screen');
             const gameWrapper = document.getElementById('main-game-wrapper');
+
             squadScreen.classList.add('fade-out');
-            setTimeout(() => { squadScreen.classList.add('hidden'); gameWrapper.classList.remove('hidden'); window.game.initBoard(); window.game.renderUI(); window.game.setCamera('OVERVIEW'); }, 500);
+            setTimeout(() => {
+                squadScreen.classList.add('hidden');
+                gameWrapper.classList.remove('hidden');
+                
+                // Inicia o Jogo de verdade
+                window.game.initBoard();
+                window.game.coinToss(); // Começa com Cara ou Coroa
+            }, 500);
         }
     </script>
 </body>
