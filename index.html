@@ -3,46 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fut Cards MVP - Arena</title>
+    <title>Fut Cards - Full Screen Arena</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div id="app-window">
-        <header>
-            <h1>Fut Cards: Batalha Territorial</h1>
-            <div id="score-board">
-                JOGADOR 0 x 0 IA <br>
-                <span id="possession-display">Posse: NEUTRA (Meio-Campo)</span>
+    <main id="game-area">
+        <div id="pitch-container">
+            <div class="goal-structure goal-left" id="zone-0">
+                <div class="net"></div>
             </div>
-        </header>
 
-        <div id="pitch-wrapper">
-            <div id="pitch-container">
-                <div class="field-zone goal-zone goal-left" id="zone-0"></div>
+            <div class="field-zone defense-zone" id="zone-1"></div>
+            <div class="field-zone midfield-zone" id="zone-2"></div>
+            <div class="field-zone attack-zone" id="zone-3"></div>
 
-                <div class="field-zone defense-zone" id="zone-1"></div>
+            <div class="goal-structure goal-right" id="zone-4">
+                <div class="net"></div>
+            </div>
+            
+            <div id="ball-indicator"></div>
+        </div>
+    </main>
 
-                <div class="field-zone midfield-zone" id="zone-2"></div>
-
-                <div class="field-zone attack-zone" id="zone-3"></div>
-
-                <div class="field-zone goal-zone goal-right" id="zone-4"></div>
-                
-                <div id="ball-indicator"></div>
+    <footer id="ui-footer">
+        
+        <div class="footer-group score-group">
+            <div class="team-score">
+                <span class="label">JOGADOR</span>
+                <span class="value" id="score-player">0</span>
+            </div>
+            <div class="score-divider">X</div>
+            <div class="team-score">
+                <span class="value" id="score-ia">0</span>
+                <span class="label">IA</span>
             </div>
         </div>
 
-        <div id="controls-area">
-            <button onclick="game.startBattle()" id="btn-battle">⚔️ Iniciar Batalha</button>
-            <div id="game-info">Pressione o botão para iniciar...</div>
+        <div class="footer-group action-group">
+            <div id="possession-display">Posse: NEUTRA</div>
+            <button onclick="game.startBattle()" id="btn-battle">
+                ⚔️ BATALHAR
+            </button>
         </div>
-    </div>
-    
-    <script src="game.js"></script>
+
+        <div class="footer-group log-group">
+            <div id="game-info">Arena pronta. Inicie a batalha!</div>
+        </div>
+
+    </footer>
+
+    <script src="cards.js"></script> <script src="game.js"></script>
+
     <script>
-        // Inicializa o jogo ao carregar a página
+        // Adaptador para atualizar a nova UI na barra inferior
         const game = new Game();
+        
+        game.render = function() {
+            // Atualiza Placar
+            document.getElementById('score-player').textContent = this.scorePlayer;
+            document.getElementById('score-ia').textContent = this.scoreIA;
+            
+            // Atualiza Posse
+            let posText = "NEUTRA";
+            if (this.possession === 1) posText = "JOGADOR";
+            if (this.possession === -1) posText = "IA";
+            
+            // Texto da zona atual
+            let zoneText = this.territories[this.ballPositionIndex];
+            
+            document.getElementById('possession-display').innerHTML = 
+                `<span>${posText}</span> <small>(${zoneText})</small>`;
+
+            // Move a bola
+            this.moveBallVisual();
+        };
+
         game.render();
     </script>
 </body>

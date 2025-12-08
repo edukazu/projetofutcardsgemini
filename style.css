@@ -1,240 +1,239 @@
-/* style.css - Versão Completa e Revisada */
+/* style.css - Layout Cinemático (Footer Bar) */
 
-/* ---------------------------------- */
-/* 1. CONFIGURAÇÕES GERAIS E FUNDO */
-/* ---------------------------------- */
+/* RESET */
+* { box-sizing: border-box; }
+
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
     margin: 0;
-    /* Cor da "grama externa" ao redor da janela do app */
-    background-color: #2E7D32; 
-    color: #fff;
-    overflow: hidden; /* Evita barras de rolagem desnecessárias */
-}
-
-/* ---------------------------------- */
-/* 2. JANELA DO APLICATIVO */
-/* ---------------------------------- */
-#app-window {
-    background-color: #333d47; /* Fundo cinza azulado escuro */
-    padding: 25px;
-    border-radius: 12px;
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+    padding: 0;
+    height: 100vh;
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 95%;
-    max-width: 1100px;
-    /* Garante que cabe na tela sem rolar o body */
-    max-height: 95vh; 
-    overflow-y: auto; 
-    text-align: center;
-}
-
-header h1 {
-    margin: 0 0 15px 0;
-    font-size: 1.8em;
-    color: #80cbc4; /* Verde água claro */
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-/* Placar */
-#score-board {
-    background-color: #263238;
-    border: 2px solid #80cbc4;
-    padding: 10px 30px;
-    border-radius: 8px;
-    font-size: 1.2em;
-    font-weight: bold;
+    flex-direction: column; /* Organiza Campo em cima, Footer embaixo */
+    background-color: #1b5e20; /* Fundo Verde Escuro */
     color: #fff;
-    margin-bottom: 20px;
+    overflow: hidden;
 }
 
-#possession-display {
-    font-size: 0.8em;
-    font-weight: normal;
-    color: #b0bec5;
-}
-
-/* ---------------------------------- */
-/* 3. O CAMPO DE FUTEBOL (PITCH) */
-/* ---------------------------------- */
-#pitch-wrapper {
-    width: 100%;
+/* --- 1. ÁREA DO CAMPO (Expandida) --- */
+#game-area {
+    flex-grow: 1; /* Ocupa todo o espaço disponível acima do footer */
     display: flex;
     justify-content: center;
     align-items: center;
-    /* Padding garante que vejamos a 'grama' fora das 4 linhas */
-    padding: 20px 0;
+    position: relative;
+    /* Textura de fundo sutil */
+    background-image: radial-gradient(#2e7d32 1px, transparent 1px);
+    background-size: 30px 30px;
+    
+    /* Padding lateral garante que os gols (que saem do campo) não toquem na borda da tela */
+    padding: 0 80px; 
 }
 
 #pitch-container {
-    /* O campo principal (as 4 linhas) */
-    width: 100%;
-    max-width: 900px;
-    /* Altura proporcional para parecer um campo */
-    height: 500px; 
+    /* Dimensões Aumentadas */
+    width: 100%; 
+    max-width: 1400px; /* Limite para monitores ultrawide */
+    height: 80%; /* Ocupa 80% da altura da área disponível */
+    min-height: 400px;
     
-    /* Textura de Grama (Faixas) */
-    background-image: linear-gradient(to right, #43A047 0%, #43A047 50%, #4CAF50 50%, #4CAF50 100%);
-    background-size: 10% 100%; /* Tamanho das faixas */
+    /* Grama */
+    background-image: linear-gradient(to right, #43a047 0%, #43a047 50%, #4caf50 50%, #4caf50 100%);
+    background-size: 10% 100%;
     
-    border: 4px solid #fff; /* Linhas Laterais e de Fundo */
+    border: 5px solid #fff;
     position: relative;
-    display: flex; /* Para alinhar as zonas */
-    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    display: flex;
+    overflow: visible; /* Deixa os gols aparecerem fora */
+    box-shadow: 0 30px 60px rgba(0,0,0,0.6); /* Sombra forte para destacar do fundo */
 }
 
-/* --- LINHAS DO CAMPO (Desenhadas via CSS) --- */
-
-/* Linha Central */
-#pitch-container::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 50%;
-    width: 2px;
-    height: 100%;
-    background-color: rgba(255, 255, 255, 0.8);
-    transform: translateX(-50%);
-    z-index: 1;
+/* LINHAS DO CAMPO (CSS Puro) */
+#pitch-container::before { /* Linha Central */
+    content: ''; position: absolute; top: 0; left: 50%; width: 4px; height: 100%;
+    background-color: rgba(255,255,255,0.8); transform: translateX(-50%); z-index: 1;
 }
-
-/* Círculo Central */
-#pitch-container::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 130px;
-    height: 130px;
-    border: 2px solid rgba(255, 255, 255, 0.8);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 1;
+#pitch-container::after { /* Círculo Central */
+    content: ''; position: absolute; top: 50%; left: 50%; width: 180px; height: 180px; /* Aumentei o círculo */
+    border: 4px solid rgba(255,255,255,0.8); border-radius: 50%;
+    transform: translate(-50%, -50%); z-index: 1;
 }
+.defense-zone::before, .attack-zone::before { /* Grande Área */
+    content: ''; position: absolute; top: 50%; width: 18%; height: 60%; /* Proporcional ao tamanho novo */
+    border: 4px solid rgba(255,255,255,0.8); transform: translateY(-50%); z-index: 1;
+}
+.defense-zone::before { left: 0; border-left: none; }
+.attack-zone::before { right: 0; border-right: none; }
 
-/* Áreas (Grande Área) */
-.defense-zone::before, .attack-zone::before {
-    content: '';
+.field-zone { flex-grow: 1; position: relative; z-index: 2; }
+
+/* GOLS (Estrutura Externa) */
+.goal-structure {
     position: absolute;
     top: 50%;
-    width: 150px; /* Profundidade da área */
-    height: 250px; /* Largura da área */
-    border: 2px solid rgba(255, 255, 255, 0.8);
+    width: 60px;
+    height: 160px; /* Gol um pouco maior */
     transform: translateY(-50%);
-    z-index: 1;
+    border: 4px solid #fff;
+    z-index: 0;
+    background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(255,255,255,0.2) 5px, rgba(255,255,255,0.2) 7px);
 }
+.goal-left { left: -64px; border-right: none; }
+.goal-right { right: -64px; border-left: none; }
 
-/* Posicionamento específico das áreas */
-.defense-zone::before {
-    right: 0; /* Encostado na linha de fundo da defesa (lado esquerdo visualmente se inverter, mas aqui é lógico) */
-    border-right: none; /* Remove a linha que fica em cima da linha de fundo */
-}
-/* Nota: No CSS Flexbox padrão, a ordem visual é 0-1-2-3-4. 
-   Zone 1 é Defesa IA (Esquerda do campo visualmente, se o Jogador ataca para a direita? 
-   Vamos assumir: IA na Esquerda (Zone 1), Jogador na Direita (Zone 3). */
-   
-.defense-zone::before {
-    left: 0; /* Área da IA fica na esquerda */
-    border-left: none;
-    border-right: 2px solid rgba(255, 255, 255, 0.8);
-}
-
-.attack-zone::before {
-    right: 0; /* Área do Jogador fica na direita */
-    border-right: none;
-    border-left: 2px solid rgba(255, 255, 255, 0.8);
-}
-
-
-/* ---------------------------------- */
-/* 4. ZONAS LÓGICAS E BOLA */
-/* ---------------------------------- */
-
-.field-zone {
-    flex-grow: 1; /* Divide o espaço igualmente */
-    position: relative;
-    /* Zonas invisíveis para o usuário, servem apenas para lógica e posicionamento */
-    z-index: 2; 
-}
-
-/* Zonas de Gol (Externas ao campo de jogo) */
-.goal-zone {
-    flex-grow: 0; /* Não crescem como o campo */
-    width: 40px;
-    background-color: transparent; /* Transparente para ver o fundo do body */
-    border: none;
-    position: relative;
-}
-
-/* Redes dos Gols (Visual Simples) */
-.goal-left {
-    border-top: 2px solid rgba(255,255,255,0.5);
-    border-bottom: 2px solid rgba(255,255,255,0.5);
-    border-left: 2px solid rgba(255,255,255,0.5);
-    margin-right: -2px; /* Cola na linha de fundo */
-}
-.goal-right {
-    border-top: 2px solid rgba(255,255,255,0.5);
-    border-bottom: 2px solid rgba(255,255,255,0.5);
-    border-right: 2px solid rgba(255,255,255,0.5);
-    margin-left: -2px; /* Cola na linha de fundo */
-}
-
-/* A BOLA */
+/* BOLA */
 #ball-indicator {
-    position: absolute;
-    top: 50%;
-    width: 20px;
-    height: 20px;
-    background: radial-gradient(circle at 35% 35%, #ffffff, #d32f2f);
-    border: 1px solid #333;
-    border-radius: 50%;
-    box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+    position: absolute; top: 50%; width: 28px; height: 28px;
+    background: radial-gradient(circle at 35% 35%, #fff, #d50000);
+    border: 2px solid #333; border-radius: 50%;
+    box-shadow: 2px 5px 10px rgba(0,0,0,0.5);
     transform: translate(-50%, -50%);
-    transition: left 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Efeito elástico */
-    z-index: 10;
+    transition: left 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 20;
 }
 
-/* ---------------------------------- */
-/* 5. CONTROLES E RODAPÉ */
-/* ---------------------------------- */
-#controls-area {
-    margin-top: 20px;
-    width: 100%;
+/* --- 2. BARRA INFERIOR (FOOTER UI) --- */
+#ui-footer {
+    height: 80px; /* Altura fixa da barra */
+    background-color: #263238; /* Cinza Escuro */
+    border-top: 4px solid #004d40;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.4);
+    z-index: 50;
 }
 
-button {
-    background-color: #00897b;
+.footer-group {
+    display: flex;
+    align-items: center;
+}
+
+/* Esquerda: Placar */
+.score-group { width: 25%; }
+.team-score { display: flex; flex-direction: column; align-items: center; }
+.team-score .label { font-size: 0.75rem; color: #b0bec5; font-weight: bold; }
+.team-score .value { font-size: 1.8rem; font-weight: bold; color: #fff; line-height: 1; }
+#score-player { color: #4db6ac; } /* Cor Diferente para o Jogador */
+#score-ia { color: #ff7043; } /* Cor Diferente para a IA */
+.score-divider { font-size: 1.2rem; color: #546e7a; margin: 0 15px; }
+
+/* Centro: Botão e Info */
+.action-group { 
+    width: 50%; 
+    justify-content: center; 
+    gap: 20px;
+}
+#possession-display {
+    font-size: 0.9rem;
+    color: #eceff1;
+    background-color: #37474f;
+    padding: 5px 15px;
+    border-radius: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+#possession-display span { font-weight: bold; color: #ffd54f; }
+
+#btn-battle {
+    background: linear-gradient(135deg, #00897b, #004d40);
     color: white;
     border: none;
-    padding: 15px 40px;
-    font-size: 1.1rem;
+    padding: 10px 40px;
+    font-size: 1.2rem;
     font-weight: bold;
     border-radius: 30px;
     cursor: pointer;
-    box-shadow: 0 5px 15px rgba(0, 137, 123, 0.4);
-    transition: all 0.2s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    transition: transform 0.1s, box-shadow 0.1s;
 }
+#btn-battle:hover { transform: scale(1.05); box-shadow: 0 6px 15px rgba(0,0,0,0.4); }
+#btn-battle:active { transform: scale(0.98); }
 
-button:hover {
-    background-color: #00695c;
-    transform: translateY(-2px);
+/* Direita: Logs */
+.log-group { 
+    width: 25%; 
+    justify-content: flex-end; 
 }
-
-button:active {
-    transform: translateY(1px);
-}
-
 #game-info {
-    margin-top: 15px;
-    font-size: 1.1em;
-    color: #e0f2f1;
-    min-height: 1.2em;
+    font-size: 0.9rem;
+    color: #cfd8dc;
+    text-align: right;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+/* ... (Mantenha o CSS anterior do Layout Cinemático e adicione/atualize isso) ... */
+
+/* --- VISUAL DAS CARTAS EM CAMPO --- */
+/* Container dentro da zona para organizar as cartas */
+.cards-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: space-around; /* Espalha as cartas */
+    align-items: center;
+    flex-wrap: wrap; /* Permite quebra de linha se tiver muitas cartas */
+    padding: 10px;
+    z-index: 5; /* Acima da grama, abaixo da bola */
+    pointer-events: none; /* Deixa o clique passar para o campo se precisar */
+}
+
+.card-token {
+    width: 40px; /* Tamanho da carta no campo (mini) */
+    height: 55px;
+    border-radius: 4px;
+    border: 2px solid #fff;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.6rem;
+    font-weight: bold;
+    color: white;
+    transition: transform 0.3s;
+    position: relative;
+}
+
+/* Efeito ao passar o mouse (futuro) */
+.card-token:hover { transform: scale(1.2) translateY(-5px); z-index: 10; }
+
+/* --- SISTEMA DE CÂMERA (ZOOM E FOCO) --- */
+
+/* O Container do Campo agora precisa de transição suave para o Zoom */
+#pitch-container {
+    /* Adicione essa linha ao #pitch-container existente */
+    transition: transform 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Movimento cinematográfico lento */
+    transform-origin: center center; /* Zoom parte do centro */
+}
+
+/* ZOOM NÍVEL 1: BOLA NO MEIO (Zone 2) */
+/* Foca no meio, mas vê um pouco das pontas */
+.camera-focus-mid {
+    transform: scale(1.5); /* Zoom de 150% */
+}
+
+/* ZOOM NÍVEL 1: BOLA NA DEFESA (Zone 1) */
+/* Foca na esquerda, vendo o Gol IA e a Defesa */
+.camera-focus-defense {
+    transform: scale(1.6) translateX(25%); /* Zoom e move para a direita (mostra o lado esquerdo) */
+}
+
+/* ZOOM NÍVEL 1: BOLA NO ATAQUE (Zone 3) */
+/* Foca na direita, vendo o Ataque e o Gol Jogador */
+.camera-focus-attack {
+    transform: scale(1.6) translateX(-25%); /* Zoom e move para a esquerda (mostra o lado direito) */
+}
+
+/* ZOOM ESPECIAL: GOL (Zone 0 ou 4) */
+/* Zoom dramático no Goleiro */
+.camera-focus-goal-left {
+    transform: scale(2.0) translateX(40%);
+}
+.camera-focus-goal-right {
+    transform: scale(2.0) translateX(-40%);
 }
