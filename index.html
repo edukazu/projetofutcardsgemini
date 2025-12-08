@@ -3,24 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fut Cards - A Batalha Tática</title>
+    <title>Fut Cards - Reinício V1</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- TELA 1: MENU -->
+    <!-- MENU INICIAL -->
     <section id="start-screen">
-        <div class="background-effects">
-            <div class="floating-card c1"></div>
-            <div class="floating-card c2"></div>
-            <div class="floating-card c3"></div>
-            <div class="floating-card c4"></div>
-            <div class="spotlight"></div>
-        </div>
-
         <div class="menu-content">
             <h1 class="game-title">FUT CARDS <br><span class="highlight">ARENA</span></h1>
-            <p class="game-subtitle">Monte sua estratégia. Vença o duelo.</p>
+            <p class="game-subtitle">Monte sua estratégia.</p>
 
             <div class="team-selection">
                 <h3>ESCOLHA SEU MANTO</h3>
@@ -31,94 +23,58 @@
                     </div>
                     <div class="team-option" id="select-team-red" onclick="selectTeam('red')">
                         <div class="team-color-strip red-strip"></div>
-                        <div class="team-info"><strong>FC CATALONIA</strong><small>Formação 4-3-3</small></div>
+                        <div class="team-info"><strong>FC CATALONIA</strong><small>Formação 4-4-2</small></div>
                     </div>
                 </div>
             </div>
 
             <div class="player-input-group">
                 <label>NOME DO TREINADOR</label>
-                <input type="text" id="player-name-input" placeholder="Digite seu nome..." value="Treinador 1" autocomplete="off">
+                <input type="text" id="player-name-input" value="Treinador 1">
             </div>
 
             <button id="btn-start-game" onclick="goToSquadScreen()">GERENCIAR ELENCO</button>
-            <p class="version">Fut Cards MVP v1.5</p>
         </div>
     </section>
 
-    <!-- TELA 2: ELENCO -->
+    <!-- TELA DE ELENCO -->
     <section id="squad-screen" class="hidden">
         <header class="squad-header">
             <h2 id="squad-title">SEU TIME TITULAR</h2>
-            <div class="squad-stats">
-                <span>OVR DO TIME: <b id="team-ovr-display">86</b></span>
-                <span>FORMAÇÃO: <b id="team-form-display">4-3-3</b></span>
-            </div>
+            <div class="squad-stats"><span>OVR: <b id="team-ovr-display">0</b></span><span>FORM: <b id="team-form-display"></b></span></div>
         </header>
-
         <div class="squad-content">
             <div class="squad-grid-container" id="squad-grid"></div>
             <aside class="player-details-panel">
                 <div id="detail-card-preview"></div>
-                <div class="detail-stats-box">
-                    <h3 id="detail-name">SELECIONE</h3>
-                    <p id="detail-role">Para ver atributos</p>
-                    <div class="stat-bars" id="stat-bars-container"></div>
-                </div>
+                <div class="detail-stats-box"><h3 id="detail-name">SELECIONE</h3><p id="detail-role">-</p><div class="stat-bars" id="stat-bars-container"></div></div>
             </aside>
         </div>
-
         <div class="squad-footer">
-            <button class="btn-secondary" onclick="backToMenu()">VOLTAR</button>
-            <button class="btn-primary" onclick="goToMatch()">IR PARA O JOGO ⚽</button>
+            <button class="btn-secondary" onclick="location.reload()">VOLTAR</button>
+            <button class="btn-primary" onclick="goToMatch()">IR PARA O CAMPO</button>
         </div>
     </section>
 
-    <!-- OVERLAYS ESPECIAIS -->
-    
-    <!-- Cara ou Coroa -->
-    <div id="coin-overlay">
-        <div id="coin">
-            <div class="coin-face coin-heads"></div>
-            <div class="coin-face coin-tails"></div>
-        </div>
-    </div>
-
-    <!-- Batalha -->
-    <div id="battle-overlay">
-        <div class="duel-stage">
-            <div id="duel-card-player"></div>
-            <div class="duel-vs-badge">VS</div>
-            <div id="duel-card-ia"></div>
-        </div>
-        <div class="duel-result-box" id="duel-feedback">Preparando Duelo...</div>
-    </div>
-
-    <!-- TELA 3: JOGO -->
+    <!-- TELA DE JOGO (Sem Lógica de Batalha) -->
     <div id="main-game-wrapper" class="hidden">
         <main id="game-area">
             <div id="pitch-container">
-                <div class="goal-structure goal-left" id="zone-0"><div class="net"></div></div>
+                <div class="goal-structure goal-left" id="zone-0"></div>
                 <div class="field-zone defense-zone" id="zone-1"></div>
                 <div class="field-zone midfield-zone" id="zone-2"></div>
                 <div class="field-zone attack-zone" id="zone-3"></div>
-                <div class="goal-structure goal-right" id="zone-4"><div class="net"></div></div>
+                <div class="goal-structure goal-right" id="zone-4"></div>
                 <div id="ball-indicator"></div>
             </div>
         </main>
-
         <footer id="ui-footer">
             <div class="footer-group score-group">
                 <div class="team-score"><span class="label" id="label-player-name">JOGADOR</span><span class="value" id="score-player">0</span></div>
                 <div class="score-divider">X</div>
                 <div class="team-score"><span class="value" id="score-ia">0</span><span class="label">IA</span></div>
             </div>
-            <div class="footer-group action-group">
-                <div id="possession-display">Posse: NEUTRA</div>
-                <button onclick="game.startTurn()" id="btn-battle">⚔️ INICIAR RODADA</button>
-                <div id="action-menu" class="d-none"></div>
-            </div>
-            <div class="footer-group log-group"><div id="game-info">Arena pronta.</div></div>
+            <div class="footer-group log-group"><div id="game-info">Modo de Teste Visual</div></div>
         </footer>
     </div>
 
@@ -133,19 +89,16 @@
             document.getElementById(`select-team-${color}`).classList.add('selected');
         }
         function goToSquadScreen() {
-            const startScreen = document.getElementById('start-screen');
-            const squadScreen = document.getElementById('squad-screen');
-            const playerName = document.getElementById('player-name-input').value || "Treinador";
-            window.game = new Game({ playerTeamColor: selectedTeamColor, playerName: playerName, autoStart: false });
-            startScreen.classList.add('fade-out');
-            setTimeout(() => { startScreen.classList.add('hidden'); squadScreen.classList.remove('hidden'); window.game.renderSquadScreen(); }, 500);
+            const playerName = document.getElementById('player-name-input').value;
+            window.game = new Game({ playerTeamColor: selectedTeamColor, playerName: playerName });
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('squad-screen').classList.remove('hidden');
+            window.game.renderSquadScreen();
         }
-        function backToMenu() { location.reload(); }
         function goToMatch() {
-            const squadScreen = document.getElementById('squad-screen');
-            const gameWrapper = document.getElementById('main-game-wrapper');
-            squadScreen.classList.add('fade-out');
-            setTimeout(() => { squadScreen.classList.add('hidden'); gameWrapper.classList.remove('hidden'); window.game.initBoard(); window.game.coinToss(); }, 500);
+            document.getElementById('squad-screen').classList.add('hidden');
+            document.getElementById('main-game-wrapper').classList.remove('hidden');
+            window.game.initBoard();
         }
     </script>
 </body>

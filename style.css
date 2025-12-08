@@ -1,4 +1,4 @@
-/* style.css - Versão Final V29: Fix Travamento & Moeda */
+/* style.css - Versão V30: Fix Camadas, Placar e Moeda */
 
 /* 1. RESET */
 * { box-sizing: border-box; }
@@ -9,7 +9,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; 
 .fade-in-ready { opacity: 0; transition: opacity 1s ease; }
 .fade-in-ready.visible { opacity: 1; }
 
-/* 2. MENU SCREEN */
+/* 2. MENU SCREEN (Z-Index 1000) */
 #start-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% 30%, #1b5e20 0%, #051b0a 70%); z-index: 1000; display: flex; justify-content: center; align-items: center; overflow: hidden; }
 .background-effects { position: absolute; width: 100%; height: 100%; top: 0; left: 0; pointer-events: none; }
 .spotlight { position: absolute; top: -50%; left: 50%; width: 100%; height: 100%; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%); transform: translateX(-50%); }
@@ -41,7 +41,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; 
 #btn-start-game:hover { transform: scale(1.02); box-shadow: 0 15px 40px rgba(46, 125, 50, 0.6); }
 .version { margin-top: 25px; color: #444; font-size: 0.7rem; }
 
-/* 3. SQUAD SCREEN */
+/* 3. SQUAD SCREEN (Z-Index 900) */
 #squad-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, #263238 0%, #111 100%); z-index: 900; display: flex; flex-direction: column; }
 .squad-header { height: 80px; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; background: rgba(0,0,0,0.3); border-bottom: 1px solid rgba(255,255,255,0.1); }
 .squad-header h2 { font-family: 'Arial Black'; letter-spacing: 1px; color: #eceff1; margin: 0; }
@@ -66,7 +66,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; 
 .btn-primary { padding: 15px 50px; background: linear-gradient(90deg, #ffd700, #ffb300); color: #000; border: none; border-radius: 30px; cursor: pointer; font-weight: bold; font-size: 1.1rem; box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3); transition: transform 0.2s; }
 .btn-primary:hover { transform: scale(1.05); }
 
-/* 4. GAMEPLAY LAYOUT */
+/* 4. GAMEPLAY LAYOUT (Z-Index 1) */
 #main-game-wrapper { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; z-index: 1; background-color: #1b5e20; }
 #game-area { flex-grow: 1; height: 0; display: flex; justify-content: center; align-items: center; position: relative; background-image: radial-gradient(#2e7d32 1px, transparent 1px); background-size: 30px 30px; padding: 0 50px; overflow: hidden; }
 #pitch-container { width: 100%; max-width: 1400px; height: 75%; min-height: 450px; background-image: linear-gradient(to right, #43a047 0%, #43a047 50%, #4caf50 50%, #4caf50 100%); background-size: 10% 100%; border: 5px solid #fff; position: relative; display: flex; overflow: visible; box-shadow: 0 30px 60px rgba(0,0,0,0.6); transition: all 1.2s cubic-bezier(0.25, 1, 0.5, 1); transform-origin: center center; transform: scale(0.9); }
@@ -81,7 +81,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; 
 .goal-right { right: -84px; border-left: none; }
 #ball-indicator { position: absolute; top: 50%; width: 30px; height: 30px; background: radial-gradient(circle at 35% 35%, #fff, #d50000); border: 2px solid #333; border-radius: 50%; box-shadow: 2px 5px 15px rgba(0,0,0,0.8); transform: translate(-50%, -50%); transition: left 1s cubic-bezier(0.34, 1.56, 0.64, 1); z-index: 20; }
 
-/* 5. CARDS */
+/* 5. CARDS (TOKEN & FULL) */
 .cards-container { position: absolute; width: 100%; height: 100%; padding: 10px; z-index: 5; pointer-events: none; display: flex; justify-content: center; gap: 20%; align-items: center; }
 .team-cluster { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 10px; max-height: 100%; }
 
@@ -115,6 +115,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; 
 .card-full .stat-label { font-weight: normal; opacity: 0.8; }
 .card-full .stat-val { font-weight: bold; color: #ffd700; }
 
+/* Styles */
 .bg-royal { background: linear-gradient(135deg, #f5f5f5, #bdbdbd 40%, #d4af37 100%); color: #222 !important; }
 .bg-royal .card-ovr, .bg-royal .card-name { color: #111 !important; text-shadow: none !important; }
 .bg-royal .stat-val { color: #000 !important; }
@@ -125,47 +126,59 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; 
 .bg-catalonia .card-image svg { fill: #fff; }
 .bg-catalonia .card-crest-icon { color: #fff; }
 
+/* Hover */
 .card-full:hover { transform: translateY(-10px) scale(1.05); box-shadow: 0 20px 40px rgba(0,0,0,0.9); border-color: #ffd700; z-index: 100; }
 .team-cluster:has(.card-token:nth-child(5)) { gap: 0; }
 .team-cluster:has(.card-token:nth-child(5)) .card-token:not(:first-child) { margin-top: -25px; }
 .team-cluster:has(.card-token:nth-child(5)) .card-token:hover { transform: scale(1.15) translateY(-20px); z-index: 100; box-shadow: 0 15px 30px rgba(0,0,0,0.9); border-color: #ffd700; }
 .team-cluster:not(:has(.card-token:nth-child(5))) .card-token:hover { border-color: #ffd700; }
 
+/* Zoom */
 #pitch-container.camera-focus-mid { transform: scale(1.4); }
 #pitch-container.camera-focus-defense { transform: scale(1.5) translateX(25%); }
 #pitch-container.camera-focus-attack { transform: scale(1.5) translateX(-25%); }
 #pitch-container.camera-focus-goal-left { transform: scale(1.8) translateX(35%); }
 #pitch-container.camera-focus-goal-right { transform: scale(1.8) translateX(-35%); }
 
-/* CORREÇÃO DO TRAVAMENTO: FOOTER ACIMA DE TUDO (Z-INDEX 200) */
+/* 6. CORREÇÃO DO TRAVAMENTO: FOOTER ACIMA DE TUDO */
 #ui-footer { 
     height: 100px; flex-shrink: 0; 
     background-color: #263238; border-top: 5px solid #004d40; 
     display: flex; align-items: center; justify-content: space-between; 
-    padding: 0 20px; /* Ajuste de padding para caber o placar */
+    padding: 0 20px; 
     box-shadow: 0 -10px 30px rgba(0,0,0,0.5); 
-    z-index: 200; /* CRÍTICO: Maior que o overlay */
+    z-index: 2000; /* Z-INDEX MÁXIMO PARA GARANTIR O CLIQUE */
 }
+
+/* 7. ALINHAMENTO DO PLACAR (CORREÇÃO) */
 .footer-group { display: flex; align-items: center; }
-.score-group { width: 25%; justify-content: flex-start; /* Alinha placar à esquerda */ }
-.team-score { display: flex; flex-direction: column; align-items: center; margin-right: 15px; }
+.score-group { 
+    width: 30%; 
+    justify-content: flex-start; /* Alinha à esquerda */
+    gap: 15px;
+}
+.team-score { 
+    display: flex; flex-direction: column; align-items: flex-start; /* Alinha labels e números à esquerda */
+    margin: 0; 
+}
 .team-score .label { font-size: 0.8rem; color: #b0bec5; font-weight: bold; }
 .team-score .value { font-size: 2rem; font-weight: bold; color: #fff; line-height: 1; }
 #score-player { color: #64ffda; }
 #score-ia { color: #ffab91; }
-.score-divider { font-size: 1.5rem; color: #546e7a; margin: 0 15px; }
+.score-divider { font-size: 1.5rem; color: #546e7a; margin: 0 5px; }
+
 .action-group { width: 50%; justify-content: center; gap: 20px; }
 #possession-display { font-size: 1rem; color: #eceff1; background-color: #37474f; padding: 8px 20px; border-radius: 20px; border: 1px solid #546e7a; }
 #btn-battle { background: linear-gradient(135deg, #00897b, #004d40); color: white; border: none; padding: 15px 60px; font-size: 1.3rem; font-weight: bold; border-radius: 40px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.4); transition: transform 0.1s; letter-spacing: 1px; }
 #btn-battle:hover { transform: scale(1.05); filter: brightness(1.1); }
 #btn-battle:active { transform: scale(0.98); }
-.log-group { width: 25%; justify-content: flex-end; }
+.log-group { width: 20%; justify-content: flex-end; }
 #game-info { font-size: 1rem; color: #cfd8dc; text-align: right; }
 
-/* 6. BATTLE OVERLAY */
+/* 8. BATTLE OVERLAY (Z-INDEX 1000 - Abaixo do Footer) */
 #battle-overlay {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0, 20, 0, 0.85); z-index: 100;
+    background: rgba(0, 20, 0, 0.85); z-index: 1000;
     display: flex; flex-direction: column; justify-content: center; align-items: center;
     backdrop-filter: blur(8px); opacity: 0; pointer-events: none; transition: opacity 0.3s;
 }
@@ -175,7 +188,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; 
 .duel-vs-badge { font-family: 'Arial Black'; font-size: 4rem; color: #ffd700; text-shadow: 0 0 30px #ff6f00; z-index: 10; font-style: italic; }
 .duel-result-box { margin-top: 40px; padding: 20px 50px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); color: #fff; font-size: 1.5rem; font-weight: bold; text-align: center; border-top: 1px solid rgba(255,255,255,0.2); border-bottom: 1px solid rgba(255,255,255,0.2); min-width: 400px; text-shadow: 0 2px 4px #000; }
 
-/* 7. ACTION MENU */
+/* 9. ACTION MENU */
 #action-menu { display: flex; gap: 15px; justify-content: center; width: 100%; }
 .btn-action { padding: 12px 25px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; font-size: 1rem; text-transform: uppercase; color: white; transition: transform 0.1s, filter 0.1s; display: flex; flex-direction: column; align-items: center; gap: 5px; box-shadow: 0 4px 0 rgba(0,0,0,0.3); }
 .btn-action span { font-size: 0.7rem; opacity: 0.8; font-weight: normal; }
@@ -186,10 +199,10 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; 
 .btn-action:hover { transform: translateY(-2px); filter: brightness(1.1); }
 .btn-action:active { transform: translateY(2px); box-shadow: none; }
 
-/* 8. COIN ANIMATION */
+/* 10. COIN ANIMATION (Z-INDEX 3000) */
 #coin-overlay {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.7); z-index: 300;
+    background: rgba(0,0,0,0.7); z-index: 3000;
     display: flex; justify-content: center; align-items: center;
     opacity: 0; pointer-events: none; transition: opacity 0.5s;
 }
