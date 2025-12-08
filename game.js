@@ -1,17 +1,14 @@
 /**
- * game.js - V32: Correção de Stats de Goleiro e Formações
+ * game.js - V36: Atributos Reais e Display Dinâmico
  */
 
 class Game {
     constructor(config = {}) {
         this.territories = ['Gol IA', 'Defesa IA', 'Meio-Campo', 'Ataque Jogador', 'Gol Jogador'];
         
-        // Configurações
         this.playerName = config.playerName || "JOGADOR";
         this.playerColor = config.playerTeamColor || 'blue';
         
-        // SELEÇÃO DE TIMES (Cópia Limpa dos Dados)
-        // Se escolheu 'red', joga com Catalonia. Se 'blue', Royal.
         if (this.playerColor === 'red') {
             this.teams = { 
                 player: JSON.parse(JSON.stringify(TEAMS_DATA.catalonia)), 
@@ -24,20 +21,46 @@ class Game {
             };
         }
 
-        // Atualiza Nome na Interface
         const labelName = document.getElementById('label-player-name');
         if(labelName) labelName.textContent = this.playerName.toUpperCase();
     }
 
-    // --- TELA 1: GESTÃO DE ELENCO ---
+    // --- REGRAS DE EXIBIÇÃO (4 Stats Principais por Posição) ---
+    getAttributesForDisplay(p) {
+        if (p.role === 'GK') {
+            return [
+                {label:'REF', val: p.ref}, {label:'POS', val: p.pos}, 
+                {label:'HAN', val: p.han}, {label:'SPD', val: p.spd}
+            ];
+        } else if (p.role === 'DEF') {
+            // Defensores: Foco em Defesa e Físico
+            return [
+                {label:'DES', val: p.des}, {label:'INT', val: p.int}, 
+                {label:'PAS', val: p.pas}, {label:'PHY', val: p.sta}
+            ];
+        } else if (p.role === 'MID') {
+            // Meias: Passe e Controle
+            return [
+                {label:'PAS', val: p.pas}, {label:'DRI', val: p.dri}, 
+                {label:'INT', val: p.int}, {label:'PHY', val: p.sta}
+            ];
+        } else { 
+            // Atacantes: Gol e Drible
+            return [
+                {label:'FIN', val: p.fin}, {label:'DRI', val: p.dri}, 
+                {label:'PAS', val: p.pas}, {label:'PHY', val: p.sta} // Usamos STA como PHY
+            ];
+        }
+    }
+
+    // --- TELA DE ELENCO ---
     renderSquadScreen() {
         const grid = document.getElementById('squad-grid');
         grid.innerHTML = ''; 
 
         const myTeam = this.teams.player;
-        if(!myTeam) { console.error("Erro: Time do jogador não carregou."); return; }
+        if(!myTeam) return;
 
-        // Cabeçalho do Elenco
         let totalOvr = 0;
         myTeam.players.forEach(p => totalOvr += p.ovr);
         const avgOvr = Math.round(totalOvr / myTeam.players.length);
@@ -45,17 +68,16 @@ class Game {
         document.getElementById('team-ovr-display').textContent = avgOvr;
         document.getElementById('team-form-display').textContent = myTeam.formation;
 
-        // Renderiza Cartas Grandes
         myTeam.players.forEach(p => {
             const card = this.createCardDOM(p, 'player', 'full');
             card.onmouseenter = () => this.showCardDetails(p);
             grid.appendChild(card);
         });
 
-        // Mostra o primeiro jogador por padrão
         if (myTeam.players.length > 0) this.showCardDetails(myTeam.players[0]);
     }
 
+    // Painel Lateral (Mostra Lista Completa)
     showCardDetails(p) {
         document.getElementById('detail-name').textContent = p.name;
         document.getElementById('detail-role').textContent = `${p.role} | OVR ${p.ovr}`;
@@ -67,25 +89,27 @@ class Game {
         const statsContainer = document.getElementById('stat-bars-container');
         statsContainer.innerHTML = '';
         
-        // DEFINIÇÃO DINÂMICA DE ATRIBUTOS PARA A BARRA LATERAL
-        let attributes = [];
-        if (p.role === 'GK') {
-            attributes = [
+        // Aqui mostramos todos os stats relevantes
+        let allStats = [];
+         if (p.role === 'GK') {
+            allStats = [
                 {label:'REF', val: p.ref}, {label:'POS', val: p.pos}, 
-                {label:'HAN', val: p.han || 80}, {label:'SPD', val: p.spd || 50},
-                {label:'STA', val: p.sta || 99}
+                {label:'HAN', val: p.han}, {label:'SPD', val: p.spd},
+                {label:'STA', val: p.sta}
             ];
         } else {
-            attributes = [
+            allStats = [
                 {label:'DRI', val: p.dri}, {label:'PAS', val: p.pas}, 
-                {label:'FIN', val: p.fin}, {label:'DEF', val: p.des}, 
-                {label:'STA', val: p.sta || 99}
+                {label:'FIN', val: p.fin}, {label:'DES', val: p.des}, 
+                {label:'INT', val: p.int}, {label:'STA', val: p.sta}
             ];
         }
 
-        attributes.forEach(attr => {
-            const val = attr.val || 50; 
-            const color = val > 85 ? '#388e3c' : (val > 70 ? '#fbc02d' : '#d32f2f');
+        allStats.forEach(attr => {
+            const val = attr.val || 0; 
+            let color = '#d32f2f'; 
+            if (val > 60) color = '#fbc02d'; 
+            if (val > 80) color = '#388e3c'; 
             
             const row = document.createElement('div'); 
             row.className = 'stat-row';
@@ -94,52 +118,32 @@ class Game {
         });
     }
 
-    // --- TELA 2: TABULEIRO (INIT) ---
     initBoard() {
         document.querySelectorAll('.cards-container').forEach(e => e.remove());
-
         for (let i = 0; i <= 4; i++) {
             const zone = document.getElementById(`zone-${i}`);
             if (zone) {
                 const container = document.createElement('div');
                 container.className = 'cards-container';
                 container.id = `cards-zone-${i}`;
-                
-                const clusterPlayer = document.createElement('div');
-                clusterPlayer.className = 'team-cluster cluster-player';
-                clusterPlayer.id = `cluster-player-zone-${i}`;
-                
-                const clusterIA = document.createElement('div');
-                clusterIA.className = 'team-cluster cluster-ia';
-                clusterIA.id = `cluster-ia-zone-${i}`;
-
-                container.appendChild(clusterPlayer);
-                container.appendChild(clusterIA);
-                zone.appendChild(container);
+                const clusterPlayer = document.createElement('div'); clusterPlayer.className = 'team-cluster cluster-player'; clusterPlayer.id = `cluster-player-zone-${i}`;
+                const clusterIA = document.createElement('div'); clusterIA.className = 'team-cluster cluster-ia'; clusterIA.id = `cluster-ia-zone-${i}`;
+                container.appendChild(clusterPlayer); container.appendChild(clusterIA); zone.appendChild(container);
             }
         }
-
         this.teams.player.players.forEach(p => this.createTokenElement(p, 'player'));
         this.teams.ia.players.forEach(p => this.createTokenElement(p, 'ia'));
-        
         this.renderUI();
         this.setCamera('OVERVIEW');
-        
         this.updateInfo("Partida pronta. Modo Visual.");
     }
 
     createTokenElement(playerData, teamType) {
-        const clusterId = teamType === 'player' ? 
-            `cluster-player-zone-${playerData.zone}` : 
-            `cluster-ia-zone-${playerData.zone}`;
-            
+        const clusterId = teamType === 'player' ? `cluster-player-zone-${playerData.zone}` : `cluster-ia-zone-${playerData.zone}`;
         const container = document.getElementById(clusterId);
-        if (container) {
-            container.appendChild(this.createCardDOM(playerData, teamType, 'token'));
-        }
+        if (container) container.appendChild(this.createCardDOM(playerData, teamType, 'token'));
     }
 
-    // --- FÁBRICA DE CARTAS (DOM) ---
     createCardDOM(playerData, teamType, mode) {
         const card = document.createElement('div');
         card.className = mode === 'full' ? 'card-full' : 'card-token';
@@ -158,21 +162,8 @@ class Game {
         const selectedFace = faces[playerData.face] || faces[1];
         const flagUrl = `https://flagcdn.com/w40/${playerData.nation}.png`;
 
-        // LÓGICA DE STATS: GOLEIRO vs LINHA
-        // Define quais labels e valores mostrar na carta premium
-        let s1Label, s1Val, s2Label, s2Val, s3Label, s3Val, s4Label, s4Val;
-
-        if (playerData.role === 'GK') {
-            s1Label = 'REF'; s1Val = playerData.ref;
-            s2Label = 'POS'; s2Val = playerData.pos;
-            s3Label = 'HAN'; s3Val = playerData.han || 80;
-            s4Label = 'SPD'; s4Val = playerData.spd || 50;
-        } else {
-            s1Label = 'DRI'; s1Val = playerData.dri || '-';
-            s2Label = 'PAS'; s2Val = playerData.pas || '-';
-            s3Label = 'FIN'; s3Val = playerData.fin || '-';
-            s4Label = 'DEF'; s4Val = playerData.des || '-';
-        }
+        // Pega os 4 atributos principais para exibir na carta (VISUAL)
+        const mainStats = this.getAttributesForDisplay(playerData);
 
         if (mode === 'token') {
             card.innerHTML = `
@@ -181,7 +172,7 @@ class Game {
                 <div class="card-name-box"><span class="card-name">${playerData.name}</span></div>
             `;
         } else {
-            // CARTA FULL COM STATS DINÂMICOS
+            // CARTA PREMIUM (Layout Alinhado)
             card.innerHTML = `
                 <div class="card-content">
                     <div class="card-header">
@@ -192,14 +183,15 @@ class Game {
                         <div class="card-image"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">${selectedFace}</svg></div>
                     </div>
                     <div class="card-name-box"><span class="card-name">${playerData.name}</span></div>
+                    
                     <div class="card-stats-grid">
                         <div class="card-stats-row">
-                            <div class="stat-item"><span class="stat-val">${s1Val}</span><span class="stat-label">${s1Label}</span></div>
-                            <div class="stat-item"><span class="stat-val">${s2Val}</span><span class="stat-label">${s2Label}</span></div>
+                            <div class="stat-item"><span class="stat-val">${mainStats[0].val}</span><span class="stat-label">${mainStats[0].label}</span></div>
+                            <div class="stat-item"><span class="stat-val">${mainStats[1].val}</span><span class="stat-label">${mainStats[1].label}</span></div>
                         </div>
                         <div class="card-stats-row">
-                            <div class="stat-item"><span class="stat-val">${s3Val}</span><span class="stat-label">${s3Label}</span></div>
-                            <div class="stat-item"><span class="stat-val">${s4Val}</span><span class="stat-label">${s4Label}</span></div>
+                            <div class="stat-item"><span class="stat-val">${mainStats[2].val}</span><span class="stat-label">${mainStats[2].label}</span></div>
+                            <div class="stat-item"><span class="stat-val">${mainStats[3].val}</span><span class="stat-label">${mainStats[3].label}</span></div>
                         </div>
                     </div>
                 </div>
@@ -211,8 +203,8 @@ class Game {
     renderUI() {
         document.getElementById('score-player').textContent = 0;
         document.getElementById('score-ia').textContent = 0;
+        let playerLabel = this.playerName.split(' ')[0].toUpperCase();
         document.getElementById('possession-display').innerHTML = `<span>JOGO PRONTO</span> <small>Meio-Campo</small>`;
-        
         const ball = document.getElementById('ball-indicator');
         const targetZone = document.getElementById(`zone-2`);
         if (ball && targetZone) {
@@ -220,12 +212,10 @@ class Game {
             ball.style.left = `${newLeft}px`;
         }
     }
-    
     setCamera(mode) { 
         const pitch = document.getElementById('pitch-container');
         if(pitch) pitch.className = ''; 
     }
-    
     updateInfo(msg) { document.getElementById('game-info').textContent = msg; }
     startTurn() { alert("Lógica de Batalha Desativada para Teste de Estabilidade."); }
     coinToss() { this.updateInfo("Modo de Teste: Sem Sorteio."); }
