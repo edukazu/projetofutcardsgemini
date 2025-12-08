@@ -19,11 +19,11 @@
                 <div class="teams-grid">
                     <div class="team-option selected" id="select-team-blue" onclick="selectTeam('blue')">
                         <div class="team-color-strip blue-strip"></div>
-                        <div class="team-info"><strong>ROYAL MADRID</strong><small>Formação 4-3-3</small></div>
+                        <div class="team-info"><strong>ROYAL MADRID</strong><small>Formação 4-4-2</small></div>
                     </div>
                     <div class="team-option" id="select-team-red" onclick="selectTeam('red')">
                         <div class="team-color-strip red-strip"></div>
-                        <div class="team-info"><strong>FC CATALONIA</strong><small>Formação 4-4-2</small></div>
+                        <div class="team-info"><strong>FC CATALONIA</strong><small>Formação 4-3-3</small></div>
                     </div>
                 </div>
             </div>
@@ -34,6 +34,7 @@
             </div>
 
             <button id="btn-start-game" onclick="goToSquadScreen()">GERENCIAR ELENCO</button>
+            <p class="version">Fut Cards MVP v1 (Estável)</p>
         </div>
     </section>
 
@@ -60,11 +61,11 @@
     <div id="main-game-wrapper" class="hidden">
         <main id="game-area">
             <div id="pitch-container">
-                <div class="goal-structure goal-left" id="zone-0"></div>
+                <div class="goal-structure goal-left" id="zone-0"><div class="net"></div></div>
                 <div class="field-zone defense-zone" id="zone-1"></div>
                 <div class="field-zone midfield-zone" id="zone-2"></div>
                 <div class="field-zone attack-zone" id="zone-3"></div>
-                <div class="goal-structure goal-right" id="zone-4"></div>
+                <div class="goal-structure goal-right" id="zone-4"><div class="net"></div></div>
                 <div id="ball-indicator"></div>
             </div>
         </main>
@@ -73,6 +74,11 @@
                 <div class="team-score"><span class="label" id="label-player-name">JOGADOR</span><span class="value" id="score-player">0</span></div>
                 <div class="score-divider">X</div>
                 <div class="team-score"><span class="value" id="score-ia">0</span><span class="label">IA</span></div>
+            </div>
+            <div class="footer-group action-group">
+                <div id="possession-display">Posse: NEUTRA</div>
+                <!-- Botão inativo por enquanto -->
+                <button id="btn-battle" style="opacity: 0.5; cursor: default;">TESTE VISUAL (Sem Lógica)</button>
             </div>
             <div class="footer-group log-group"><div id="game-info">Modo de Teste Visual</div></div>
         </footer>
