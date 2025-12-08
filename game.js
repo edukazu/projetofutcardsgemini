@@ -1,11 +1,14 @@
 /**
- * game.js - V36: Atributos Reais e Display Dinâmico
+ * game.js - V39: Display Sem Stamina na Carta
  */
 
 class Game {
     constructor(config = {}) {
         this.territories = ['Gol IA', 'Defesa IA', 'Meio-Campo', 'Ataque Jogador', 'Gol Jogador'];
-        
+        this.ballPositionIndex = 2; // Bola no meio
+        this.scorePlayer = 0;
+        this.scoreIA = 0;
+
         this.playerName = config.playerName || "JOGADOR";
         this.playerColor = config.playerTeamColor || 'blue';
         
@@ -25,7 +28,7 @@ class Game {
         if(labelName) labelName.textContent = this.playerName.toUpperCase();
     }
 
-    // --- REGRAS DE EXIBIÇÃO (4 Stats Principais por Posição) ---
+    // --- REGRAS DE EXIBIÇÃO (4 Stats Técnicos - SEM STAMINA) ---
     getAttributesForDisplay(p) {
         if (p.role === 'GK') {
             return [
@@ -33,22 +36,22 @@ class Game {
                 {label:'HAN', val: p.han}, {label:'SPD', val: p.spd}
             ];
         } else if (p.role === 'DEF') {
-            // Defensores: Foco em Defesa e Físico
+            // Defensores: Defesa, Interceptação, Passe, Drible
             return [
                 {label:'DES', val: p.des}, {label:'INT', val: p.int}, 
-                {label:'PAS', val: p.pas}, {label:'PHY', val: p.sta}
+                {label:'PAS', val: p.pas}, {label:'DRI', val: p.dri}
             ];
         } else if (p.role === 'MID') {
-            // Meias: Passe e Controle
+            // Meias: Passe, Drible, Interceptação, Finalização
             return [
                 {label:'PAS', val: p.pas}, {label:'DRI', val: p.dri}, 
-                {label:'INT', val: p.int}, {label:'PHY', val: p.sta}
+                {label:'INT', val: p.int}, {label:'FIN', val: p.fin}
             ];
         } else { 
-            // Atacantes: Gol e Drible
+            // Atacantes: Finalização, Drible, Passe, Interceptação (Leitura)
             return [
                 {label:'FIN', val: p.fin}, {label:'DRI', val: p.dri}, 
-                {label:'PAS', val: p.pas}, {label:'PHY', val: p.sta} // Usamos STA como PHY
+                {label:'PAS', val: p.pas}, {label:'INT', val: p.int}
             ];
         }
     }
@@ -77,7 +80,6 @@ class Game {
         if (myTeam.players.length > 0) this.showCardDetails(myTeam.players[0]);
     }
 
-    // Painel Lateral (Mostra Lista Completa)
     showCardDetails(p) {
         document.getElementById('detail-name').textContent = p.name;
         document.getElementById('detail-role').textContent = `${p.role} | OVR ${p.ovr}`;
@@ -89,7 +91,7 @@ class Game {
         const statsContainer = document.getElementById('stat-bars-container');
         statsContainer.innerHTML = '';
         
-        // Aqui mostramos todos os stats relevantes
+        // Lista Completa (Incluindo Stamina)
         let allStats = [];
          if (p.role === 'GK') {
             allStats = [
@@ -118,32 +120,50 @@ class Game {
         });
     }
 
+    // --- TABULEIRO ---
     initBoard() {
         document.querySelectorAll('.cards-container').forEach(e => e.remove());
+
         for (let i = 0; i <= 4; i++) {
             const zone = document.getElementById(`zone-${i}`);
             if (zone) {
                 const container = document.createElement('div');
                 container.className = 'cards-container';
                 container.id = `cards-zone-${i}`;
-                const clusterPlayer = document.createElement('div'); clusterPlayer.className = 'team-cluster cluster-player'; clusterPlayer.id = `cluster-player-zone-${i}`;
-                const clusterIA = document.createElement('div'); clusterIA.className = 'team-cluster cluster-ia'; clusterIA.id = `cluster-ia-zone-${i}`;
-                container.appendChild(clusterPlayer); container.appendChild(clusterIA); zone.appendChild(container);
+                
+                const clusterPlayer = document.createElement('div');
+                clusterPlayer.className = 'team-cluster cluster-player';
+                clusterPlayer.id = `cluster-player-zone-${i}`;
+                
+                const clusterIA = document.createElement('div');
+                clusterIA.className = 'team-cluster cluster-ia';
+                clusterIA.id = `cluster-ia-zone-${i}`;
+
+                container.appendChild(clusterPlayer);
+                container.appendChild(clusterIA);
+                zone.appendChild(container);
             }
         }
+
         this.teams.player.players.forEach(p => this.createTokenElement(p, 'player'));
         this.teams.ia.players.forEach(p => this.createTokenElement(p, 'ia'));
+        
         this.renderUI();
         this.setCamera('OVERVIEW');
         this.updateInfo("Partida pronta. Modo Visual.");
     }
 
     createTokenElement(playerData, teamType) {
-        const clusterId = teamType === 'player' ? `cluster-player-zone-${playerData.zone}` : `cluster-ia-zone-${playerData.zone}`;
+        const clusterId = teamType === 'player' ? 
+            `cluster-player-zone-${playerData.zone}` : 
+            `cluster-ia-zone-${playerData.zone}`;
         const container = document.getElementById(clusterId);
-        if (container) container.appendChild(this.createCardDOM(playerData, teamType, 'token'));
+        if (container) {
+            container.appendChild(this.createCardDOM(playerData, teamType, 'token'));
+        }
     }
 
+    // --- FÁBRICA DE CARTAS (DOM) ---
     createCardDOM(playerData, teamType, mode) {
         const card = document.createElement('div');
         card.className = mode === 'full' ? 'card-full' : 'card-token';
@@ -162,7 +182,6 @@ class Game {
         const selectedFace = faces[playerData.face] || faces[1];
         const flagUrl = `https://flagcdn.com/w40/${playerData.nation}.png`;
 
-        // Pega os 4 atributos principais para exibir na carta (VISUAL)
         const mainStats = this.getAttributesForDisplay(playerData);
 
         if (mode === 'token') {
@@ -212,10 +231,12 @@ class Game {
             ball.style.left = `${newLeft}px`;
         }
     }
+    
     setCamera(mode) { 
         const pitch = document.getElementById('pitch-container');
         if(pitch) pitch.className = ''; 
     }
+    
     updateInfo(msg) { document.getElementById('game-info').textContent = msg; }
     startTurn() { alert("Lógica de Batalha Desativada para Teste de Estabilidade."); }
     coinToss() { this.updateInfo("Modo de Teste: Sem Sorteio."); }
