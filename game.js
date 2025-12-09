@@ -1,5 +1,5 @@
 /**
- * game.js - V41: Correção de Nomes dos Times no Placar
+ * game.js - V42: Lógica de Kickoff e Interação de Clique
  */
 
 class Game {
@@ -8,6 +8,11 @@ class Game {
         this.ballPositionIndex = 2; // Bola no meio
         this.scorePlayer = 0;
         this.scoreIA = 0;
+
+        // --- NOVOS ESTADOS ---
+        this.state = 'LOADING'; // LOADING, KICKOFF, MATCH_LOGIC
+        this.ballHolder = null; // Quem está com a posse
+        this.possessionTeam = null; // 'player' ou 'ia'
 
         this.playerName = config.playerName || "JOGADOR";
         this.playerColor = config.playerTeamColor || 'blue';
@@ -114,8 +119,9 @@ class Game {
         });
     }
 
-    // --- TABULEIRO ---
+    // --- TABULEIRO E INICIALIZAÇÃO ---
     initBoard() {
+        this.state = 'LOADING';
         document.querySelectorAll('.cards-container').forEach(e => e.remove());
 
         for (let i = 0; i <= 4; i++) {
@@ -144,16 +150,72 @@ class Game {
         
         this.renderUI();
         this.setCamera('OVERVIEW');
-        this.updateInfo("Partida pronta. Modo Visual.");
+        
+        // Inicia o fluxo de Kickoff após breve delay
+        setTimeout(() => this.startKickoff(), 500);
     }
 
+    // --- LÓGICA DE KICKOFF (PONTAPÉ INICIAL) ---
+    startKickoff() {
+        this.state = 'KICKOFF';
+        
+        // 1. Cara ou Coroa (50/50)
+        const winner = Math.random() < 0.5 ? 'player' : 'ia';
+        const winnerTeam = (winner === 'player') ? this.teams.player : this.teams.ia;
+        
+        // 2. Identificar Melhor Passador (Maior atributo 'pas')
+        const bestPasser = winnerTeam.players.reduce((prev, current) => {
+            return (prev.pas > current.pas) ? prev : current;
+        });
+
+        // 3. Dar a posse
+        this.ballHolder = bestPasser;
+        this.possessionTeam = winner; // 'player' ou 'ia'
+
+        // 4. Atualizar Visual (Bola e Texto)
+        this.moveBallToPlayer(bestPasser);
+        
+        if (winner === 'player') {
+            this.updateInfo(`Cara ou Coroa: ${winnerTeam.name} venceu! Bola com ${bestPasser.name}. CLIQUE em um parceiro para passar.`);
+        } else {
+            this.updateInfo(`Cara ou Coroa: IA venceu. Bola com ${bestPasser.name}. Aguardando IA...`);
+            // Futuramente chamaremos a IA aqui
+        }
+    }
+
+    // --- INTERAÇÃO DE CLIQUE ---
+    handleCardClick(playerData, teamType) {
+        // Só permite interação se for o turno do jogador e estiver no estado de Kickoff
+        if (this.state === 'KICKOFF' && this.possessionTeam === 'player') {
+            
+            // Não pode passar para si mesmo nem para o adversário
+            if (playerData.id === this.ballHolder.id) return;
+            if (teamType !== 'player') return;
+
+            // Realiza o passe visual
+            console.log(`Passe de ${this.ballHolder.name} para ${playerData.name}`);
+            this.ballHolder = playerData;
+            this.moveBallToPlayer(playerData);
+            
+            // Finaliza introdução e chama lógica de batalha (futuro)
+            this.state = 'MATCH_LOGIC'; 
+            this.updateInfo(`Passe recebido por ${playerData.name}. Iniciando Lógica de Batalha...`);
+        }
+    }
+
+    // --- CRIAÇÃO DE TOKENS NO CAMPO ---
     createTokenElement(playerData, teamType) {
         const clusterId = teamType === 'player' ? 
             `cluster-player-zone-${playerData.zone}` : 
             `cluster-ia-zone-${playerData.zone}`;
         const container = document.getElementById(clusterId);
         if (container) {
-            container.appendChild(this.createCardDOM(playerData, teamType, 'token'));
+            const cardDOM = this.createCardDOM(playerData, teamType, 'token');
+            
+            // Adiciona interação de clique
+            cardDOM.onclick = () => this.handleCardClick(playerData, teamType);
+            
+            container.appendChild(cardDOM);
         }
     }
 
@@ -161,6 +223,11 @@ class Game {
     createCardDOM(playerData, teamType, mode) {
         const card = document.createElement('div');
         card.className = mode === 'full' ? 'card-full' : 'card-token';
+        
+        // ID único para encontrar o elemento depois (essencial para a bola seguir o jogador)
+        if (mode === 'token') {
+            card.id = `card-${playerData.id}`;
+        }
         
         const teamObj = (teamType === 'player') ? this.teams.player : this.teams.ia;
         const isRoyal = (teamObj.id === 'team_royal');
@@ -220,12 +287,25 @@ class Game {
         document.getElementById('label-player-team').textContent = this.teams.player.name;
         document.getElementById('label-ia-team').textContent = this.teams.ia.name;
 
-        document.getElementById('possession-display').innerHTML = `<span>JOGO PRONTO</span> <small>Meio-Campo</small>`;
+        document.getElementById('possession-display').innerHTML = `<span>JOGO PRONTO</span> <small>Sorteando...</small>`;
+    }
+
+    // --- MOVIMENTAÇÃO DA BOLA (VISUAL) ---
+    moveBallToPlayer(playerData) {
+        // Encontra o elemento HTML da carta
+        const cardElement = document.getElementById(`card-${playerData.id}`);
         const ball = document.getElementById('ball-indicator');
-        const targetZone = document.getElementById(`zone-2`);
-        if (ball && targetZone) {
-            let newLeft = targetZone.offsetLeft + (targetZone.offsetWidth / 2);
-            ball.style.left = `${newLeft}px`;
+        
+        if (ball && cardElement) {
+            // Anexa a bola diretamente dentro do elemento da carta.
+            // Isso garante que a bola siga o zoom/transform da carta automaticamente.
+            cardElement.appendChild(ball);
+            
+            // Centraliza a bola na carta
+            ball.style.position = 'absolute';
+            ball.style.top = '50%';
+            ball.style.left = '50%';
+            ball.style.transform = 'translate(-50%, -50%)';
         }
     }
     
