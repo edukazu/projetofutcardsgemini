@@ -1,5 +1,5 @@
 /**
- * game.js - V39: Display Sem Stamina na Carta
+ * game.js - V41: Correção de Nomes dos Times no Placar
  */
 
 class Game {
@@ -12,6 +12,7 @@ class Game {
         this.playerName = config.playerName || "JOGADOR";
         this.playerColor = config.playerTeamColor || 'blue';
         
+        // Seleção de Times
         if (this.playerColor === 'red') {
             this.teams = { 
                 player: JSON.parse(JSON.stringify(TEAMS_DATA.catalonia)), 
@@ -23,9 +24,6 @@ class Game {
                 ia: JSON.parse(JSON.stringify(TEAMS_DATA.catalonia)) 
             };
         }
-
-        const labelName = document.getElementById('label-player-name');
-        if(labelName) labelName.textContent = this.playerName.toUpperCase();
     }
 
     // --- REGRAS DE EXIBIÇÃO (4 Stats Técnicos - SEM STAMINA) ---
@@ -36,19 +34,16 @@ class Game {
                 {label:'HAN', val: p.han}, {label:'SPD', val: p.spd}
             ];
         } else if (p.role === 'DEF') {
-            // Defensores: Defesa, Interceptação, Passe, Drible
             return [
                 {label:'DES', val: p.des}, {label:'INT', val: p.int}, 
                 {label:'PAS', val: p.pas}, {label:'DRI', val: p.dri}
             ];
         } else if (p.role === 'MID') {
-            // Meias: Passe, Drible, Interceptação, Finalização
             return [
                 {label:'PAS', val: p.pas}, {label:'DRI', val: p.dri}, 
                 {label:'INT', val: p.int}, {label:'FIN', val: p.fin}
             ];
         } else { 
-            // Atacantes: Finalização, Drible, Passe, Interceptação (Leitura)
             return [
                 {label:'FIN', val: p.fin}, {label:'DRI', val: p.dri}, 
                 {label:'PAS', val: p.pas}, {label:'INT', val: p.int}
@@ -91,7 +86,6 @@ class Game {
         const statsContainer = document.getElementById('stat-bars-container');
         statsContainer.innerHTML = '';
         
-        // Lista Completa (Incluindo Stamina)
         let allStats = [];
          if (p.role === 'GK') {
             allStats = [
@@ -191,7 +185,6 @@ class Game {
                 <div class="card-name-box"><span class="card-name">${playerData.name}</span></div>
             `;
         } else {
-            // CARTA PREMIUM (Layout Alinhado)
             card.innerHTML = `
                 <div class="card-content">
                     <div class="card-header">
@@ -222,7 +215,11 @@ class Game {
     renderUI() {
         document.getElementById('score-player').textContent = 0;
         document.getElementById('score-ia').textContent = 0;
-        let playerLabel = this.playerName.split(' ')[0].toUpperCase();
+        
+        // --- ATUALIZAÇÃO DO PLACAR COM NOMES DOS TIMES ---
+        document.getElementById('label-player-team').textContent = this.teams.player.name;
+        document.getElementById('label-ia-team').textContent = this.teams.ia.name;
+
         document.getElementById('possession-display').innerHTML = `<span>JOGO PRONTO</span> <small>Meio-Campo</small>`;
         const ball = document.getElementById('ball-indicator');
         const targetZone = document.getElementById(`zone-2`);

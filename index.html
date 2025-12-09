@@ -8,7 +8,6 @@
 </head>
 <body>
 
-    <!-- MENU INICIAL -->
     <section id="start-screen">
         <div class="menu-content">
             <h1 class="game-title">FUT CARDS <br><span class="highlight">ARENA</span></h1>
@@ -34,11 +33,10 @@
             </div>
 
             <button id="btn-start-game" onclick="goToSquadScreen()">GERENCIAR ELENCO</button>
-            <p class="version">Fut Cards MVP v1 (Estável)</p>
+            <p class="version">Fut Cards MVP v1 (Visual Update 2)</p>
         </div>
     </section>
 
-    <!-- TELA DE ELENCO -->
     <section id="squad-screen" class="hidden">
         <header class="squad-header">
             <h2 id="squad-title">SEU TIME TITULAR</h2>
@@ -57,7 +55,6 @@
         </div>
     </section>
 
-    <!-- TELA DE JOGO (Sem Lógica de Batalha) -->
     <div id="main-game-wrapper" class="hidden">
         <main id="game-area">
             <div id="pitch-container">
@@ -66,20 +63,32 @@
                 <div class="field-zone midfield-zone" id="zone-2"></div>
                 <div class="field-zone attack-zone" id="zone-3"></div>
                 <div class="goal-structure goal-right" id="zone-4"><div class="net"></div></div>
-                <div id="ball-indicator"></div>
+                <div id="ball-indicator"><div class="ball-shading"></div></div>
             </div>
         </main>
+        
         <footer id="ui-footer">
-            <div class="footer-group score-group">
-                <div class="team-score"><span class="label" id="label-player-name">JOGADOR</span><span class="value" id="score-player">0</span></div>
-                <div class="score-divider">X</div>
-                <div class="team-score"><span class="value" id="score-ia">0</span><span class="label">IA</span></div>
+            <div class="footer-group score-wrapper">
+                <div class="match-scoreboard">
+                    <div class="team-info-block player-side">
+                        <span class="team-name" id="label-player-team">TIME CASA</span>
+                        <span class="score-digit" id="score-player">0</span>
+                    </div>
+                    
+                    <div class="score-divider">X</div>
+                    
+                    <div class="team-info-block ia-side">
+                        <span class="score-digit" id="score-ia">0</span>
+                        <span class="team-name" id="label-ia-team">TIME VISITANTE</span>
+                    </div>
+                </div>
             </div>
+
             <div class="footer-group action-group">
                 <div id="possession-display">Posse: NEUTRA</div>
-                <!-- Botão inativo por enquanto -->
                 <button id="btn-battle" style="opacity: 0.5; cursor: default;">TESTE VISUAL (Sem Lógica)</button>
             </div>
+            
             <div class="footer-group log-group"><div id="game-info">Modo de Teste Visual</div></div>
         </footer>
     </div>
