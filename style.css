@@ -80,12 +80,14 @@ body {
 /* ========================================= */
 #main-game-wrapper { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; z-index: 1; background-color: #1b5e20; }
 #game-area {
-    /* Garante que o fundo verde escuro apareça */
-    padding: 20px; 
+    /* Top: 40px (Aumento usando o espaço do footer) */
+    /* Bottom: 20px (Original mantido) */
+    padding: 40px 20px 20px 20px; 
     display: flex;
     align-items: center; 
     justify-content: center;
-    overflow: hidden; /* Evita barras de rolagem indesejadas */
+    overflow: hidden;
+    flex-grow: 1; 
 }
 #pitch-container {
     /* Reduzimos a largura para 82% -> Cria o "respiro" verde escuro nas laterais */
@@ -132,6 +134,23 @@ body {
 .goal-right {
     right: -106px;
     border-left: none;
+}
+
+/* --- FIX: POSICIONAMENTO DOS GOLEIROS (SOBRE A LINHA) --- */
+/* Garante que o container do gol fique acima das linhas do campo para o jogador não ser cortado */
+.goal-structure {
+    z-index: 5; 
+    overflow: visible; /* Permite que o goleiro "vaze" para dentro do campo */
+}
+
+/* Goleiro Esquerda (Zone 0): Move 50px para a direita (Borda do campo) */
+#zone-0 .cards-container {
+    transform: translateX(50px);
+}
+
+/* Goleiro Direita (Zone 4): Move 50px para a esquerda (Borda do campo) */
+#zone-4 .cards-container {
+    transform: translateX(-50px);
 }
 
 /* --- BOLA DE FUTEBOL REALISTA CORRIGIDA (BASE BRANCA) --- */
@@ -274,7 +293,9 @@ body {
 
 /* Footer */
 #ui-footer { 
-    height: 100px; flex-shrink: 0; 
+    /* Reduzido de 100px para 80px (20% a menos) */
+    height: 80px; 
+    flex-shrink: 0; 
     background-color: #263238; border-top: 5px solid #004d40; 
     display: flex; align-items: center; justify-content: space-between; 
     padding: 0 20px; 
@@ -383,21 +404,27 @@ body {
 /* --- AJUSTE DE CAMPO (CONTAINER) --- */
 .cards-container {
     display: flex;
-    /* Distribui os times nas extremidades da zona */
-    justify-content: space-around;
+    /* MUDANÇA CRÍTICA: De space-around para center (Aproxima os times) */
+    justify-content: center;
     align-items: center;
     height: 100%; /* Usa toda a altura disponível */
     padding: 40px 0; /* Mais respiro vertical nas zonas */
+    /* AJUSTE FINO: Aumentado de 40px para 60px para dar respiro ao hover */
+    gap: 100px; 
+    pointer-events: none;
 }
 
 .team-cluster {
     display: flex;
     /* AQUI ESTÁ A CORREÇÃO: Coluna Vertical (Cima -> Baixo) */
     flex-direction: column;
-    justify-content: center; /* Centraliza o bloco */
+    /* MUDANÇA: De center para space-evenly para distribuir igualmente no eixo vertical */
+    justify-content: space-evenly; 
     align-items: center;
     height: 100%;
-    gap: 10px; /* Espaço vertical entre os jogadores */
+    /* MUDANÇA: Removemos o gap fixo e usamos padding para não colar na linha lateral */
+    gap: 0; 
+    padding: 20px 0; 
     pointer-events: none;
 }
 
@@ -419,3 +446,69 @@ body {
 .field-card-container .card-full {
     pointer-events: none !important;
 }
+ 
+/* ========================================= */
+/* 6. COMPRESSÃO DO CAMPO (DIORAMA COMPACTO) */
+/* ========================================= */
+
+/* ZONA 1 (Esquerda): Empurra todo o bloco de batalha para a DIREITA (Rumo ao meio/Fora da área) */
+#cards-zone-1 {
+    transform: translateX(120px); 
+}
+
+/* ZONA 3 (Direita): Empurra todo o bloco de batalha para a ESQUERDA (Rumo ao meio/Fora da área) */
+#cards-zone-3 {
+    transform: translateX(-120px); 
+}
+
+/* Nota: A Zona 2 (Meio) permanece neutra/centralizada como referência */
+
+/* ========================================= */
+/* 7. POSICIONAMENTO EXCLUSIVO DE GOLEIROS */
+/* ========================================= */
+/* Isola as zonas de gol das regras globais de batalha */
+
+#zone-0 .cards-container, 
+#zone-4 .cards-container {
+    gap: 0 !important; /* Ignora o gap de 100px do time */
+    justify-content: center !important; /* Centraliza horizontalmente na caixa do gol */
+    width: 100%;
+}
+
+#zone-0 .team-cluster, 
+#zone-4 .team-cluster {
+    justify-content: center !important; /* Garante alinhamento Vertical Perfeito (Topo/Base iguais) */
+    padding: 0 !important; /* Remove paddings extras */
+    height: 100%;
+}
+
+/* AJUSTE DA "LINHA IMAGINÁRIA": Coloca o centro do goleiro na linha de fundo */
+
+/* Goleiro Esquerda: Move 50px para a Direita (Borda do campo) */
+#zone-0 .field-card-container {
+    transform: translateX(50px) !important; 
+    z-index: 50; /* Garante que fique acima da rede */
+}
+
+/* Goleiro Direita: Move 50px para a Esquerda (Borda do campo) */
+#zone-4 .field-card-container {
+    transform: translateX(-50px) !important;
+    z-index: 50;
+}
+/* --- ESTILO ATHLETIC MATRICE (REVISADO) --- */
+/* Gradiente suave de Vermelho para um tom mais escuro/azulado no canto, similar ao Catalonia */
+.bg-matrice {
+    background: linear-gradient(135deg, #cb3524, #a92b1e 40%, #004D98 100%);
+    color: #fff !important; /* Força texto branco para contraste */
+}
+
+/* Garante que os ícones e o nome fiquem brancos/legíveis */
+.bg-matrice .card-image svg { fill: #fff; }
+.bg-matrice .card-crest-icon { color: #fff; }
+.bg-matrice .card-name-box { 
+    background: rgba(0,0,0,0.3); /* Fundo escuro transparente para o nome */
+    border-bottom: 1px solid rgba(255,255,255,0.3);
+}
+.bg-matrice .card-name { color: #fff !important; text-shadow: 1px 1px 2px black; }
+.bg-matrice .stat-val { color: #ffd700 !important; } /* Estatísticas douradas */
+.bg-matrice .stat-label { color: #ddd !important; opacity: 0.9 !important; }

@@ -17,23 +17,30 @@ class Game {
         this.playerName = config.playerName || "JOGADOR";
         this.playerColor = config.playerTeamColor || 'blue';
         
-        // Seleção de Times (Clona os dados para não alterar o original)
-        if (this.playerColor === 'red') {
-            this.teams = { 
-                player: JSON.parse(JSON.stringify(TEAMS_DATA.catalonia)), 
-                ia: JSON.parse(JSON.stringify(TEAMS_DATA.royal)) 
-            };
-        } else {
-            this.teams = { 
-                player: JSON.parse(JSON.stringify(TEAMS_DATA.royal)), 
-                ia: JSON.parse(JSON.stringify(TEAMS_DATA.catalonia)) 
-            };
+        // Configuração de Times baseada na escolha do Menu
+        switch(this.playerColor) {
+            case 'red': // FC Catalonia
+                this.teams = { 
+                    player: JSON.parse(JSON.stringify(TEAMS_DATA.catalonia)), 
+                    ia: JSON.parse(JSON.stringify(TEAMS_DATA.royal)) 
+                };
+                break;
+            case 'redwhite': // Athletic Matrice (NOVO)
+                this.teams = { 
+                    player: JSON.parse(JSON.stringify(TEAMS_DATA.matrice)), 
+                    ia: JSON.parse(JSON.stringify(TEAMS_DATA.catalonia)) // Joga contra o Catalonia
+                };
+                break;
+            default: // Royal Madrid (Blue) - Padrão
+                this.teams = { 
+                    player: JSON.parse(JSON.stringify(TEAMS_DATA.royal)), 
+                    ia: JSON.parse(JSON.stringify(TEAMS_DATA.matrice)) // Joga contra o Matrice (Teste Variado)
+                };
+                break;
         }
 
         // --- CORREÇÃO DE ZONAS (FIX ROYAL/ORIENTAÇÃO) ---
-        // Força o Time do Jogador a estar sempre no Lado Esquerdo (Zonas 0, 1, 2, 3)
-        // Força a IA a estar sempre no Lado Direito (Zonas 4, 3, 2, 1)
-        
+        // Aplica a orientação correta independente do time escolhido
         this.assignTacticalZones(this.teams.player, 'left');
         this.assignTacticalZones(this.teams.ia, 'right');
     }
@@ -347,7 +354,11 @@ class Game {
         
         const teamObj = (teamType === 'player') ? this.teams.player : this.teams.ia;
         const isRoyal = (teamObj.id === 'team_royal');
-        card.classList.add(isRoyal ? 'bg-royal' : 'bg-catalonia');
+        const isMatrice = (teamObj.id === 'team_matrice');
+
+        if (isRoyal) card.classList.add('bg-royal');
+        else if (isMatrice) card.classList.add('bg-matrice');
+        else card.classList.add('bg-catalonia');
         
         const skin = playerData.skin || "#e0ac69";
         const faces = {

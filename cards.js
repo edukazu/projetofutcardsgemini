@@ -58,5 +58,35 @@ const TEAMS_DATA = {
             { id: "fcb_st", name: "R. Lewan", role: "ATT", ovr: 88, nation: "pl", face: 1, skin: "#f5d0b0", fin: 91, dri: 80, pas: 75, int: 40, des: 35, sta: 75, zone: 3 },
             { id: "fcb_rw", name: "I. Iamal", role: "ATT", ovr: 82, nation: "es", face: 2, skin: "#c68642", fin: 78, dri: 87, pas: 82, int: 45, des: 40, sta: 80, zone: 3 }
         ]
+    }, // Não esqueça da vírgula separando o time anterior
+    matrice: {
+        id: "team_matrice",
+        name: "ATHLETIC MATRICE",
+        shortName: "ATM",
+        // Escudo estilizado: Listras + Triângulo Azul com Estrelas
+        crest: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M50 95C50 95 10 70 10 30V10H90V30C90 70 50 95 50 95Z" fill="#F8F9FA" stroke="#CB3524" stroke-width="4"/><path d="M25 10V80" stroke="#CB3524" stroke-width="10"/><path d="M50 10V90" stroke="#CB3524" stroke-width="10"/><path d="M75 10V80" stroke="#CB3524" stroke-width="10"/><path d="M10 10H50L10 50V10Z" fill="#004D98"/><circle cx="20" cy="20" r="3" fill="white"/><circle cx="35" cy="20" r="3" fill="white"/><circle cx="20" cy="35" r="3" fill="white"/></svg>`,
+        formation: "3-5-2",
+        colorPrimary: "#CB3524", // Vermelho Atlético
+        colorSecondary: "#004D98", // Azul
+        players: [
+            // GK
+            { id: "atm_gk", name: "J. Oblack", role: "GK", ovr: 89, nation: "si", face: 1, skin: "#f5d0b0", ref: 89, pos: 90, han: 85, spd: 50, pas: 40, dri: 35, des: 20, fin: 20, sta: 99, zone: 0 },
+
+            // ZAGA (3 Defensores)
+            { id: "atm_cb1", name: "Gimmy", role: "DEF", ovr: 84, nation: "uy", face: 2, skin: "#f5d0b0", des: 86, int: 85, pas: 65, dri: 60, fin: 40, sta: 85, zone: 1 },
+            { id: "atm_cb2", name: "Lenor", role: "DEF", ovr: 82, nation: "es", face: 1, skin: "#f5d0b0", des: 84, int: 82, pas: 70, dri: 65, fin: 35, sta: 82, zone: 1 },
+            { id: "atm_cb3", name: "A. Wits", role: "DEF", ovr: 81, nation: "be", face: 3, skin: "#e0ac69", des: 83, int: 86, pas: 78, dri: 70, fin: 50, sta: 75, zone: 1 },
+
+            // MEIO (5 Meio-campistas)
+            { id: "atm_lm", name: "S. Lio", role: "MID", ovr: 81, nation: "br", face: 4, skin: "#c68642", pas: 78, dri: 84, des: 60, int: 55, fin: 75, sta: 88, zone: 2 },
+            { id: "atm_cm1", name: "Koko", role: "MID", ovr: 84, nation: "es", face: 2, skin: "#f5d0b0", pas: 86, dri: 80, des: 78, int: 82, fin: 70, sta: 85, zone: 2 },
+            { id: "atm_cm2", name: "D. Pool", role: "MID", ovr: 85, nation: "ar", face: 3, skin: "#f5d0b0", pas: 86, dri: 83, des: 75, int: 70, fin: 74, sta: 90, zone: 2 },
+            { id: "atm_cm3", name: "Galager", role: "MID", ovr: 82, nation: "gb-eng", face: 1, skin: "#f5d0b0", pas: 80, dri: 81, des: 78, int: 75, fin: 76, sta: 95, zone: 2 },
+            { id: "atm_rm", name: "Molinaro", role: "MID", ovr: 80, nation: "ar", face: 2, skin: "#f5d0b0", pas: 79, dri: 80, des: 72, int: 70, fin: 65, sta: 88, zone: 2 },
+
+            // ATAQUE (2 Atacantes)
+            { id: "atm_st1", name: "Grizou", role: "ATT", ovr: 88, nation: "fr", face: 3, skin: "#f5d0b0", dri: 89, fin: 87, pas: 86, int: 55, des: 50, sta: 85, zone: 3 },
+            { id: "atm_st2", name: "J. Alvin", role: "ATT", ovr: 86, nation: "ar", face: 1, skin: "#f5d0b0", dri: 86, fin: 85, pas: 75, int: 45, des: 40, sta: 88, zone: 3 }
+        ]
     }
 };
