@@ -79,17 +79,60 @@ body {
 /* 4. GAMEPLAY LAYOUT */
 /* ========================================= */
 #main-game-wrapper { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; z-index: 1; background-color: #1b5e20; }
-#game-area { flex-grow: 1; height: 0; display: flex; justify-content: center; align-items: center; position: relative; background-image: radial-gradient(#2e7d32 1px, transparent 1px); background-size: 30px 30px; padding: 0 50px; overflow: hidden; }
-#pitch-container { width: 100%; max-width: 1400px; height: 75%; min-height: 450px; background-image: linear-gradient(to right, #43a047 0%, #43a047 50%, #4caf50 50%, #4caf50 100%); background-size: 10% 100%; border: 5px solid #fff; position: relative; display: flex; overflow: visible; box-shadow: 0 30px 60px rgba(0,0,0,0.6); transition: all 1.2s cubic-bezier(0.25, 1, 0.5, 1); transform-origin: center center; transform: scale(0.9); }
+#game-area {
+    /* Garante que o fundo verde escuro apareça */
+    padding: 20px; 
+    display: flex;
+    align-items: center; 
+    justify-content: center;
+    overflow: hidden; /* Evita barras de rolagem indesejadas */
+}
+#pitch-container {
+    /* Reduzimos a largura para 82% -> Cria o "respiro" verde escuro nas laterais */
+    width: 82%;
+    /* Altura calibrada para caber na tela sem scrolar */
+    height: 85vh;
+    min-height: 650px;
+    max-height: 950px;
+    /* Centralização */
+    margin: auto;
+    background-image: linear-gradient(to right, #43a047 0%, #43a047 50%, #4caf50 50%, #4caf50 100%);
+    background-size: 10% 100%;
+    border: 6px solid #fff;
+    position: relative;
+    display: flex;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+    /* Câmera */
+    transition: transform 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+    transform-origin: center center;
+}
 #pitch-container::before { content: ''; position: absolute; top: 0; left: 50%; width: 4px; height: 100%; background-color: rgba(255,255,255,0.6); transform: translateX(-50%); z-index: 1; }
 #pitch-container::after { content: ''; position: absolute; top: 50%; left: 50%; width: 200px; height: 200px; border: 4px solid rgba(255,255,255,0.6); border-radius: 50%; transform: translate(-50%, -50%); z-index: 1; }
 .defense-zone::before, .attack-zone::before { content: ''; position: absolute; top: 50%; width: 18%; height: 60%; border: 4px solid rgba(255,255,255,0.6); transform: translateY(-50%); z-index: 1; }
 .defense-zone::before { left: 0; border-left: none; }
 .attack-zone::before { right: 0; border-right: none; }
 .field-zone { flex-grow: 1; position: relative; z-index: 2; }
-.goal-structure { position: absolute; top: 50%; width: 80px; height: 180px; transform: translateY(-50%); border: 4px solid #fff; z-index: 0; background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(255,255,255,0.2) 5px, rgba(255,255,255,0.2) 7px); }
-.goal-left { left: -84px; border-right: none; }
-.goal-right { right: -84px; border-left: none; }
+/* --- GOL ALINHADO E MAIOR --- */
+.goal-structure {
+    position: absolute;
+    /* Top 50% + translateY -50% garante alinhamento matemático com o centro */
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100px;
+    height: 360px; /* Aumentado para ficar proporcional ao Goleiro */
+    border: 6px solid #fff;
+    z-index: 0;
+    background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.2) 10px, rgba(255,255,255,0.2) 12px);
+}
+/* Ajuste fino da posição horizontal das redes */
+.goal-left {
+    left: -106px;
+    border-right: none;
+}
+.goal-right {
+    right: -106px;
+    border-left: none;
+}
 
 /* --- BOLA DE FUTEBOL REALISTA CORRIGIDA (BASE BRANCA) --- */
 #ball-indicator { 
@@ -122,21 +165,55 @@ body {
 .cards-container { position: absolute; width: 100%; height: 100%; padding: 10px; z-index: 5; pointer-events: none; display: flex; justify-content: center; gap: 20%; align-items: center; }
 .team-cluster { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 10px; max-height: 100%; }
 
-/* --- TOKEN (JOGO) --- */
-.card-token {
-    width: 80px; height: 110px; border-radius: 6px; border: 2px solid rgba(255,255,255,0.3); background: linear-gradient(135deg, #333, #111);
-    display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 3px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.5); position: relative; overflow: hidden; flex-shrink: 0; transition: all 0.3s ease-out; margin-top: 0;
-    pointer-events: auto; cursor: pointer;
+/* --- MODO DIORAMA: Cartas no Campo (Corrigido) --- */
+/* O "Slot" onde a carta fica. Força um tamanho pequeno no layout */
+.field-card-container {
+    width: 100px; /* Largura física reservada no campo */
+    height: 140px; /* Altura física reservada */
+    position: relative;
+    z-index: 10;
+    margin: 0 5px; /* Espacinho entre elas */
+    perspective: 600px; /* Prepara o 3D */
+    cursor: pointer; /* Garante que pareça clicável */
+    transition: all 0.4s ease-out;
 }
-.card-token .card-top-info { position: absolute; top: 2px; left: 4px; display: flex; flex-direction: column; align-items: center; z-index: 2; }
-.card-token .card-ovr { font-family: 'Arial Black', sans-serif; font-size: 0.9rem; color: #fff; text-shadow: 1px 1px 0 #000; line-height: 1; }
-.card-token .card-pos { font-size: 0.5rem; font-weight: normal; opacity: 0.9; }
-.card-token .card-image { width: 50px; height: 50px; margin-top: 10px; opacity: 0.8; display: flex; justify-content: center; align-items: flex-end; }
-.card-token .card-image svg { width: auto; height: 100%; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5)); }
-.card-token .card-name-box { width: 100%; background: rgba(0,0,0,0.6); padding: 2px 0; border-radius: 2px; text-align: center; z-index: 2; margin-top: auto; margin-bottom: 2px; }
-.card-token .card-name { display: block; font-size: 0.6rem; font-weight: bold; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-transform: uppercase; }
-.card-token .card-stats-grid, .card-token .card-left-col, .card-token .card-right-col { display: none; }
+
+/* A Carta em si (Filha do container) */
+.field-card-container .card-full {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    /* Reduz a carta e a centraliza no slot */
+    transform: translateX(-50%) scale(0.65);
+    transform-origin: bottom center;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.4);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    /* Importante: O clique vai no container pai, não aqui, para evitar bugs */
+    pointer-events: none;
+}
+
+/* --- ESTADO ATIVO (Com a bola ou mouse em cima) --- */
+.field-card-container:hover,
+.field-card-container.active-focus {
+    z-index: 100; /* Traz para frente */
+    transform: translateY(-10px); /* Levanta um pouco o slot */
+}
+
+.field-card-container:hover .card-full,
+.field-card-container.active-focus .card-full {
+    /* Aumenta para quase o tamanho original */
+    transform: translateX(-50%) scale(0.95) rotateX(0deg);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+    filter: brightness(1.1);
+}
+
+/* Ajuste da bola no modo Diorama */
+.field-card-container #ball-indicator {
+    width: 30px; height: 30px; bottom: 5px; left: 50%; /* Centraliza na carta */
+    transform: translate(-50%, 0); /* Ajuste fino */
+    z-index: 200;
+    pointer-events: none; /* Deixa o clique passar para a carta */
+}
 
 /* --- FULL PREMIUM CARD (MENU) --- */
 .card-full {
@@ -187,10 +264,6 @@ body {
 
 /* Hover */
 .card-full:hover { transform: translateY(-10px) scale(1.05); box-shadow: 0 20px 40px rgba(0,0,0,0.9); border-color: #ffd700; z-index: 100; }
-.team-cluster:has(.card-token:nth-child(5)) { gap: 0; }
-.team-cluster:has(.card-token:nth-child(5)) .card-token:not(:first-child) { margin-top: -25px; }
-.team-cluster:has(.card-token:nth-child(5)) .card-token:hover { transform: scale(1.15) translateY(-20px); z-index: 100; box-shadow: 0 15px 30px rgba(0,0,0,0.9); border-color: #ffd700; }
-.team-cluster:not(:has(.card-token:nth-child(5))) .card-token:hover { border-color: #ffd700; }
 
 /* Zoom */
 #pitch-container.camera-focus-mid { transform: scale(1.4); }
@@ -305,4 +378,44 @@ body {
 @keyframes spin3DCoin {
     from { transform: rotateY(0deg); }
     to { transform: rotateY(1800deg); } /* Gira muitas vezes rápido */
+}
+
+/* --- AJUSTE DE CAMPO (CONTAINER) --- */
+.cards-container {
+    display: flex;
+    /* Distribui os times nas extremidades da zona */
+    justify-content: space-around;
+    align-items: center;
+    height: 100%; /* Usa toda a altura disponível */
+    padding: 40px 0; /* Mais respiro vertical nas zonas */
+}
+
+.team-cluster {
+    display: flex;
+    /* AQUI ESTÁ A CORREÇÃO: Coluna Vertical (Cima -> Baixo) */
+    flex-direction: column;
+    justify-content: center; /* Centraliza o bloco */
+    align-items: center;
+    height: 100%;
+    gap: 10px; /* Espaço vertical entre os jogadores */
+    pointer-events: none;
+}
+
+/* O Wrapper da carta (Area clicável) */
+.field-card-container {
+    /* Tamanho levemente ajustado para empilhar bem */
+    width: 100px;
+    height: 130px;
+    /* Margem negativa leve para aproximar se tiver muitos jogadores? Não, vamos usar gap por enquanto */
+    position: relative;
+    z-index: 10;
+    perspective: 600px;
+    pointer-events: auto !important; /* CLIQUE FUNCIONANDO */
+    cursor: pointer;
+    transition: all 0.4s ease-out;
+}
+
+/* Garante que a carta visual não bloqueie o clique do wrapper */
+.field-card-container .card-full {
+    pointer-events: none !important;
 }

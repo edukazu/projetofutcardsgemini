@@ -1,0 +1,32 @@
+PROJETO: Fut Cards (Web Game)
+FASE ATUAL: Fim da Fase 1 (Kickoff & Visual) -> Início da Fase 2 (Gameplay)
+DATA: 09/12/2025
+
+=== 1. STATUS GERAL ===
+O jogo inicializa, carrega os times, executa um sorteio de "Cara ou Coroa" em tela cheia (3D) e realiza o pontapé inicial (Kickoff) respeitando a regra de passar para um Meio-Campista (MID). O visual mudou para um estilo "Diorama Tático" (Vertical).
+
+=== 2. MUDANÇAS VISUAIS IMPORTANTES (Conceito Diorama) ===
+* Orientação: O jogo agora usa formação VERTICAL (Cluster column) para simular as linhas do campo.
+* Cartas: Não usamos mais tokens. Usamos as cartas completas (Full Art) reduzidas no campo.
+* Campo: Altura aumentada drasticamente (85vh) para caber 5 cartas em pé. Largura reduzida (82%) para dar respiro lateral.
+* Gol: Aumentado para 360px de altura para alinhar com o Goleiro.
+
+=== 3. LÓGICA DE CÂMERA ===
+* Sistema: Pan & Zoom via classes CSS (`cam-pos-X`, `cam-zoom-X`).
+* Comportamento: A câmera foca na zona onde está a bola.
+* Bug Atual: O "Pan" pode estar invertido dependendo do lado do campo.
+
+=== 4. BUGS CONHECIDOS (PRIORIDADE PARA CORREÇÃO) ===
+1. [CRÍTICO] Orientação do Royal: Ao escolher o Royal Madrid como time do jogador, há uma confusão visual (provavelmente a câmera foca no lado errado ou os times nascem no lado trocado). Precisamos revisar a lógica de "Lado Esquerdo vs Lado Direito" e espelhamento de câmera.
+2. [VISUAL] Ajustes Finos: O Gol ainda pode precisar de alinhamento fino com o Goleiro.
+
+=== 5. PRÓXIMOS PASSOS ===
+1. Corrigir o bug de orientação do time Royal.
+2. Implementar a Lógica de Batalha (Botão "INICIAR DUELO" já existe, mas só dá alert).
+3. Criar o sistema de comparação de atributos (Atacante vs Defensor).
+
+=== 6. ARQUITETURA TÉCNICA ===
+* `game.js`:
+  - `startKickoff()`: Gerencia o overlay de moeda e lógica de posse.
+  - `createTokenElement()`: Cria "Wrappers" clicáveis para as cartas. Importante: O clique está no wrapper, não na carta visual.
+  - `setCamera(zone)`: Move o #pitch-container.

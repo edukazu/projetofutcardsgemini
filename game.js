@@ -161,60 +161,120 @@ class Game {
         this.updateInfo("Aguardando o sorteio...");
     // 1. Configurar o Overlay
     const overlay = document.getElementById('coin-toss-overlay');
+    const coin = document.getElementById('coin'); // O elemento que gira
     const coinFront = document.getElementById('coin-front-face');
     const coinBack = document.getElementById('coin-back-face');
-    // Define as cores e nomes na moeda com base nos times atuais
-    // Frente = Time do Jogador | Verso = Time da IA
+    // Define as cores e nomes
     coinFront.textContent = this.teams.player.name;
     coinFront.className = `coin-face coin-front ${this.teams.player.id === 'team_royal' ? 'bg-royal' : 'bg-catalonia'}`;
     
     coinBack.textContent = this.teams.ia.name;
     coinBack.className = `coin-face coin-back ${this.teams.ia.id === 'team_royal' ? 'bg-royal' : 'bg-catalonia'}`;
-    // 2. Mostrar o overlay e iniciar a animação
+    // 2. Mostrar e Girar
     overlay.style.display = 'flex';
-    // 3. Aguarda 3 segundos de "drama"
+    coin.style.transition = 'none'; // Remove transição para o giro contínuo
+    coin.className = 'coin-spinning'; // Classe do CSS que gira infinito
+    // 3. Determinar o Vencedor AGORA (mas não mostrar ainda)
+    const winner = Math.random() < 0.5 ? 'player' : 'ia';
+    const winnerTeam = (winner === 'player') ? this.teams.player : this.teams.ia;
+    
+    // Identificar Melhor Passador
+    const bestPasser = winnerTeam.players.reduce((prev, current) => {
+        return (prev.pas > current.pas) ? prev : current;
+    });
+    // 4. Agendar a PARADA da moeda (Drama)
     setTimeout(() => {
-        // --- Lógica do Sorteio ---
-        const winner = Math.random() < 0.5 ? 'player' : 'ia';
-        const winnerTeam = (winner === 'player') ? this.teams.player : this.teams.ia;
+        // Para a animação infinita
+        coin.className = ''; 
         
-        // Identificar Melhor Passador
-        const bestPasser = winnerTeam.players.reduce((prev, current) => {
-            return (prev.pas > current.pas) ? prev : current;
-        });
-        // ESCONDE O OVERLAY
-        overlay.style.display = 'none';
-        // Aplica os resultados no jogo
-        this.ballHolder = bestPasser;
-        this.possessionTeam = winner; 
-        this.moveBallToPlayer(bestPasser);
+        // Adiciona uma transição suave para "travar" na face correta
+        coin.style.transition = 'transform 0.5s ease-out';
         
+        // Força a rotação para o lado do vencedor
+        // Frente (0deg) = Jogador | Verso (180deg) = IA
         if (winner === 'player') {
-            this.updateInfo(`Vencedor: ${winnerTeam.name}! Bola com ${bestPasser.name}. CLIQUE em um parceiro.`);
+            coin.style.transform = 'rotateY(0deg)'; // Para na Frente
         } else {
-            this.updateInfo(`Vencedor: IA (${winnerTeam.name}). Bola com ${bestPasser.name}. Aguardando IA...`);
+            coin.style.transform = 'rotateY(180deg)'; // Para no Verso
         }
-    }, 3000); // 3 segundos de suspense
+        // Atualiza texto visualmente
+        this.updateInfo(`Vencedor: ${winnerTeam.name}!`);
+        // 5. Esperar o jogador LER o resultado antes de esconder (Delay de leitura)
+        setTimeout(() => {
+            overlay.style.display = 'none';
+            
+            // Aplica a lógica do jogo
+            this.ballHolder = bestPasser;
+            this.possessionTeam = winner; 
+            this.moveBallToPlayer(bestPasser);
+            
+            if (winner === 'player') {
+                this.updateInfo(`Vencedor: ${winnerTeam.name}! Bola com ${bestPasser.name}. CLIQUE em um parceiro.`);
+            } else {
+                // Turno da IA: Automatiza o passe
+                this.updateInfo(`Vencedor: IA (${winnerTeam.name}). Bola com ${bestPasser.name}. IA preparando passe...`);
+                this.triggerIAKickoff(); // <--- CHAMADA NOVA AQUI
+            }
+        }, 2000); // 2 segundos vendo o resultado estático
+    }, 1500); // Gira por 1.5 segundos antes de parar
 }
 
-    // --- INTERAÇÃO DE CLIQUE ---
+    // --- INTERAÇÃO DO JOGADOR ---
     handleCardClick(playerData, teamType) {
-        // Só permite interação se for o turno do jogador e estiver no estado de Kickoff
+        // Regra 1: Só funciona no Kickoff se for posse do jogador
         if (this.state === 'KICKOFF' && this.possessionTeam === 'player') {
-            
-            // Não pode passar para si mesmo nem para o adversário
-            if (playerData.id === this.ballHolder.id) return;
-            if (teamType !== 'player') return;
-
-            // Realiza o passe visual
-            console.log(`Passe de ${this.ballHolder.name} para ${playerData.name}`);
-            this.ballHolder = playerData;
-            this.moveBallToPlayer(playerData);
-            
-            // Finaliza introdução e chama lógica de batalha (futuro)
-            this.state = 'MATCH_LOGIC'; 
-            this.updateInfo(`Passe recebido por ${playerData.name}. Iniciando Lógica de Batalha...`);
+            if (playerData.id === this.ballHolder.id) return; // Não passar para si mesmo
+            if (teamType !== 'player') return; // Não passar para adversário
+        // REGRA DO KICKOFF: O passe deve ser para um Meio-Campista (MID)
+        if (playerData.role !== 'MID') {
+            this.updateInfo(`Regra: O pontapé inicial deve ser para um MEIO-CAMPISTA!`);
+            return; // Bloqueia a ação
         }
+        // Executa o passe
+        console.log(`Passe de ${this.ballHolder.name} para ${playerData.name}`);
+        this.ballHolder = playerData;
+        this.moveBallToPlayer(playerData);
+        
+        // Transição para o Jogo Real
+        this.startMatchState();
+    }
+}
+
+    // --- NOVA FUNÇÃO: IA REALIZA O PONTAPÉ INICIAL (REGRA: SÓ PARA MEIO-CAMPO) ---
+    triggerIAKickoff() {
+        // Delay para parecer que a IA está "pensando"
+        setTimeout(() => {
+            const aiTeam = this.teams.ia.players;
+            
+            // Regra: O passe inicial deve ir para um Meio-Campista (MID) que não seja o dono da bola
+            let possibleReceivers = aiTeam.filter(p => p.role === 'MID' && p.id !== this.ballHolder.id);
+            
+            // Fallback: Se não houver meias (ex: formação exótica), permite passar para qualquer um exceto GK
+            if (possibleReceivers.length === 0) {
+                possibleReceivers = aiTeam.filter(p => p.id !== this.ballHolder.id && p.role !== 'GK');
+            }
+            
+            // Escolhe um alvo aleatório entre os válidos
+            const target = possibleReceivers[Math.floor(Math.random() * possibleReceivers.length)];
+            
+            if (target) {
+                console.log(`IA (Kickoff): ${this.ballHolder.name} passa para ${target.name} (MID)`);
+                this.updateInfo(`IA: ${this.ballHolder.name} tocou para ${target.name}.`);
+                
+                // Move a bola e muda o estado
+                this.ballHolder = target;
+                this.moveBallToPlayer(target);
+                
+                // Inicia o jogo real
+                this.startMatchState();
+            }
+        }, 1500); 
+    }
+
+    startMatchState() {
+        this.state = 'MATCH_LOGIC';
+        this.updateInfo('A partida começou! Lógica de batalha será implementada.');
+        console.log('Match state started. Current ball holder:', this.ballHolder);
     }
 
     // --- CRIAÇÃO DE TOKENS NO CAMPO ---
@@ -223,13 +283,29 @@ class Game {
             `cluster-player-zone-${playerData.zone}` : 
             `cluster-ia-zone-${playerData.zone}`;
         const container = document.getElementById(clusterId);
+        
         if (container) {
-            const cardDOM = this.createCardDOM(playerData, teamType, 'token');
+            const wrapper = document.createElement('div');
+            wrapper.className = 'field-card-container';
+            wrapper.id = `card-wrapper-${playerData.id}`;
             
-            // Adiciona interação de clique
-            cardDOM.onclick = () => this.handleCardClick(playerData, teamType);
+            // Cria a carta visual
+            const cardDOM = this.createCardDOM(playerData, teamType, 'full');
+            wrapper.appendChild(cardDOM);
             
-            container.appendChild(cardDOM);
+            // --- EVENTO DE CLIQUE BLINDADO ---
+            wrapper.onclick = (e) => {
+                e.stopPropagation(); // Impede que cliques duplos buguem
+                console.log(`>>> CLIQUE em: ${playerData.name} | Estado: ${this.state} | Turno: ${this.possessionTeam}`);
+                
+                if (this.state === 'KICKOFF') {
+                    this.handleCardClick(playerData, teamType);
+                } else {
+                    console.log("Clique ignorado: Não é momento de Kickoff.");
+                }
+            };
+            
+            container.appendChild(wrapper);
         }
     }
 
@@ -306,20 +382,21 @@ class Game {
 
     // --- MOVIMENTAÇÃO DA BOLA (VISUAL) ---
     moveBallToPlayer(playerData) {
-        // Encontra o elemento HTML da carta
-        const cardElement = document.getElementById(`card-${playerData.id}`);
+        // Remove destaque de todos primeiro
+        document.querySelectorAll('.field-card-container').forEach(el => el.classList.remove('active-focus'));
+    // Busca o Wrapper (que tem a escala)
+    const wrapper = document.getElementById(`card-wrapper-${playerData.id}`);
         const ball = document.getElementById('ball-indicator');
         
-        if (ball && cardElement) {
-            // Anexa a bola diretamente dentro do elemento da carta.
-            // Isso garante que a bola siga o zoom/transform da carta automaticamente.
-            cardElement.appendChild(ball);
+        if (ball && wrapper) {
+            // Adiciona destaque visual (Cresce a carta)
+            wrapper.classList.add('active-focus');
             
-            // Centraliza a bola na carta
-            ball.style.position = 'absolute';
-            ball.style.top = '50%';
-            ball.style.left = '50%';
-            ball.style.transform = 'translate(-50%, -50%)';
+            // Anexa a bola
+            wrapper.appendChild(ball);
+            
+            // Câmera segue
+            this.setCamera(playerData.zone, 'normal');
         }
     }
     
