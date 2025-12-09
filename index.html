@@ -130,5 +130,28 @@
         </div>
         <h2 style="color: white; margin-top: 20px; text-shadow: 1px 1px 3px #000;">QUEM COMEÇA?</h2>
     </div>
+
+    <div id="duel-stage-overlay" class="hidden">
+        <div class="duel-background"></div>
+        
+        <div class="duel-arena">
+            <div class="duel-fighter attacker-slot" id="fighter-att">
+            </div>
+
+            <div class="duel-vs-icon">VS</div>
+
+            <div class="duel-fighter defender-slot" id="fighter-def">
+            </div>
+        </div>
+
+        <div id="duel-result-panel" class="hidden">
+            <h2 id="duel-action-title">DRIBLE</h2>
+            <div class="result-numbers">
+                <div class="res-left"><span id="res-att-val">0</span></div>
+                <div class="res-right"><span id="res-def-val">0</span></div>
+            </div>
+            <div id="duel-outcome-text">VENCEDOR</div>
+        </div>
+    </div>
 </body>
 </html>

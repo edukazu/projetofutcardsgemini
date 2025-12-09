@@ -320,8 +320,8 @@ class Game {
         this.updateInfo('Sua vez! Escolha uma ação.');
         this.updateActionButtons(); // <--- IMPORTANTE
         
-        // Visualização Tática Automática (Opcional, para ver o cone)
-        this.highlightValidDefenders();
+        // --- GARANTIA VISUAL: Acende o cone assim que o turno começa ---
+        this.highlightValidDefenders(); 
     }
 
     // 1. Chamado ao clicar no botão
@@ -341,54 +341,144 @@ class Game {
         this.resolveDuelMath(actionType, this.ballHolder, defenseSetup);
     }
 
-    // 2. A Matemática (Transparente)
+    // A. Calculadora (Faz a conta e prepara os dados)
     resolveDuelMath(actionType, attacker, defenseSetup) {
         const defender = defenseSetup.main;
         const supportBonus = defenseSetup.bonus;
 
-        // --- DEFINIR ATRIBUTOS USADOS (Baseado no Manual) ---
-        let attAttr = 0;
-        let defAttr = 0;
-        let actionLabel = "";
+        // Atributos
+        let attAttr = (actionType === 'DRIBBLE') ? attacker.dri : attacker.pas;
+        let defAttr = (actionType === 'DRIBBLE') ? defender.des : defender.int;
+        const actionLabel = (actionType === 'DRIBBLE') ? "DRIBLE" : "PASSE";
 
-        if (actionType === 'DRIBBLE') {
-            attAttr = attacker.dri; // Drible
-            defAttr = defender.des; // Contra Desarme (Padrão IA)
-            actionLabel = "Drible vs Desarme";
-        } else if (actionType === 'PASS') {
-            attAttr = attacker.pas; // Passe
-            defAttr = defender.int; // Contra Interceptação
-            actionLabel = "Passe vs Interceptação";
-        }
-
-        // --- CÁLCULO FINAL ---
-        // 1. Rola o Dado (d20) para ambos - Fator Sorte
+        // Dados
         const diceAtt = Math.floor(Math.random() * 20) + 1;
         const diceDef = Math.floor(Math.random() * 20) + 1;
 
-        // 2. Soma Totais
-        // Defesa recebe o Bônus de Suporte calculado no resolveDefenseSetup
-        // Fórmula: (Atributo + Dado) vs (Atributo + Dado + Bônus Suporte)
+        // Totais
         const totalAtt = attAttr + diceAtt;
-        
-        // Aplica o bônus de suporte no atributo do defensor
         const defAttrWithBonus = Math.floor(defAttr * (1 + (supportBonus / 100))); 
         const totalDef = defAttrWithBonus + diceDef;
+        const winner = (totalAtt > totalDef) ? 'att' : 'def';
 
-        // --- LOG TRANSPARENTE (PARA O JOGADOR ENTENDER) ---
-        console.clear();
-        console.log(`%c⚡ RESOLUÇÃO DE DUELO: ${actionLabel}`, "color: yellow; font-weight: bold; font-size: 14px;");
-        console.log(`ATAQUE (${attacker.name}): ${attAttr} (Attr) + ${diceAtt} (Dado) = ${totalAtt}`);
-        console.log(`DEFESA (${defender.name}): ${defAttr} (Attr) + ${supportBonus}% (Suporte) = ${defAttrWithBonus} (Final) + ${diceDef} (Dado) = ${totalDef}`);
+        // Objeto de Resultado para a Animação
+        const duelData = {
+            actionLabel,
+            attacker: { name: attacker.name, id: attacker.id, base: attAttr, dice: diceAtt, total: totalAtt },
+            defender: { name: defender.name, id: defender.id, base: defAttr, bonus: supportBonus, bonusVal: defAttrWithBonus, dice: diceDef, total: totalDef },
+            winner
+        };
 
-        // --- RESULTADO ---
-        if (totalAtt > totalDef) {
-            this.updateInfo(`VENCEU! ${attacker.name} superou a marcação de ${defender.name}!`);
-            alert(`VITÓRIA DO ATAQUE!\n\n${attacker.name}: ${totalAtt}\n${defender.name}: ${totalDef}\n\n(Próximo passo: Executar o movimento/passe)`);
+        // Chama a Animação
+        this.animateDuelScene(duelData);
+    }
+
+    // C. O Novo Diretor de Cena (Versão Corrigida: Remove 'hidden')
+    animateDuelScene(data) {
+        const overlay = document.getElementById('duel-stage-overlay');
+        const attSlot = document.getElementById('fighter-att');
+        const defSlot = document.getElementById('fighter-def');
+        const resultPanel = document.getElementById('duel-result-panel');
+
+        // --- FIX CRÍTICO: Garante que o palco esteja visível ---
+        overlay.classList.remove('hidden'); 
+        // Força o navegador a reconhecer a mudança antes de animar a opacidade
+        void overlay.offsetWidth; 
+        overlay.classList.add('active'); 
+
+        // 1. Limpeza do Palco
+        attSlot.innerHTML = '';
+        defSlot.innerHTML = '';
+        // Reseta as animações removendo as classes anteriores
+        attSlot.className = 'duel-fighter attacker-slot'; 
+        defSlot.className = 'duel-fighter defender-slot';
+        
+        resultPanel.className = 'hidden'; // Esconde o resultado no início
+
+        // 2. CLONAGEM: Pega os visuais originais e cria cópias
+        const originalAttWrapper = document.getElementById(`card-wrapper-${data.attacker.id}`);
+        const originalDefWrapper = document.getElementById(`card-wrapper-${data.defender.id}`);
+
+        // Segurança: Só clona se encontrar as cartas
+        if (originalAttWrapper && originalDefWrapper) {
+            const cloneAtt = originalAttWrapper.querySelector('.card-full').cloneNode(true);
+            const cloneDef = originalDefWrapper.querySelector('.card-full').cloneNode(true);
+
+            // Ajusta classes para o tamanho gigante e remove IDs duplicados
+            cloneAtt.className = 'card-full cloned-card-visual';
+            cloneDef.className = 'card-full cloned-card-visual';
+            cloneAtt.removeAttribute('id');
+            cloneDef.removeAttribute('id');
+
+            attSlot.appendChild(cloneAtt);
+            defSlot.appendChild(cloneDef);
+
+            // 3. AÇÃO: Aplica animações de entrada (Slide In) após leve delay
+            setTimeout(() => {
+                attSlot.classList.add('animate-enter-left');
+                defSlot.classList.add('animate-enter-right');
+            }, 100);
         } else {
-            this.updateInfo(`PERDEU! ${defender.name} parou a jogada.`);
-            alert(`VITÓRIA DA DEFESA!\n\n${attacker.name}: ${totalAtt}\n${defender.name}: ${totalDef}\n\n(Próximo passo: Trocar posse)`);
+            console.error("Erro: Não foi possível encontrar as cartas originais para clonar.");
         }
+
+        // Configura textos iniciais
+        const titleEl = document.getElementById('duel-action-title');
+        if(titleEl) titleEl.textContent = data.actionLabel;
+        
+        const resAtt = document.getElementById('res-att-val');
+        const resDef = document.getElementById('res-def-val');
+        const outcome = document.getElementById('duel-outcome-text');
+        
+        if(resAtt) { resAtt.textContent = ''; resAtt.style.color = '#fff'; }
+        if(resDef) { resDef.textContent = ''; resDef.style.color = '#fff'; }
+        if(outcome) outcome.textContent = '';
+
+        // 4. CLÍMAX: O Resultado aparece (1.2s depois)
+        setTimeout(() => {
+            // Tremor de impacto
+            const arena = document.querySelector('.duel-arena');
+            if(arena) arena.classList.add('clash-impact');
+            
+            // Mostra Painel
+            if(resultPanel) resultPanel.classList.remove('hidden');
+            if(resultPanel) resultPanel.classList.add('show');
+            
+            if(resAtt) resAtt.textContent = data.attacker.total;
+            if(resDef) resDef.textContent = data.defender.total;
+
+            // Define Vencedor Visualmente
+            if (data.winner === 'att') {
+                attSlot.classList.add('winner-glow');
+                defSlot.classList.add('loser-gray');
+                if(outcome) outcome.textContent = "SUCESSO!";
+                if(resAtt) resAtt.style.color = "#00e676";
+                if(resDef) resDef.style.color = "#ff5252";
+            } else {
+                defSlot.classList.add('winner-glow');
+                attSlot.classList.add('loser-gray');
+                if(outcome) outcome.textContent = "BLOQUEADO!";
+                if(resDef) resDef.style.color = "#00e676";
+                if(resAtt) resAtt.style.color = "#ff5252";
+            }
+
+            // 5. FIM DA CENA: Fecha tudo
+            setTimeout(() => {
+                overlay.classList.remove('active');
+                setTimeout(() => {
+                    overlay.classList.add('hidden'); // Volta a esconder
+                    if(arena) arena.classList.remove('clash-impact');
+                }, 300);
+
+                console.log("Cena acabou. Vencedor:", data.winner);
+                
+                // Feedback Provisório
+                if (data.winner === 'att') this.updateInfo("ATAQUE VENCEU! Avançando...");
+                else this.updateInfo("DEFESA VENCEU! Roubando a bola...");
+
+            }, 3000); // Tempo para ler o resultado
+
+        }, 1200); // Tempo da animação de entrada
     }
 
     // 3. Atualiza UI (Chamar no startMatchState)
