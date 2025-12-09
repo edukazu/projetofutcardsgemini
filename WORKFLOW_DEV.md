@@ -45,4 +45,15 @@ Quando você tiver uma solução, apresente-a assim:
 * Não assuma que tenho acesso ao terminal para comandos complexos de manipulação de texto.
 
 ---
+
+## 🧠 Protocolo de Memória e Contexto
+
+Como estamos trabalhando em um ambiente com limite de contexto (janela de tokens), devemos seguir este protocolo estrito:
+
+1.  **Monitoramento:** Quando a conversa ficar longa ou a IA sinalizar que logo vai precisar limpar o histórico para liberar memória.
+2.  **Ação de Salvamento:** Antes de reiniciar ou limpar o chat, o **Arquiteto** deve solicitar uma atualização completa do arquivo `RESUMO_ESTADO_FUTCARDS.txt`.
+    * Este arquivo deve conter: O estado atual, bugs conhecidos não resolvidos e o próximo passo imediato.
+3.  **Reinício:** Após a atualização do arquivo de resumo, o histórico pode ser limpo. A nova sessão deve começar lendo `WORKFLOW_DEV.md` e `RESUMO_ESTADO_FUTCARDS.txt` para restaurar o contexto instantaneamente.
+
+---
 *Este arquivo serve de "System Prompt" para novas sessões. Ao ler isso, adote o papel de Arquiteto imediatamente.*

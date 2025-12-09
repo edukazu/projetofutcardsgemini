@@ -17,7 +17,7 @@ class Game {
         this.playerName = config.playerName || "JOGADOR";
         this.playerColor = config.playerTeamColor || 'blue';
         
-        // Seleção de Times
+        // Seleção de Times (Clona os dados para não alterar o original)
         if (this.playerColor === 'red') {
             this.teams = { 
                 player: JSON.parse(JSON.stringify(TEAMS_DATA.catalonia)), 
@@ -29,6 +29,32 @@ class Game {
                 ia: JSON.parse(JSON.stringify(TEAMS_DATA.catalonia)) 
             };
         }
+
+        // --- CORREÇÃO DE ZONAS (FIX ROYAL/ORIENTAÇÃO) ---
+        // Força o Time do Jogador a estar sempre no Lado Esquerdo (Zonas 0, 1, 2, 3)
+        // Força a IA a estar sempre no Lado Direito (Zonas 4, 3, 2, 1)
+        
+        this.assignTacticalZones(this.teams.player, 'left');
+        this.assignTacticalZones(this.teams.ia, 'right');
+    }
+
+    // Método auxiliar para distribuir posições
+    assignTacticalZones(teamObj, side) {
+        teamObj.players.forEach(p => {
+            if (side === 'left') {
+                // Jogador: GK(0), DEF(1), MID(2), ATT(3) -> Ataca para a direita
+                if (p.role === 'GK') p.zone = 0;
+                else if (p.role === 'DEF') p.zone = 1;
+                else if (p.role === 'MID') p.zone = 2;
+                else if (p.role === 'ATT') p.zone = 3; // Entra na defesa da IA
+            } else {
+                // IA: GK(4), DEF(3), MID(2), ATT(1) -> Ataca para a esquerda
+                if (p.role === 'GK') p.zone = 4;
+                else if (p.role === 'DEF') p.zone = 3;
+                else if (p.role === 'MID') p.zone = 2;
+                else if (p.role === 'ATT') p.zone = 1; // Entra na defesa do Jogador
+            }
+        });
     }
 
     // --- REGRAS DE EXIBIÇÃO (4 Stats Técnicos - SEM STAMINA) ---
