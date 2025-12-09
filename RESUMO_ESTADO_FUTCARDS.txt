@@ -1,32 +1,33 @@
 PROJETO: Fut Cards (Web Game)
-FASE ATUAL: Fase 2 - Gameplay Core (Lógica de Batalha Implementada)
+FASE ATUAL: Fase 2 - Gameplay Core (Visual de Duelo & Hierarquia)
 DATA: 09/12/2025
 
 === 1. STATUS GERAL ===
-O jogo possui Kickoff funcional (com regra de Meio-Campo) e um "Motor de Duelo" completo.
-O jogador pode selecionar ações (Passe/Drible), o sistema identifica defensores próximos (Cone de Influência), a IA organiza a defesa (Líder + Suportes) e o resultado é calculado matematicamente (Atributos + Bônus + d20).
+O "Motor de Duelo" está funcional e visualmente polido.
+O fluxo atual é: Kickoff -> Seleção de Ação -> Identificação de Defesa (Cone) -> Animação de Duelo (Cinema Mode) -> Resultado Matemático.
+A hierarquia visual (Z-Index) foi blindada para garantir que cartas destacadas nunca fiquem escondidas.
 
-=== 2. ÚLTIMAS IMPLEMENTAÇÕES (Lógica Tática) ===
-* UI de Batalha: Botões "Drible" e "Passe" aparecem no turno do jogador.
-* Smart Defense (IA):
-  - Cone de Influência: Detecta defensores em um raio de 35% na zona oposta.
-  - Cobertura: Se houver >1 defensor, o melhor assume o duelo e os outros dão bônus (+10% cada).
-* Matemática: Sistema Transparente (Log no Console) mostrando a soma de Atributos + Dados.
-* Times: Adicionado "Athletic Matrice" (3-5-2) com correção visual para zonas densas (5 jogadores).
+=== 2. ÚLTIMAS IMPLEMENTAÇÕES (Visual & UX) ===
+* Cena de Duelo (Cinema Mode): Overlay escuro que clona as cartas, anima a entrada lateral e o impacto central. Substituiu os alerts.
+* Hierarquia Visual Absoluta:
+  - Uso do seletor `:has()` no CSS para trazer a ZONA inteira para frente quando uma carta é destacada.
+  - Correção de Z-Index: Mouse Hover > Destaque Principal > Suporte > Cartas Normais.
+* Fix de Interação: O bloqueio de cliques (pointer-events) foi ajustado para permitir selecionar cartas mesmo quando elas invadem visualmente outra zona.
 
 === 3. ARQUITETURA TÉCNICA ===
+* `style.css`:
+  - `.field-zone:has(...)`: Correção crítica de empilhamento de contextos.
+  - `#duel-stage-overlay`: Camada de animação superior.
 * `game.js`:
-  - `identifyDefenders()`: Retorna lista de oponentes válidos (proximidade).
-  - `resolveDefenseSetup()`: Define quem é o Main Defender e calcula bônus de suporte.
-  - `resolveDuelMath()`: Executa a equação `(Attr + Dado) vs (Attr + Bonus + Dado)`.
-* `MANUAL_REGRAS.md`: Criado para documentar todas as fórmulas (Open Data).
+  - `animateDuelScene()`: Gerencia a clonagem de DOM e timing da animação.
+  - `resolveDuelMath()`: Agora chama a animação em vez de mostrar alert.
 
 === 4. PENDÊNCIAS IMEDIATAS (Próximos Passos) ===
-1. [VISUAL] Implementar a "Cena de Duelo" (Focus Mode). Substituir o `alert()` por uma animação onde a tela escurece e as cartas se chocam/interagem.
-2. [LÓGICA] Implementar a consequência da vitória.
-   - Se Atacante vence: Avança para próxima zona ou toca a bola.
-   - Se Defensor vence: Rouba a posse (Turnover).
-3. [MOBILE] Manter em mente a migração futura (Capacitor).
+1. [LÓGICA] Implementar a **Consequência do Duelo**.
+   - Atualmente, a animação termina e... nada acontece (apenas log).
+   - Precisamos mover a bola (se Ataque venceu) ou trocar a posse (se Defesa venceu).
+2. [DEBUG] Investigar os "pequenos problemas" visuais relatados (ajustes finos).
+3. [UI] Melhorar o feedback de "Quem ganhou" após a animação fechar (talvez um texto flutuante no campo).
 
-=== 5. BUGS CONHECIDOS ===
-* Nenhum bug crítico no momento. Lógica de seleção de oponente e kickoff estão estáveis.
+=== 5. ESTADO DA MEMÓRIA ===
+* Backup realizado após correção da Hierarquia Visual. Código estável.
