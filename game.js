@@ -207,14 +207,24 @@ class Game {
     overlay.style.display = 'flex';
     coin.style.transition = 'none'; // Remove transição para o giro contínuo
     coin.className = 'coin-spinning'; // Classe do CSS que gira infinito
-    // 3. Determinar o Vencedor AGORA (mas não mostrar ainda)
-    const winner = Math.random() < 0.5 ? 'player' : 'ia';
-    const winnerTeam = (winner === 'player') ? this.teams.player : this.teams.ia;
+            // 3. Determinar o Vencedor AGORA
+            const winner = Math.random() < 0.5 ? 'player' : 'ia';
+            const winnerTeam = (winner === 'player') ? this.teams.player : this.teams.ia;
+            
+            // --- FIX KICKOFF: REGRA DE MEIO-CAMPO ---
+            // Primeiro, filtra apenas os Meio-Campistas (MID)
+            let eligiblePlayers = winnerTeam.players.filter(p => p.role === 'MID');
+            
+            // Fallback de segurança: Se não houver MID (ex: formação exótica), usa qualquer um exceto GK
+            if (eligiblePlayers.length === 0) {
+                eligiblePlayers = winnerTeam.players.filter(p => p.role !== 'GK');
+            }
+
+            // Agora sim, busca o melhor passador DENTRO dos elegíveis
+            const bestPasser = eligiblePlayers.reduce((prev, current) => {
+                return (prev.pas >= current.pas) ? prev : current;
+            });
     
-    // Identificar Melhor Passador
-    const bestPasser = winnerTeam.players.reduce((prev, current) => {
-        return (prev.pas > current.pas) ? prev : current;
-    });
     // 4. Agendar a PARADA da moeda (Drama)
     setTimeout(() => {
         // Para a animação infinita

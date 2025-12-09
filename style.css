@@ -512,3 +512,17 @@ body {
 .bg-matrice .card-name { color: #fff !important; text-shadow: 1px 1px 2px black; }
 .bg-matrice .stat-val { color: #ffd700 !important; } /* Estatísticas douradas */
 .bg-matrice .stat-label { color: #ddd !important; opacity: 0.9 !important; }
+
+/* ========================================= */
+/* 8. CORREÇÃO AUTOMÁTICA DE DENSIDADE (5 JOGADORES) */
+/* ========================================= */
+
+/* Seletor Inteligente (:has): Detecta se o grupo tem uma 5ª carta */
+/* Aplica o ajuste APENAS para clusters densos (ex: Meio-Campo 3-5-2) */
+.team-cluster:has(.field-card-container:nth-child(5)) {
+    /* Move o grupo inteiro para baixo para aliviar a borda superior */
+    transform: translateY(20px); 
+    
+    /* Opcional: Reduz levemente a escala se sentir que ficou muito apertado */
+    /* transform: translateY(15px) scale(0.98); */
+}
