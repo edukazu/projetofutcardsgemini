@@ -1,41 +1,32 @@
 PROJETO: Fut Cards (Web Game)
-FASE ATUAL: Fim da Fase 1 (Kickoff & Visual) -> Início da Fase 2 (Gameplay)
+FASE ATUAL: Fase 2 - Gameplay Core (Lógica de Batalha Implementada)
 DATA: 09/12/2025
 
 === 1. STATUS GERAL ===
-O jogo inicializa, carrega os times, executa um sorteio de "Cara ou Coroa" em tela cheia (3D) e realiza o pontapé inicial (Kickoff) respeitando a regra de passar para um Meio-Campista (MID). O visual mudou para um estilo "Diorama Tático" (Vertical).
+O jogo possui Kickoff funcional (com regra de Meio-Campo) e um "Motor de Duelo" completo.
+O jogador pode selecionar ações (Passe/Drible), o sistema identifica defensores próximos (Cone de Influência), a IA organiza a defesa (Líder + Suportes) e o resultado é calculado matematicamente (Atributos + Bônus + d20).
 
-=== 2. MUDANÇAS VISUAIS IMPORTANTES (Conceito Diorama) ===
-* Orientação: O jogo agora usa formação VERTICAL (Cluster column) para simular as linhas do campo.
-* Cartas: Não usamos mais tokens. Usamos as cartas completas (Full Art) reduzidas no campo.
-* Campo: Altura aumentada drasticamente (85vh) para caber 5 cartas em pé. Largura reduzida (82%) para dar respiro lateral.
-* Gol: Aumentado para 360px de altura para alinhar com o Goleiro.
+=== 2. ÚLTIMAS IMPLEMENTAÇÕES (Lógica Tática) ===
+* UI de Batalha: Botões "Drible" e "Passe" aparecem no turno do jogador.
+* Smart Defense (IA):
+  - Cone de Influência: Detecta defensores em um raio de 35% na zona oposta.
+  - Cobertura: Se houver >1 defensor, o melhor assume o duelo e os outros dão bônus (+10% cada).
+* Matemática: Sistema Transparente (Log no Console) mostrando a soma de Atributos + Dados.
+* Times: Adicionado "Athletic Matrice" (3-5-2) com correção visual para zonas densas (5 jogadores).
 
-=== 3. LÓGICA DE CÂMERA ===
-* Sistema: Pan & Zoom via classes CSS (`cam-pos-X`, `cam-zoom-X`).
-* Comportamento: A câmera foca na zona onde está a bola.
-* Bug Atual: O "Pan" pode estar invertido dependendo do lado do campo.
-
-=== 4. BUGS CONHECIDOS (PRIORIDADE PARA CORREÇÃO) ===
-1. [CRÍTICO] Orientação do Royal: Ao escolher o Royal Madrid como time do jogador, há uma confusão visual (provavelmente a câmera foca no lado errado ou os times nascem no lado trocado). Precisamos revisar a lógica de "Lado Esquerdo vs Lado Direito" e espelhamento de câmera.
-2. [VISUAL] Ajustes Finos: O Gol ainda pode precisar de alinhamento fino com o Goleiro.
-
-=== 6. ARQUITETURA TÉCNICA ===
+=== 3. ARQUITETURA TÉCNICA ===
 * `game.js`:
-  - `startKickoff()`: Lógica de sorteio e primeiro passe (Corrigido para priorizar Meias).
-  - `createTokenElement()`: Cria Wrappers.
-* Estratégia de Plataforma:
-  - FASE 1 (Atual): Desenvolvimento Web (HTML/CSS/JS puro) para iteração rápida.
-  - FASE 2 (Futura): Backend simples para segurança (Node.js).
-  - FASE 3 (Release): Empacotamento Mobile (Android/iOS) via Capacitor/Cordova.
+  - `identifyDefenders()`: Retorna lista de oponentes válidos (proximidade).
+  - `resolveDefenseSetup()`: Define quem é o Main Defender e calcula bônus de suporte.
+  - `resolveDuelMath()`: Executa a equação `(Attr + Dado) vs (Attr + Bonus + Dado)`.
+* `MANUAL_REGRAS.md`: Criado para documentar todas as fórmulas (Open Data).
 
-=== 7. CHECKLIST DE MIGRAÇÃO MOBILE (FUTURO) ===
-[ ] 1. Backend: Criar servidor para validar partidas (evitar hacks de console).
-[ ] 2. UI/UX: Implementar controles de toque nativos (swipes) e feedback tátil.
-[ ] 3. Monetização: Integrar SDK de Ads (AdMob) e IAP (In-App Purchases).
-[ ] 4. Build: Configurar Capacitor.js para gerar APK/IPA.
+=== 4. PENDÊNCIAS IMEDIATAS (Próximos Passos) ===
+1. [VISUAL] Implementar a "Cena de Duelo" (Focus Mode). Substituir o `alert()` por uma animação onde a tela escurece e as cartas se chocam/interagem.
+2. [LÓGICA] Implementar a consequência da vitória.
+   - Se Atacante vence: Avança para próxima zona ou toca a bola.
+   - Se Defensor vence: Rouba a posse (Turnover).
+3. [MOBILE] Manter em mente a migração futura (Capacitor).
 
-=== 8. PRÓXIMOS PASSOS IMEDIATOS (FASE 1) ===
-1. [PRIORIDADE] Implementar a Lógica de Turno (Jogador seleciona carta -> Opções aparecem).
-2. Criar o UI de Batalha (Botões de Ação: Passe, Drible, Chute).
-3. Resolver a matemática do duelo (Atributo A vs Atributo B).
+=== 5. BUGS CONHECIDOS ===
+* Nenhum bug crítico no momento. Lógica de seleção de oponente e kickoff estão estáveis.

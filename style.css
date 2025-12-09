@@ -534,3 +534,26 @@ body {
     transform: translateY(-10px) scale(1.05); /* Leve destaque de "Alerta" */
     transition: all 0.3s ease;
 }
+
+/* Destaque Diferente para quem está dando Suporte (Cobertura) */
+.support-defender-highlight .card-full {
+    border-color: #ffd700 !important; /* Amarelo/Dourado */
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+    transform: translateY(-5px) scale(1.02);
+}
+
+/* UI DE BATALHA */
+#action-panel { display: flex; gap: 15px; }
+
+.btn-action {
+    border: none; padding: 12px 25px; border-radius: 8px;
+    font-family: 'Arial Black', sans-serif; font-size: 1rem; cursor: pointer;
+    text-transform: uppercase; display: flex; align-items: center; gap: 10px;
+    color: white; transition: transform 0.1s;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.3);
+}
+.btn-action:active { transform: translateY(4px); box-shadow: none; }
+
+/* Cores Táticas */
+.btn-dribble { background: linear-gradient(#ff9800, #f57c00); border-bottom: 4px solid #e65100; }
+.btn-pass { background: linear-gradient(#2196f3, #1976d2); border-bottom: 4px solid #0d47a1; }

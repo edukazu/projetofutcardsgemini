@@ -317,7 +317,85 @@ class Game {
 
     startMatchState() {
         this.state = 'MATCH_LOGIC';
-        this.updateInfo('Partida Iniciada. Identificando marcadores...');
+        this.updateInfo('Sua vez! Escolha uma ação.');
+        this.updateActionButtons(); // <--- IMPORTANTE
+        
+        // Visualização Tática Automática (Opcional, para ver o cone)
+        this.highlightValidDefenders();
+    }
+
+    // 1. Chamado ao clicar no botão
+    executeTurnAction(actionType) {
+        if (!this.ballHolder) return;
+
+        // A. Identifica o cenário defensivo (Quem marca? Tem suporte?)
+        const defendersInCone = this.identifyDefenders(this.ballHolder);
+        const defenseSetup = this.resolveDefenseSetup(defendersInCone);
+
+        if (defenseSetup.type === 'OPEN') {
+            alert("Caminho Livre! (Implementar avanço automático)");
+            return;
+        }
+
+        // B. Executa a Matemática do Duelo
+        this.resolveDuelMath(actionType, this.ballHolder, defenseSetup);
+    }
+
+    // 2. A Matemática (Transparente)
+    resolveDuelMath(actionType, attacker, defenseSetup) {
+        const defender = defenseSetup.main;
+        const supportBonus = defenseSetup.bonus;
+
+        // --- DEFINIR ATRIBUTOS USADOS (Baseado no Manual) ---
+        let attAttr = 0;
+        let defAttr = 0;
+        let actionLabel = "";
+
+        if (actionType === 'DRIBBLE') {
+            attAttr = attacker.dri; // Drible
+            defAttr = defender.des; // Contra Desarme (Padrão IA)
+            actionLabel = "Drible vs Desarme";
+        } else if (actionType === 'PASS') {
+            attAttr = attacker.pas; // Passe
+            defAttr = defender.int; // Contra Interceptação
+            actionLabel = "Passe vs Interceptação";
+        }
+
+        // --- CÁLCULO FINAL ---
+        // 1. Rola o Dado (d20) para ambos - Fator Sorte
+        const diceAtt = Math.floor(Math.random() * 20) + 1;
+        const diceDef = Math.floor(Math.random() * 20) + 1;
+
+        // 2. Soma Totais
+        // Defesa recebe o Bônus de Suporte calculado no resolveDefenseSetup
+        // Fórmula: (Atributo + Dado) vs (Atributo + Dado + Bônus Suporte)
+        const totalAtt = attAttr + diceAtt;
+        
+        // Aplica o bônus de suporte no atributo do defensor
+        const defAttrWithBonus = Math.floor(defAttr * (1 + (supportBonus / 100))); 
+        const totalDef = defAttrWithBonus + diceDef;
+
+        // --- LOG TRANSPARENTE (PARA O JOGADOR ENTENDER) ---
+        console.clear();
+        console.log(`%c⚡ RESOLUÇÃO DE DUELO: ${actionLabel}`, "color: yellow; font-weight: bold; font-size: 14px;");
+        console.log(`ATAQUE (${attacker.name}): ${attAttr} (Attr) + ${diceAtt} (Dado) = ${totalAtt}`);
+        console.log(`DEFESA (${defender.name}): ${defAttr} (Attr) + ${supportBonus}% (Suporte) = ${defAttrWithBonus} (Final) + ${diceDef} (Dado) = ${totalDef}`);
+
+        // --- RESULTADO ---
+        if (totalAtt > totalDef) {
+            this.updateInfo(`VENCEU! ${attacker.name} superou a marcação de ${defender.name}!`);
+            alert(`VITÓRIA DO ATAQUE!\n\n${attacker.name}: ${totalAtt}\n${defender.name}: ${totalDef}\n\n(Próximo passo: Executar o movimento/passe)`);
+        } else {
+            this.updateInfo(`PERDEU! ${defender.name} parou a jogada.`);
+            alert(`VITÓRIA DA DEFESA!\n\n${attacker.name}: ${totalAtt}\n${defender.name}: ${totalDef}\n\n(Próximo passo: Trocar posse)`);
+        }
+    }
+
+    // 3. Atualiza UI (Chamar no startMatchState)
+    updateActionButtons() {
+        const panel = document.getElementById('action-panel');
+        if(this.possessionTeam === 'player') panel.classList.remove('hidden');
+        else panel.classList.add('hidden');
     }
 
     // --- LÓGICA TÁTICA: IDENTIFICAR DEFENSORES VÁLIDOS ---
@@ -364,26 +442,73 @@ class Game {
         return validDefenders;
     }
 
-    // Método visual para testar a lógica
+    // --- LÓGICA TÁTICA: RESOLVER QUEM MARCA E QUEM AJUDA ---
+    resolveDefenseSetup(validDefenders) {
+        if (!validDefenders || validDefenders.length === 0) {
+            return { type: 'OPEN', main: null, supporters: [], bonus: 0 };
+        }
+
+        // 1. Se tiver só um, é duelo simples (1x1)
+        if (validDefenders.length === 1) {
+            return { type: 'DUEL', main: validDefenders[0], supporters: [], bonus: 0 };
+        }
+
+        // 2. Se tiver mais de um (1xN), escolhe o MELHOR para o combate (Smart AI)
+        // Critério: Soma de (Desarme + Interceptação) * Fator Cansaço
+        // Isso simula um jogador escolhendo seu melhor zagueiro para parar a jogada
+        const sortedDefenders = validDefenders.sort((a, b) => {
+            const scoreA = (a.des + a.int) * (a.sta / 100);
+            const scoreB = (b.des + b.int) * (b.sta / 100);
+            return scoreB - scoreA; // Ordena do Maior para o Menor
+        });
+
+        const mainDefender = sortedDefenders[0]; // O melhor assume
+        const supporters = sortedDefenders.slice(1); // O resto ajuda
+
+        // 3. Calcula o Bônus de Suporte (Vantagem Numérica)
+        // Regra: Cada suporte adiciona 10% de eficiência ao defensor principal
+        const supportBonus = supporters.length * 10; 
+
+        console.log(`Defesa Organizada: ${mainDefender.name} assume o duelo.`);
+        console.log(`Suporte: +${supportBonus}% vindo de ${supporters.length} jogadores.`);
+
+        return { 
+            type: 'CLUSTER', 
+            main: mainDefender, 
+            supporters: supporters, 
+            bonus: supportBonus 
+        };
+    }
+
+    // Atualize o método de teste highlight para usar essa nova inteligência visualmente
     highlightValidDefenders() {
         if (!this.ballHolder) return;
 
-        // Limpa destaques anteriores (caso haja)
+        // Limpa destaques anteriores
         document.querySelectorAll('.valid-defender-highlight').forEach(el => el.classList.remove('valid-defender-highlight'));
+        document.querySelectorAll('.support-defender-highlight').forEach(el => el.classList.remove('support-defender-highlight'));
 
-        // Chama a lógica matemática acima
+        // 1. Identifica quem está no cone
         const defenders = this.identifyDefenders(this.ballHolder);
         
-        console.log(`Lógica Tática: Atacante ${this.ballHolder.name} vs ${defenders.length} Defensores`);
+        // 2. Resolve a hierarquia (Quem manda, quem ajuda)
+        const setup = this.resolveDefenseSetup(defenders);
 
-        // Aplica o visual nos defensores encontrados
-        defenders.forEach(def => {
-            // Procura o wrapper (container) da carta
-            const wrapper = document.getElementById(`card-wrapper-${def.id}`);
-            if (wrapper) {
-                wrapper.classList.add('valid-defender-highlight'); 
-            }
-        });
+        if (setup.main) {
+            // Destaque Laranja para o Duelista Principal
+            const mainWrapper = document.getElementById(`card-wrapper-${setup.main.id}`);
+            if (mainWrapper) mainWrapper.classList.add('valid-defender-highlight');
+
+            // Destaque Amarelo/Azul para os Suportes (Se houver)
+            setup.supporters.forEach(sup => {
+                const supWrapper = document.getElementById(`card-wrapper-${sup.id}`);
+                if (supWrapper) supWrapper.classList.add('support-defender-highlight');
+            });
+            
+            this.updateInfo(`Defesa: ${setup.main.name} lidera a marcação (+${setup.bonus}% suporte).`);
+        } else {
+            this.updateInfo(`Caminho Livre! Nenhum defensor próximo.`);
+        }
     }
 
     // --- CRIAÇÃO DE TOKENS NO CAMPO ---
