@@ -17,27 +17,28 @@ class Game {
         this.playerName = config.playerName || "JOGADOR";
         this.playerColor = config.playerTeamColor || 'blue';
         
-        // Configuração de Times baseada na escolha do Menu
+        // 1. Identifica o Time do Jogador baseado na cor escolhida
+        let playerTeamData;
         switch(this.playerColor) {
-            case 'red': // FC Catalonia
-                this.teams = { 
-                    player: JSON.parse(JSON.stringify(TEAMS_DATA.catalonia)), 
-                    ia: JSON.parse(JSON.stringify(TEAMS_DATA.royal)) 
-                };
-                break;
-            case 'redwhite': // Athletic Matrice (NOVO)
-                this.teams = { 
-                    player: JSON.parse(JSON.stringify(TEAMS_DATA.matrice)), 
-                    ia: JSON.parse(JSON.stringify(TEAMS_DATA.catalonia)) // Joga contra o Catalonia
-                };
-                break;
-            default: // Royal Madrid (Blue) - Padrão
-                this.teams = { 
-                    player: JSON.parse(JSON.stringify(TEAMS_DATA.royal)), 
-                    ia: JSON.parse(JSON.stringify(TEAMS_DATA.matrice)) // Joga contra o Matrice (Teste Variado)
-                };
-                break;
+            case 'red': playerTeamData = TEAMS_DATA.catalonia; break;
+            case 'redwhite': playerTeamData = TEAMS_DATA.matrice; break;
+            default: playerTeamData = TEAMS_DATA.royal; break; // 'blue'
         }
+
+        // 2. Sorteia o Oponente (Qualquer time MENOS o que o jogador escolheu)
+        const allTeams = Object.values(TEAMS_DATA); // Pega a lista [Royal, Catalonia, Matrice]
+        const availableOpponents = allTeams.filter(t => t.id !== playerTeamData.id);
+        
+        // Escolhe um índice aleatório da lista de disponíveis
+        const randomOpponent = availableOpponents[Math.floor(Math.random() * availableOpponents.length)];
+
+        // 3. Inicializa os times (Clonando para garantir segurança dos dados)
+        this.teams = { 
+            player: JSON.parse(JSON.stringify(playerTeamData)), 
+            ia: JSON.parse(JSON.stringify(randomOpponent)) 
+        };
+
+        console.log(`Matchup: ${this.teams.player.name} vs ${this.teams.ia.name}`);
 
         // --- CORREÇÃO DE ZONAS (FIX ROYAL/ORIENTAÇÃO) ---
         // Aplica a orientação correta independente do time escolhido
@@ -316,8 +317,73 @@ class Game {
 
     startMatchState() {
         this.state = 'MATCH_LOGIC';
-        this.updateInfo('A partida começou! Lógica de batalha será implementada.');
-        console.log('Match state started. Current ball holder:', this.ballHolder);
+        this.updateInfo('Partida Iniciada. Identificando marcadores...');
+    }
+
+    // --- LÓGICA TÁTICA: IDENTIFICAR DEFENSORES VÁLIDOS ---
+    identifyDefenders(attackerCard) {
+        // 1. Identificar a Zona de Defesa Oposta (Espelhamento)
+        let targetZoneId = attackerCard.zone;
+        if (attackerCard.zone === 3) targetZoneId = 1; // Atacante (3) vs Defesa (1)
+        if (attackerCard.zone === 2) targetZoneId = 2; // Meio (2) vs Meio (2)
+        if (attackerCard.zone === 1) targetZoneId = 3; // Defesa (1) saindo jogando vs Ataque (3)
+
+        // Define quem é o time defensor baseado em quem tem a posse
+        const defenseTeam = (this.possessionTeam === 'player') ? this.teams.ia.players : this.teams.player.players;
+        
+        // Filtra apenas os inimigos que estão fisicamente na zona de combate
+        const potentialDefenders = defenseTeam.filter(p => p.zone === targetZoneId);
+
+        if (potentialDefenders.length === 0) return []; // Caminho livre
+
+        // 2. Calcular Posição Relativa (0% a 100% da largura do campo)
+        // Precisamos saber onde o atacante está para saber quem está perto dele
+        const attackTeam = (this.possessionTeam === 'player') ? this.teams.player.players : this.teams.ia.players;
+        const attackersInZone = attackTeam.filter(p => p.zone === attackerCard.zone);
+        
+        // Descobre o índice do atacante no array da zona (ex: é o 2º de 3 jogadores)
+        const attackerIndex = attackersInZone.indexOf(attackerCard);
+        // Transforma em porcentagem (0.0 a 1.0). Se estiver sozinho, assume o meio (0.5)
+        const attackerPos = attackersInZone.length > 1 ? attackerIndex / (attackersInZone.length - 1) : 0.5;
+
+        // 3. Filtrar Defensores pelo Alcance (Cone de Influência)
+        const RANGE = 0.35; // 35% de alcance para cada lado (cobre frente e diagonais)
+        
+        const validDefenders = potentialDefenders.filter((def, index) => {
+            // Calcula a posição do defensor
+            const defPos = potentialDefenders.length > 1 ? index / (potentialDefenders.length - 1) : 0.5;
+            // Mede a distância
+            const distance = Math.abs(attackerPos - defPos);
+            
+            // Regra Especial: Se só tem um defensor na zona, ele sempre marca (para evitar bugs de range)
+            if (potentialDefenders.length === 1) return true;
+
+            return distance <= RANGE;
+        });
+
+        return validDefenders;
+    }
+
+    // Método visual para testar a lógica
+    highlightValidDefenders() {
+        if (!this.ballHolder) return;
+
+        // Limpa destaques anteriores (caso haja)
+        document.querySelectorAll('.valid-defender-highlight').forEach(el => el.classList.remove('valid-defender-highlight'));
+
+        // Chama a lógica matemática acima
+        const defenders = this.identifyDefenders(this.ballHolder);
+        
+        console.log(`Lógica Tática: Atacante ${this.ballHolder.name} vs ${defenders.length} Defensores`);
+
+        // Aplica o visual nos defensores encontrados
+        defenders.forEach(def => {
+            // Procura o wrapper (container) da carta
+            const wrapper = document.getElementById(`card-wrapper-${def.id}`);
+            if (wrapper) {
+                wrapper.classList.add('valid-defender-highlight'); 
+            }
+        });
     }
 
     // --- CRIAÇÃO DE TOKENS NO CAMPO ---
