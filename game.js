@@ -155,33 +155,47 @@ class Game {
         setTimeout(() => this.startKickoff(), 500);
     }
 
-    // --- LÓGICA DE KICKOFF (PONTAPÉ INICIAL) ---
+    // --- LÓGICA DE KICKOFF (EVENTO DE CARA OU COROA) ---
     startKickoff() {
         this.state = 'KICKOFF';
-        
-        // 1. Cara ou Coroa (50/50)
+        this.updateInfo("Aguardando o sorteio...");
+    // 1. Configurar o Overlay
+    const overlay = document.getElementById('coin-toss-overlay');
+    const coinFront = document.getElementById('coin-front-face');
+    const coinBack = document.getElementById('coin-back-face');
+    // Define as cores e nomes na moeda com base nos times atuais
+    // Frente = Time do Jogador | Verso = Time da IA
+    coinFront.textContent = this.teams.player.name;
+    coinFront.className = `coin-face coin-front ${this.teams.player.id === 'team_royal' ? 'bg-royal' : 'bg-catalonia'}`;
+    
+    coinBack.textContent = this.teams.ia.name;
+    coinBack.className = `coin-face coin-back ${this.teams.ia.id === 'team_royal' ? 'bg-royal' : 'bg-catalonia'}`;
+    // 2. Mostrar o overlay e iniciar a animação
+    overlay.style.display = 'flex';
+    // 3. Aguarda 3 segundos de "drama"
+    setTimeout(() => {
+        // --- Lógica do Sorteio ---
         const winner = Math.random() < 0.5 ? 'player' : 'ia';
         const winnerTeam = (winner === 'player') ? this.teams.player : this.teams.ia;
         
-        // 2. Identificar Melhor Passador (Maior atributo 'pas')
+        // Identificar Melhor Passador
         const bestPasser = winnerTeam.players.reduce((prev, current) => {
             return (prev.pas > current.pas) ? prev : current;
         });
-
-        // 3. Dar a posse
+        // ESCONDE O OVERLAY
+        overlay.style.display = 'none';
+        // Aplica os resultados no jogo
         this.ballHolder = bestPasser;
-        this.possessionTeam = winner; // 'player' ou 'ia'
-
-        // 4. Atualizar Visual (Bola e Texto)
+        this.possessionTeam = winner; 
         this.moveBallToPlayer(bestPasser);
         
         if (winner === 'player') {
-            this.updateInfo(`Cara ou Coroa: ${winnerTeam.name} venceu! Bola com ${bestPasser.name}. CLIQUE em um parceiro para passar.`);
+            this.updateInfo(`Vencedor: ${winnerTeam.name}! Bola com ${bestPasser.name}. CLIQUE em um parceiro.`);
         } else {
-            this.updateInfo(`Cara ou Coroa: IA venceu. Bola com ${bestPasser.name}. Aguardando IA...`);
-            // Futuramente chamaremos a IA aqui
+            this.updateInfo(`Vencedor: IA (${winnerTeam.name}). Bola com ${bestPasser.name}. Aguardando IA...`);
         }
-    }
+    }, 3000); // 3 segundos de suspense
+}
 
     // --- INTERAÇÃO DE CLIQUE ---
     handleCardClick(playerData, teamType) {

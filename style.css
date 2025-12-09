@@ -250,3 +250,59 @@ body {
 #game-info { font-size: 1rem; color: #cfd8dc; text-align: right; }
 
 #coin-overlay, #battle-overlay { display: none; }
+
+/* --- OVERLAY E MOEDA 3D GIGANTE --- */
+#coin-toss-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.85); /* Fundo escuro e opaco */
+    z-index: 2000; /* Fica acima de tudo */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    perspective: 1000px; /* Necessário para o efeito 3D */
+}
+.coin-container { width: 150px; height: 150px; }
+
+#coin {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d; /* Mantém as faces em 3D */
+}
+
+.coin-spinning {
+    animation: spin3DCoin 1s infinite linear;
+}
+
+.coin-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    backface-visibility: hidden; /* Esconde a parte de trás quando girada */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: white;
+    text-shadow: 1px 1px 2px #000;
+    border: 5px solid #ffd700; /* Borda dourada */
+    box-shadow: inset 0 0 15px rgba(0,0,0,0.5), 0 0 20px rgba(255, 215, 0, 0.4);
+}
+
+/* A frente é a cor do jogador */
+.coin-front {
+    transform: rotateY(0deg); /* Cor será injetada via JS */
+}
+
+/* O verso é a cor da IA (rotacionado 180deg para começar escondido) */
+.coin-back {
+    transform: rotateY(180deg); /* Cor será injetada via JS */
+}
+
+@keyframes spin3DCoin {
+    from { transform: rotateY(0deg); }
+    to { transform: rotateY(1800deg); } /* Gira muitas vezes rápido */
+}
