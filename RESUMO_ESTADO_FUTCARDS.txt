@@ -20,13 +20,22 @@ O jogo inicializa, carrega os times, executa um sorteio de "Cara ou Coroa" em te
 1. [CRÍTICO] Orientação do Royal: Ao escolher o Royal Madrid como time do jogador, há uma confusão visual (provavelmente a câmera foca no lado errado ou os times nascem no lado trocado). Precisamos revisar a lógica de "Lado Esquerdo vs Lado Direito" e espelhamento de câmera.
 2. [VISUAL] Ajustes Finos: O Gol ainda pode precisar de alinhamento fino com o Goleiro.
 
-=== 5. PRÓXIMOS PASSOS ===
-1. Corrigir o bug de orientação do time Royal.
-2. Implementar a Lógica de Batalha (Botão "INICIAR DUELO" já existe, mas só dá alert).
-3. Criar o sistema de comparação de atributos (Atacante vs Defensor).
-
 === 6. ARQUITETURA TÉCNICA ===
 * `game.js`:
-  - `startKickoff()`: Gerencia o overlay de moeda e lógica de posse.
-  - `createTokenElement()`: Cria "Wrappers" clicáveis para as cartas. Importante: O clique está no wrapper, não na carta visual.
-  - `setCamera(zone)`: Move o #pitch-container.
+  - `startKickoff()`: Lógica de sorteio e primeiro passe (Corrigido para priorizar Meias).
+  - `createTokenElement()`: Cria Wrappers.
+* Estratégia de Plataforma:
+  - FASE 1 (Atual): Desenvolvimento Web (HTML/CSS/JS puro) para iteração rápida.
+  - FASE 2 (Futura): Backend simples para segurança (Node.js).
+  - FASE 3 (Release): Empacotamento Mobile (Android/iOS) via Capacitor/Cordova.
+
+=== 7. CHECKLIST DE MIGRAÇÃO MOBILE (FUTURO) ===
+[ ] 1. Backend: Criar servidor para validar partidas (evitar hacks de console).
+[ ] 2. UI/UX: Implementar controles de toque nativos (swipes) e feedback tátil.
+[ ] 3. Monetização: Integrar SDK de Ads (AdMob) e IAP (In-App Purchases).
+[ ] 4. Build: Configurar Capacitor.js para gerar APK/IPA.
+
+=== 8. PRÓXIMOS PASSOS IMEDIATOS (FASE 1) ===
+1. [PRIORIDADE] Implementar a Lógica de Turno (Jogador seleciona carta -> Opções aparecem).
+2. Criar o UI de Batalha (Botões de Ação: Passe, Drible, Chute).
+3. Resolver a matemática do duelo (Atributo A vs Atributo B).
