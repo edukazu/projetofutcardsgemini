@@ -1,0 +1,47 @@
+/* css/game.css - O Jogo em si */
+
+#main-game-wrapper { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; z-index: 1; background-color: #1b5e20; }
+#game-area { flex-grow: 1; height: 0; display: flex; justify-content: center; align-items: center; position: relative; background-image: radial-gradient(#2e7d32 1px, transparent 1px); background-size: 30px 30px; padding: 0 50px; overflow: hidden; }
+
+/* CAMPO */
+#pitch-container { width: 100%; max-width: 1400px; height: 75%; min-height: 450px; background-image: linear-gradient(to right, #43a047 0%, #43a047 50%, #4caf50 50%, #4caf50 100%); background-size: 10% 100%; border: 5px solid #fff; position: relative; display: flex; overflow: visible; box-shadow: 0 30px 60px rgba(0,0,0,0.6); transition: all 1.2s cubic-bezier(0.25, 1, 0.5, 1); transform-origin: center center; transform: scale(0.9); }
+#pitch-container::before { content: ''; position: absolute; top: 0; left: 50%; width: 4px; height: 100%; background-color: rgba(255,255,255,0.6); transform: translateX(-50%); z-index: 1; }
+#pitch-container::after { content: ''; position: absolute; top: 50%; left: 50%; width: 200px; height: 200px; border: 4px solid rgba(255,255,255,0.6); border-radius: 50%; transform: translate(-50%, -50%); z-index: 1; }
+.field-zone { flex-grow: 1; position: relative; z-index: 2; }
+.defense-zone::before, .attack-zone::before { content: ''; position: absolute; top: 50%; width: 18%; height: 60%; border: 4px solid rgba(255,255,255,0.6); transform: translateY(-50%); z-index: 1; }
+.defense-zone::before { left: 0; border-left: none; }
+.attack-zone::before { right: 0; border-right: none; }
+.goal-structure { position: absolute; top: 50%; width: 80px; height: 180px; transform: translateY(-50%); border: 4px solid #fff; z-index: 0; background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(255,255,255,0.2) 5px, rgba(255,255,255,0.2) 7px); }
+.goal-left { left: -84px; border-right: none; }
+.goal-right { right: -84px; border-left: none; }
+
+/* BOLA (Branca e Realista) */
+#ball-indicator { 
+    position: absolute; top: 50%; width: 34px; height: 34px; border-radius: 50%; z-index: 20; 
+    transform: translate(-50%, -50%); transition: left 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+    background-color: #ffffff;
+    background-image: radial-gradient(circle at 50% 10%, #000 15%, transparent 16%), radial-gradient(circle at 10% 80%, #000 15%, transparent 16%), radial-gradient(circle at 90% 80%, #000 15%, transparent 16%);
+    background-size: 100% 100%;
+    box-shadow: inset -5px -5px 10px rgba(0,0,0,0.2), 2px 5px 15px rgba(0,0,0,0.6);
+    border: 1px solid #ddd;
+}
+
+/* FOOTER & PLACAR */
+#ui-footer { height: 100px; background-color: #263238; border-top: 5px solid #004d40; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; box-shadow: 0 -10px 30px rgba(0,0,0,0.5); z-index: 2000; }
+.footer-group { display: flex; align-items: center; }
+.score-wrapper { width: 50%; justify-content: flex-start; }
+.match-scoreboard {
+    display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
+    border: 1px solid rgba(255,255,255,0.15); border-radius: 50px; padding: 10px 40px; box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+    min-width: 450px; gap: 20px;
+}
+.team-info-block { display: flex; align-items: center; gap: 15px; width: 45%; }
+.player-side { justify-content: flex-end; color: #64ffda; text-align: right; }
+.ia-side { justify-content: flex-start; color: #ffab91; text-align: left; }
+.team-name { font-size: 0.9rem; font-weight: 800; letter-spacing: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px; }
+.score-digit { font-family: 'Courier New', monospace; font-size: 2.5rem; font-weight: bold; line-height: 1; text-shadow: 0 0 10px rgba(0,0,0,0.5); }
+.score-divider { font-size: 1.5rem; color: #fff; opacity: 0.3; }
+.action-group { width: 30%; justify-content: center; gap: 20px; }
+#possession-display { background-color: #37474f; padding: 8px 20px; border-radius: 20px; border: 1px solid #546e7a; color: #eceff1; }
+#btn-battle { background: linear-gradient(135deg, #00897b, #004d40); color: white; border: none; padding: 15px 60px; font-size: 1.3rem; font-weight: bold; border-radius: 40px; cursor: pointer; }
+#game-info { color: #cfd8dc; font-size: 1rem; }

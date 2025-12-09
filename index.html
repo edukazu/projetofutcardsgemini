@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fut Cards - Reinício V1</title>
-    <link rel="stylesheet" href="style.css">
+    
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/game.css">
+    <link rel="stylesheet" href="css/cards.css">
 </head>
 <body>
 
@@ -33,7 +36,7 @@
             </div>
 
             <button id="btn-start-game" onclick="goToSquadScreen()">GERENCIAR ELENCO</button>
-            <p class="version">Fut Cards MVP v1 (Visual Update 2)</p>
+            <p class="version">Fut Cards MVP v1 (Modular V42)</p>
         </div>
     </section>
 
@@ -93,23 +96,27 @@
         </footer>
     </div>
 
-    <script src="cards.js"></script>
-    <script src="game.js"></script>
+    <script src="js/data.js"></script> <script src="js/game.js"></script>
     
     <script>
         let selectedTeamColor = 'blue';
+        
         function selectTeam(color) {
             selectedTeamColor = color;
             document.querySelectorAll('.team-option').forEach(el => el.classList.remove('selected'));
             document.getElementById(`select-team-${color}`).classList.add('selected');
         }
+
         function goToSquadScreen() {
             const playerName = document.getElementById('player-name-input').value;
+            // Instancia o jogo carregando os dados do data.js e a classe do game.js
             window.game = new Game({ playerTeamColor: selectedTeamColor, playerName: playerName });
+            
             document.getElementById('start-screen').classList.add('hidden');
             document.getElementById('squad-screen').classList.remove('hidden');
             window.game.renderSquadScreen();
         }
+
         function goToMatch() {
             document.getElementById('squad-screen').classList.add('hidden');
             document.getElementById('main-game-wrapper').classList.remove('hidden');

@@ -1,5 +1,5 @@
 /**
- * game.js - V41: Correção de Nomes dos Times no Placar
+ * js/game.js - Lógica Principal (V42 - Modular e Completo)
  */
 
 class Game {
@@ -26,7 +26,7 @@ class Game {
         }
     }
 
-    // --- REGRAS DE EXIBIÇÃO (4 Stats Técnicos - SEM STAMINA) ---
+    // --- UTILS: DEFINIÇÃO DE ATRIBUTOS PARA DISPLAY ---
     getAttributesForDisplay(p) {
         if (p.role === 'GK') {
             return [
@@ -51,7 +51,7 @@ class Game {
         }
     }
 
-    // --- TELA DE ELENCO ---
+    // --- UI: SQUAD SCREEN (GERENCIAMENTO DE ELENCO) ---
     renderSquadScreen() {
         const grid = document.getElementById('squad-grid');
         grid.innerHTML = ''; 
@@ -83,6 +83,10 @@ class Game {
         previewContainer.innerHTML = '';
         previewContainer.appendChild(this.createCardDOM(p, 'player', 'full'));
         
+        this.renderStatBars(p);
+    }
+
+    renderStatBars(p) {
         const statsContainer = document.getElementById('stat-bars-container');
         statsContainer.innerHTML = '';
         
@@ -114,27 +118,23 @@ class Game {
         });
     }
 
-    // --- TABULEIRO ---
+    // --- UI: GAME BOARD (TABULEIRO) ---
     initBoard() {
         document.querySelectorAll('.cards-container').forEach(e => e.remove());
 
         for (let i = 0; i <= 4; i++) {
             const zone = document.getElementById(`zone-${i}`);
             if (zone) {
+                // Cria container se não existir (Modularização exige recriação limpa)
                 const container = document.createElement('div');
                 container.className = 'cards-container';
                 container.id = `cards-zone-${i}`;
                 
-                const clusterPlayer = document.createElement('div');
-                clusterPlayer.className = 'team-cluster cluster-player';
-                clusterPlayer.id = `cluster-player-zone-${i}`;
-                
-                const clusterIA = document.createElement('div');
-                clusterIA.className = 'team-cluster cluster-ia';
-                clusterIA.id = `cluster-ia-zone-${i}`;
-
-                container.appendChild(clusterPlayer);
-                container.appendChild(clusterIA);
+                // Cria clusters vazios
+                container.innerHTML = `
+                    <div class="team-cluster cluster-player" id="cluster-player-zone-${i}"></div>
+                    <div class="team-cluster cluster-ia" id="cluster-ia-zone-${i}"></div>
+                `;
                 zone.appendChild(container);
             }
         }
@@ -157,7 +157,7 @@ class Game {
         }
     }
 
-    // --- FÁBRICA DE CARTAS (DOM) ---
+    // --- FÁBRICA DE CARTAS (DOM & SVG) ---
     createCardDOM(playerData, teamType, mode) {
         const card = document.createElement('div');
         card.className = mode === 'full' ? 'card-full' : 'card-token';
@@ -167,6 +167,8 @@ class Game {
         card.classList.add(isRoyal ? 'bg-royal' : 'bg-catalonia');
         
         const skin = playerData.skin || "#e0ac69";
+        
+        // SVGs DOS ROSTOS (COMPLETOS)
         const faces = {
             1: `<g transform="translate(2,2) scale(0.9)"><path d="M12 21C12 21 7 21 5 17C5 17 3.5 13 5 9C6.5 5 9 4 12 4C15 4 17.5 5 19 9C20.5 13 19 17 19 17C17 21 12 21 12 21Z" fill="${skin}"/><path d="M5 9C5 9 6 3 12 3C18 3 19 9 19 9C19 9 20 6 12 1C4 6 5 9 5 9Z" fill="#222"/><path d="M4 24C4 24 6 18 12 18C18 18 20 24 20 24" fill="${skin}"/><path d="M12 18C8 18 4 21 2 24H22C20 21 16 18 12 18Z" fill="#222"/></g>`,
             2: `<g transform="translate(2,2) scale(0.9)"><circle cx="12" cy="10" r="8" fill="#111"/><path d="M12 21C12 21 7 21 5 17C5 17 4 13 6 10C8 7 12 7 12 7C12 7 16 7 18 10C20 13 19 17 19 17C17 21 12 21 12 21Z" fill="${skin}"/><path d="M12 18C8 18 4 21 2 24H22C20 21 16 18 12 18Z" fill="#111"/></g>`,
@@ -185,6 +187,7 @@ class Game {
                 <div class="card-name-box"><span class="card-name">${playerData.name}</span></div>
             `;
         } else {
+            // CARTA PREMIUM (Layout Alinhado)
             card.innerHTML = `
                 <div class="card-content">
                     <div class="card-header">
@@ -212,11 +215,12 @@ class Game {
         return card;
     }
 
+    // --- UI: ATUALIZAÇÕES GERAIS ---
     renderUI() {
         document.getElementById('score-player').textContent = 0;
         document.getElementById('score-ia').textContent = 0;
         
-        // --- ATUALIZAÇÃO DO PLACAR COM NOMES DOS TIMES ---
+        // Atualização de nomes dos times no placar (V41/V42)
         document.getElementById('label-player-team').textContent = this.teams.player.name;
         document.getElementById('label-ia-team').textContent = this.teams.ia.name;
 
