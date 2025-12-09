@@ -27,11 +27,6 @@
                 </div>
             </div>
 
-            <div class="player-input-group">
-                <label>NOME DO TREINADOR</label>
-                <input type="text" id="player-name-input" value="Treinador 1">
-            </div>
-
             <button id="btn-start-game" onclick="goToSquadScreen()">GERENCIAR ELENCO</button>
             <p class="version">Fut Cards MVP v1 (Visual Update 2)</p>
         </div>
@@ -104,8 +99,7 @@
             document.getElementById(`select-team-${color}`).classList.add('selected');
         }
         function goToSquadScreen() {
-            const playerName = document.getElementById('player-name-input').value;
-            window.game = new Game({ playerTeamColor: selectedTeamColor, playerName: playerName });
+            window.game = new Game({ playerTeamColor: selectedTeamColor, playerName: "Treinador" });
             document.getElementById('start-screen').classList.add('hidden');
             document.getElementById('squad-screen').classList.remove('hidden');
             window.game.renderSquadScreen();
