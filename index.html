@@ -56,47 +56,62 @@
     <div id="main-game-wrapper" class="hidden">
         <main id="game-area">
             <div id="pitch-container">
-                <div class="goal-structure goal-left" id="zone-0"><div class="net"></div></div>
-                <div class="field-zone defense-zone" id="zone-1"></div>
-                <div class="field-zone midfield-zone" id="zone-2"></div>
-                <div class="field-zone attack-zone" id="zone-3"></div>
-                <div class="goal-structure goal-right" id="zone-4"><div class="net"></div></div>
+                
+                <div id="pitch-markings">
+                    <div class="field-line half-way-line"></div>
+                    <div class="field-circle center-circle"></div>
+                    <div class="field-dot center-spot"></div>
+
+                    <div class="field-box penalty-area left-area"></div>
+                    <div class="field-box goal-area left-goal-box"></div>
+                    <div class="field-dot penalty-spot left-spot"></div>
+                    <div class="field-arc corner-arc top-left"></div>
+                    <div class="field-arc corner-arc bottom-left"></div>
+
+                    <div class="field-box penalty-area right-area"></div>
+                    <div class="field-box goal-area right-goal-box"></div>
+                    <div class="field-dot penalty-spot right-spot"></div>
+                    <div class="field-arc corner-arc top-right"></div>
+                    <div class="field-arc corner-arc bottom-right"></div>
+                </div>
+
+                <div class="goal-structure goal-left-geometry">
+                    <div class="net-mesh"></div>
+                    <div class="goal-zone-container" id="zone-0"></div>
+                </div>
+
+                <div class="goal-structure goal-right-geometry">
+                    <div class="net-mesh"></div>
+                    <div class="goal-zone-container" id="zone-4"></div>
+                </div>
+
+                <div id="zones-layer">
+                    <div class="field-zone" id="zone-1"></div>
+                    <div class="field-zone" id="zone-2"></div>
+                    <div class="field-zone" id="zone-3"></div>
+                </div>
+
                 <div id="ball-indicator"><div class="ball-shading"></div></div>
+
             </div>
         </main>
-        
-        <footer id="ui-footer">
-            <div class="footer-group score-wrapper">
-                <div class="match-scoreboard">
-                    <div class="team-info-block player-side">
-                        <span class="team-name" id="label-player-team">TIME CASA</span>
-                        <span class="score-digit" id="score-player">0</span>
-                    </div>
-                    
-                    <div class="score-divider">X</div>
-                    
-                    <div class="team-info-block ia-side">
-                        <span class="score-digit" id="score-ia">0</span>
-                        <span class="team-name" id="label-ia-team">TIME VISITANTE</span>
-                    </div>
-                </div>
+
+        <div id="hud-layer">
+            
+            <div id="game-info-container">
+                <span id="game-info">Aguardando início...</span>
             </div>
 
-            <div class="footer-group action-group">
-                <div id="possession-display">Posse: NEUTRA</div>
-                
-                <div id="action-panel" class="hidden">
-                    <button class="btn-action btn-dribble" onclick="game.executeTurnAction('DRIBBLE')">
-                        <span class="btn-icon">⚡</span> DRIBLE
-                    </button>
-                    <button class="btn-action btn-pass" onclick="game.executeTurnAction('PASS')">
-                        <span class="btn-icon">⚽</span> PASSE
-                    </button>
-                </div>
+            <div id="floating-action-menu" class="hidden">
+                <button class="btn-action btn-dribble" onclick="game.executeTurnAction('DRIBBLE')">
+                    <span class="btn-icon">⚡</span> DRIBLE
+                </button>
+                <button class="btn-action btn-pass" onclick="game.executeTurnAction('PASS')">
+                    <span class="btn-icon">⚽</span> PASSE
+                </button>
             </div>
-            
-            <div class="footer-group log-group"><div id="game-info">Modo de Teste Visual</div></div>
-        </footer>
+
+        </div>
     </div>
 
     <script src="cards.js"></script>

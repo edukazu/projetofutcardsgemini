@@ -483,9 +483,14 @@ class Game {
 
     // 3. Atualiza UI (Chamar no startMatchState)
     updateActionButtons() {
-        const panel = document.getElementById('action-panel');
-        if(this.possessionTeam === 'player') panel.classList.remove('hidden');
-        else panel.classList.add('hidden');
+        // Atualizado para o novo ID flutuante
+        const panel = document.getElementById('floating-action-menu');
+        
+        if (this.possessionTeam === 'player') {
+            panel.classList.remove('hidden');
+        } else {
+            panel.classList.add('hidden');
+        }
     }
 
     // --- LÓGICA TÁTICA: IDENTIFICAR DEFENSORES VÁLIDOS ---
