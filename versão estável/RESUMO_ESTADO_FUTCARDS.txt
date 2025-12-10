@@ -1,0 +1,42 @@
+PROJETO: Fut Cards (Web Game)
+FASE ATUAL: Fase 3.5 - Reboot Visual (Vertical Scrolling Field)
+DATA: 10/12/2025
+
+=== 1. STATUS GERAL (O NOVO CONCEITO) ===
+O projeto passou por um "Reboot Visual". Abandonamos o campo 2D estático e o 3D Tabletop.
+O novo padrão é **"Vertical Scene Scrolling"** (Estilo Soccer Spirits):
+* **Orientação:** Paisagem (Landscape/Widescreen).
+* **Navegação:** O campo é uma "Torre Vertical" dividida em 3 Cenas (Ataque, Meio, Defesa).
+* **Câmera:** A câmera viaja verticalmente (`translateY`) focando em apenas uma zona por vez.
+* **Estado Atual:** Temos um "Esqueleto Visual" funcional. A navegação funciona, as cartas renderizam, mas não há lógica de jogo conectada.
+
+=== 2. ARQUITETURA TÉCNICA (NOVA BASE) ===
+* `index.html`: Estrutura de `#app-frame` (Widescreen). O mundo é `#world-container` (Flex Column).
+    * Cada Cena (`.scene-zone`) contém duas linhas de batalha: `.enemy-line` (Topo) e `.player-line` (Baixo).
+* `style.css`: 
+    * Uso de `transform: translateY` para mover a câmera entre andares.
+    * Visual "Premium Dark" restaurado.
+* `game.js`:
+    * Controlador de Câmera (`focusCamera`).
+    * Renderização espelhada (renderiza Inimigos no topo e Jogador embaixo em cada cena).
+
+=== 3. PENDÊNCIAS IMEDIATAS (PRÓXIMOS PASSOS) ===
+Estas são as tarefas para o início da próxima sessão (Workflow: Arquiteto -> Construtor):
+
+1.  [CORREÇÃO UI] **Restaurar Navegação Manual:**
+    * Remover os botões de ação "Drible/Passe" (prematuros).
+    * Reimplementar botões de Debug/Navegação (Ir para Ataque, Ir para Defesa) para testar o fluxo sem depender de cliques nas cartas.
+
+2.  [LAYOUT] **Ajuste de Goleiros e Defensores:**
+    * Atualmente, Goleiros estão misturados na linha de zaga.
+    * Criar container visual separado ou lógica de posicionamento para destacar o Goleiro atrás da linha defensiva.
+
+3.  [LÓGICA] **Reconectar o Cérebro:**
+    * A lógica de `matchState`, `diceRoll` e `attributes` foi desligada para focar no visual.
+    * Precisamos reativar o `game.js` antigo dentro dessa nova estrutura visual.
+
+4.  [DADOS] **Adversários:**
+    * Garantir que a renderização dos adversários esteja puxando os dados corretos do `cards.js` (atualmente são ícones genéricos de debug em algumas partes).
+
+=== 4. OBSERVAÇÕES DE WORKFLOW ===
+* Manter arquivos limpos. Evitar acumular código comentado.

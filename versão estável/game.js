@@ -103,96 +103,14 @@ class Game {
     }
 
     createCard(p, side) {
-        const teamData = side === 'player' ? this.teams.player : this.teams.ia;
-        const color1 = teamData.colorPrimary;
-        const color2 = teamData.colorSecondary;
-        
-        // Determina quais 4 atributos mostrar baseados na ROLE
-        // 4 Atributos principais
-        const stats = this.getStatsForRole(p);
-
         const card = document.createElement('div');
-        card.className = `card-unit is-${side} card-premium`;
-        
-        // Injetamos as cores do time como variáveis CSS locais
-        // Variáveis de cor
-        card.style.setProperty('--team-c1', color1);
-        card.style.setProperty('--team-c2', color2);
-
+        card.className = `card-unit is-${side}`;
         card.innerHTML = `
-            <div class="cp-header">
-                <div class="cp-col-left">
-                    <div class="cp-ovr">${p.ovr}</div>
-                    <div class="cp-role">${p.role}</div>
-                </div>
-
-                <div class="cp-col-right">
-                    <div class="cp-nation">${this.getFlagEmoji(p.nation)}</div>
-                    <div class="cp-team-badge">${teamData.crest}</div>
-                </div>
-            </div>
-
-            <div class="cp-visual">
-                ${this.generateFaceSVG(p.face, p.skin)}
-            </div>
-
-            <div class="cp-name">${p.name}</div>
-
-            <div class="cp-stats">
-                <div class="stat-row">
-                    <span class="s-label">${stats[0].label}</span><span class="s-val">${stats[0].val}</span>
-                    <span class="s-label">${stats[1].label}</span><span class="s-val">${stats[1].val}</span>
-                </div>
-                <div class="stat-row">
-                    <span class="s-label">${stats[2].label}</span><span class="s-val">${stats[2].val}</span>
-                    <span class="s-label">${stats[3].label}</span><span class="s-val">${stats[3].val}</span>
-                </div>
-            </div>
+            <div class="c-head"><span>${p.ovr}</span><span>${p.role}</span></div>
+            <div class="c-body">${this.getIcon(p.role)}</div>
+            <div class="c-name">${p.name}</div>
         `;
         return card;
-    }
-
-    // Retorna os 4 atributos principais para exibir na carta
-    getStatsForRole(p) {
-        if (p.role === 'GK') {
-            return [{label:'REF', val:p.ref}, {label:'HAN', val:p.han}, {label:'POS', val:p.pos}, {label:'PAS', val:p.pas}];
-        }
-        if (p.role === 'DEF') {
-            return [{label:'DES', val:p.des}, {label:'INT', val:p.int}, {label:'PAS', val:p.pas}, {label:'FIS', val:p.sta}];
-        }
-        if (p.role === 'MID') {
-            return [{label:'PAS', val:p.pas}, {label:'DRI', val:p.dri}, {label:'INT', val:p.int}, {label:'FIN', val:p.fin}];
-        }
-        // ATT
-        return [{label:'FIN', val:p.fin}, {label:'DRI', val:p.dri}, {label:'PAS', val:p.pas}, {label:'FIS', val:p.sta}];
-    }
-
-    getFlagEmoji(nationCode) {
-        // prettier-ignore
-        const maps = {'br':'🇧🇷', 'fr':'🇫🇷', 'de':'🇩🇪', 'es':'🇪🇸', 'gb-eng':'🏴󠁧󠁢󠁥󠁮󠁧󠁿', 'uy':'🇺🇾', 'nl':'🇳🇱', 'ar':'🇦🇷', 'pt':'🇵🇹', 'be':'🇧🇪', 'si':'🇸🇮', 'pl':'🇵🇱'};
-        return maps[nationCode] || '🏳️';
-    }
-
-    // Gera um rosto SVG simples baseado nos dados
-    generateFaceSVG(faceId, skinColor) {
-        // Formatos de cabelo simples baseados no ID (1-4)
-        // prettier-ignore
-        const hairStyles = [
-            `M30,30 Q50,10 70,30 L70,40 Q50,20 30,40 Z`, // Cabelo Curto
-            `M25,35 Q50,5 75,35 L75,50 Q50,20 25,50 Z`,   // Topete
-            `M20,40 Q50,0 80,40 L80,60 Q50,30 20,60 Z`,   // Afro/Volumoso
-            `M28,30 Q50,15 72,30 L72,60 Q50,60 28,60 Z`    // Tranças/Longo
-        ];
-        // Adicionei camisa simples usando cor do time
-        return `
-        <svg class="cp-face-svg" viewBox="0 0 100 100">
-            <path d="M20,90 Q50,100 80,90 L80,100 L20,100 Z" fill="var(--team-c1)" />
-            <path d="M30,40 Q30,85 50,90 Q70,85 70,40 Q70,20 50,20 Q30,20 30,40" fill="${skinColor}" />
-            <path d="${hairStyles[(faceId-1) % 4]}" fill="#1a1a1a" />
-            <circle cx="40" cy="50" r="2" fill="#000"/>
-            <circle cx="60" cy="50" r="2" fill="#000"/>
-        </svg>
-        `;
     }
 
     updateScoreBoard() {
@@ -213,6 +131,13 @@ class Game {
         if (eName && this.teams.ia) {
             eName.innerText = this.teams.ia.shortName; // Ex: FCB
         }
+    }
+
+    getIcon(role) {
+        if(role === 'GK') return '🧤';
+        if(role === 'DEF') return '🛡️';
+        if(role === 'MID') return '⚡';
+        return '🚀';
     }
 
     // --- CÂMERA E INPUTS ---
