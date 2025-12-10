@@ -151,10 +151,23 @@ body {
 
 .cp-col-right { display: flex; flex-direction: column; align-items: center; gap: 4px; }
 
-/* CORREÇÃO DO BUG DAS BANDEIRAS: filter drop-shadow com hífen */
+/* Correção das Bandeiras SVG */
 .cp-nation { 
-    font-size: 1.2rem; line-height: 1; 
-    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5)); 
+    width: 24px;   /* Largura fixa */
+    height: 16px;  /* Altura fixa (proporção bandeira) */
+    
+    /* Removemos font-size e color, pois agora é SVG */
+    display: block;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.5); /* Sombra suave */
+    border-radius: 2px; /* Cantos levemente arredondados */
+    overflow: hidden; /* Garante corte reto */
+}
+
+/* O SVG interno se adapta ao tamanho do container */
+.cp-nation svg {
+    display: block;
+    width: 100%;
+    height: 100%;
 }
 
 .cp-team-badge {
@@ -164,29 +177,63 @@ body {
 .cp-team-badge svg { width: 100%; height: 100%; overflow: visible; }
 
 /* Visual (Rosto) */
+/* 2. Visual (Rosto Ajustado para caber) */
 .cp-visual {
-    flex: 1; position: relative;
+    flex: 1; /* Ocupa o espaço que sobra */
+    position: relative;
     display: flex; justify-content: center; align-items: flex-end;
+    min-height: 0; /* Permite encolher se necessário */
+    padding-bottom: 2px;
 }
+
 .cp-face-svg {
-    width: 95px; height: 95px; z-index: 2;
+    width: 80px; height: 75px; /* Altura reduzida para caber (era 95px) */
+    z-index: 2;
     filter: drop-shadow(0 5px 10px rgba(0,0,0,0.6));
-    margin-bottom: -8px;
+    
+    /* Ajuste de posição: Encaixa no pescoço da carta */
+    transform: translateY(4px);
 }
 
 /* Nome */
+/* 3. Nome (Blindado contra sumiço) */
 .cp-name {
+    flex-shrink: 0; /* Impede que seja esmagado/sumido */
     text-align: center;
     font-size: 0.8rem; font-weight: 800;
     text-transform: uppercase; letter-spacing: 0.5px;
     background: linear-gradient(90deg, transparent, rgba(0,0,0,0.9) 20%, rgba(0,0,0,0.9) 80%, transparent);
-    padding: 4px 0; z-index: 3;
+    padding: 2px 0;
+    z-index: 3;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 
+/* NOVA BARRA DE ESTAMINA (Entre nome e stats) */
+/* BARRA DE ESTAMINA (Blindada) */
+.cp-stamina-container {
+    flex-shrink: 0; /* Impede que suma */
+    width: 85%;
+    height: 4px;
+    background: rgba(255,255,255,0.2);
+    margin: 2px auto 4px auto;
+    border-radius: 2px;
+    overflow: hidden;
+    z-index: 3;
+}
+
+.cp-stamina-fill {
+    height: 100%;
+    /* Cor injetada via JS */
+    box-shadow: 0 0 5px rgba(255,255,255,0.5);
+    transition: width 0.3s ease;
+}
+
 /* Stats */
+/* 4. Stats (Blindado) */
 .cp-stats {
-    height: 45px; background: rgba(0,0,0,0.5);
+    flex-shrink: 0; /* Garante altura fixa */
+    height: 42px;
+    background: rgba(0,0,0,0.5);
     display: flex; flex-direction: column; justify-content: center;
     padding: 0 5px; font-size: 0.7rem;
     border-top: 1px solid rgba(255,255,255,0.05);
@@ -242,4 +289,20 @@ body {
 .gk-container .card-premium:hover { 
     /* Goleiros não usam translateX */
     transform: scale(1.15) translateY(10px); 
+}
+
+/* === CORREÇÃO DE EMPILHAMENTO (O PULO DO GATO) === */
+/* Isso resolve o problema do Goleiro preso atrás da zaga.
+   Quando passamos o mouse na carta (que tem pointer-events: auto),
+   o container pai detecta o hover e sobe sua prioridade temporariamente.
+*/
+
+.gk-container:hover,
+.battle-line:hover {
+    z-index: 101; /* Sobe acima de qualquer camada padrão (que são 5 e 10) */
+}
+
+/* Garante que a transição de saída não corte o z-index instantaneamente */
+.gk-container, .battle-line {
+    transition: z-index 0s linear; 
 }

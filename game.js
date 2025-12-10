@@ -107,9 +107,13 @@ class Game {
         const color1 = teamData.colorPrimary;
         const color2 = teamData.colorSecondary;
         
-        // Determina quais 4 atributos mostrar baseados na ROLE
-        // 4 Atributos principais
-        const stats = this.getStatsForRole(p);
+        // Lógica Nova: Pega os 4 melhores atributos (exceto Stamina)
+        const stats = this.getTopStats(p);
+        
+        // Cor da Estamina (Verde > 70%, Amarelo > 30%, Vermelho < 30%)
+        let staColor = '#00e676'; // Verde
+        if (p.sta <= 70) staColor = '#ffea00'; // Amarelo
+        if (p.sta <= 30) staColor = '#ff1744'; // Vermelho
 
         const card = document.createElement('div');
         card.className = `card-unit is-${side} card-premium`;
@@ -127,7 +131,7 @@ class Game {
                 </div>
 
                 <div class="cp-col-right">
-                    <div class="cp-nation">${this.getFlagEmoji(p.nation)}</div>
+                    <div class="cp-nation">${this.getNationSVG(p.nation)}</div>
                     <div class="cp-team-badge">${teamData.crest}</div>
                 </div>
             </div>
@@ -137,6 +141,10 @@ class Game {
             </div>
 
             <div class="cp-name">${p.name}</div>
+
+            <div class="cp-stamina-container">
+                <div class="cp-stamina-fill" style="width: ${p.sta}%; background: ${staColor};"></div>
+            </div>
 
             <div class="cp-stats">
                 <div class="stat-row">
@@ -152,25 +160,46 @@ class Game {
         return card;
     }
 
-    // Retorna os 4 atributos principais para exibir na carta
-    getStatsForRole(p) {
-        if (p.role === 'GK') {
-            return [{label:'REF', val:p.ref}, {label:'HAN', val:p.han}, {label:'POS', val:p.pos}, {label:'PAS', val:p.pas}];
-        }
-        if (p.role === 'DEF') {
-            return [{label:'DES', val:p.des}, {label:'INT', val:p.int}, {label:'PAS', val:p.pas}, {label:'FIS', val:p.sta}];
-        }
-        if (p.role === 'MID') {
-            return [{label:'PAS', val:p.pas}, {label:'DRI', val:p.dri}, {label:'INT', val:p.int}, {label:'FIN', val:p.fin}];
-        }
-        // ATT
-        return [{label:'FIN', val:p.fin}, {label:'DRI', val:p.dri}, {label:'PAS', val:p.pas}, {label:'FIS', val:p.sta}];
+    // Retorna os 4 atributos mais altos (excluindo metadados)
+    getTopStats(p) {
+        // Lista de todos os atributos possíveis de batalha
+        const candidates = [
+            { label: 'REF', val: p.ref }, { label: 'HAN', val: p.han }, { label: 'POS', val: p.pos }, // GK
+            { label: 'DES', val: p.des }, { label: 'INT', val: p.int }, // Defesa
+            { label: 'PAS', val: p.pas }, { label: 'DRI', val: p.dri }, // Técnica
+            { label: 'FIN', val: p.fin }, // Ataque
+            // SPD (Velocidade) se existir nos dados, pode adicionar aqui
+        ];
+
+        // Filtra undefined (jogadores de linha não têm REF, por exemplo) e ordena
+        const valid = candidates.filter(s => s.val !== undefined);
+        valid.sort((a, b) => b.val - a.val); // Maior para menor
+
+        // Retorna os top 4
+        return valid.slice(0, 4);
     }
 
-    getFlagEmoji(nationCode) {
-        // prettier-ignore
-        const maps = {'br':'🇧🇷', 'fr':'🇫🇷', 'de':'🇩🇪', 'es':'🇪🇸', 'gb-eng':'🏴󠁧󠁢󠁥󠁮󠁧󠁿', 'uy':'🇺🇾', 'nl':'🇳🇱', 'ar':'🇦🇷', 'pt':'🇵🇹', 'be':'🇧🇪', 'si':'🇸🇮', 'pl':'🇵🇱'};
-        return maps[nationCode] || '🏳️';
+    getNationSVG(code) {
+        // Gabarito de Bandeiras Minimalistas
+        const flags = {
+            'br': `<rect width="30" height="20" fill="#009c3b"/><path d="M15 2 L28 10 L15 18 L2 10 Z" fill="#ffdf00"/><circle cx="15" cy="10" r="3.5" fill="#002776"/>`, // Brasil
+            'fr': `<rect width="10" height="20" fill="#0055A4"/><rect x="10" width="10" height="20" fill="#fff"/><rect x="20" width="10" height="20" fill="#EF4135"/>`, // França
+            'de': `<rect width="30" height="7" fill="#000"/><rect y="7" width="30" height="7" fill="#DD0000"/><rect y="14" width="30" height="6" fill="#FFCE00"/>`, // Alemanha
+            'es': `<rect width="30" height="20" fill="#AA151B"/><rect y="5" width="30" height="10" fill="#F1BF00"/>`, // Espanha
+            'gb-eng': `<rect width="30" height="20" fill="#fff"/><rect x="13" width="4" height="20" fill="#CE1124"/><rect y="8" width="30" height="4" fill="#CE1124"/>`, // Inglaterra
+            'uy': `<rect width="30" height="20" fill="#fff"/><rect y="4" width="30" height="2" fill="#0038A8"/><rect y="8" width="30" height="2" fill="#0038A8"/><rect y="12" width="30" height="2" fill="#0038A8"/><rect y="16" width="30" height="2" fill="#0038A8"/><rect width="12" height="10" fill="#fff"/><circle cx="5" cy="5" r="3" fill="#FCD116"/>`, // Uruguai
+            'nl': `<rect width="30" height="7" fill="#AE1C28"/><rect y="7" width="30" height="7" fill="#fff"/><rect y="14" width="30" height="6" fill="#21468B"/>`, // Holanda
+            'ar': `<rect width="30" height="20" fill="#fff"/><rect width="30" height="6" fill="#74ACDF"/><rect y="14" width="30" height="6" fill="#74ACDF"/><circle cx="15" cy="10" r="2" fill="#F6B40E"/>`, // Argentina
+            'pt': `<rect width="12" height="20" fill="#006600"/><rect x="12" width="18" height="20" fill="#ff0000"/><circle cx="12" cy="10" r="4" fill="#FFFF00"/>`, // Portugal
+            'be': `<rect width="10" height="20" fill="#000"/><rect x="10" width="10" height="20" fill="#FDDA24"/><rect x="20" width="10" height="20" fill="#EF3340"/>`, // Bélgica
+            'pl': `<rect width="30" height="10" fill="#fff"/><rect y="10" width="30" height="10" fill="#DC143C"/>`, // Polônia
+            'si': `<rect width="30" height="7" fill="#fff"/><rect y="7" width="30" height="7" fill="#0000ff"/><rect y="14" width="30" height="6" fill="#ff0000"/><path d="M4 7 L8 2 L12 7" fill="#fff"/>` // Eslovênia (Simplificada)
+        };
+
+        const content = flags[code] || `<rect width="30" height="20" fill="#ccc"/>`; // Bandeira cinza se não achar
+        
+        // Retorna SVG encapsulado
+        return `<svg viewBox="0 0 30 20" width="100%" height="100%" preserveAspectRatio="none">${content}</svg>`;
     }
 
     // Gera um rosto SVG simples baseado nos dados
