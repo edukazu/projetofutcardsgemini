@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fut Cards - Reinício V1</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <section id="start-screen">
+        <div class="menu-content">
+            <h1 class="game-title">FUT CARDS</h1>
+
+            <div class="team-selection">
+                <h3>ESCOLHA SEU MANTO</h3>
+                <div class="teams-grid">
+                    <div class="team-option selected" id="select-team-blue" onclick="selectTeam('blue')">
+                        <div class="team-color-strip blue-strip"></div>
+                        <div class="team-info"><strong>ROYAL MADRID</strong><small>Formação 4-4-2</small></div>
+                    </div>
+                    <div class="team-option" id="select-team-red" onclick="selectTeam('red')">
+                        <div class="team-color-strip red-strip"></div>
+                        <div class="team-info"><strong>FC CATALONIA</strong><small>Formação 4-3-3</small></div>
+                    </div>
+                    <div class="team-option" id="select-team-redwhite" onclick="selectTeam('redwhite')">
+                        <div class="team-color-strip" style="background: repeating-linear-gradient(90deg, #cb3524, #cb3524 10px, #fff 10px, #fff 20px);"></div>
+                        <div class="team-info"><strong>ATHLETIC MATRICE</strong><small>Formação 3-5-2</small></div>
+                    </div>
+                </div>
+            </div>
+
+            <button id="btn-start-game" onclick="goToSquadScreen()">GERENCIAR ELENCO</button>
+            <p class="version">Fut Cards MVP v1 (Visual Update 2)</p>
+        </div>
+    </section>
+
+    <section id="squad-screen" class="hidden">
+        <header class="squad-header">
+            <h2 id="squad-title">SEU TIME TITULAR</h2>
+            <div class="squad-stats"><span>OVR: <b id="team-ovr-display">0</b></span><span>FORM: <b id="team-form-display"></b></span></div>
+        </header>
+        <div class="squad-content">
+            <div class="squad-grid-container" id="squad-grid"></div>
+            <aside class="player-details-panel">
+                <div id="detail-card-preview"></div>
+                <div class="detail-stats-box"><h3 id="detail-name">SELECIONE</h3><p id="detail-role">-</p><div class="stat-bars" id="stat-bars-container"></div></div>
+            </aside>
+        </div>
+        <div class="squad-footer">
+            <button class="btn-secondary" onclick="location.reload()">VOLTAR</button>
+            <button class="btn-primary" onclick="goToMatch()">IR PARA O CAMPO</button>
+        </div>
+    </section>
+
+    <div id="main-game-wrapper" class="hidden">
+        <main id="game-area">
+            <div id="pitch-container">
+                
+                <div id="pitch-markings">
+                    <div class="field-line half-way-line"></div>
+                    <div class="field-circle center-circle"></div>
+                    <div class="field-dot center-spot"></div>
+
+                    <div class="field-box penalty-area left-area"></div>
+                    <div class="field-box goal-area left-goal-box"></div>
+                    <div class="field-dot penalty-spot left-spot"></div>
+                    <div class="field-arc corner-arc top-left"></div>
+                    <div class="field-arc corner-arc bottom-left"></div>
+
+                    <div class="field-box penalty-area right-area"></div>
+                    <div class="field-box goal-area right-goal-box"></div>
+                    <div class="field-dot penalty-spot right-spot"></div>
+                    <div class="field-arc corner-arc top-right"></div>
+                    <div class="field-arc corner-arc bottom-right"></div>
+                </div>
+
+                <div class="goal-structure goal-left-geometry">
+                    <div class="net-mesh"></div>
+                    <div class="goal-zone-container" id="zone-0"></div>
+                </div>
+
+                <div class="goal-structure goal-right-geometry">
+                    <div class="net-mesh"></div>
+                    <div class="goal-zone-container" id="zone-4"></div>
+                </div>
+
+                <div id="zones-layer">
+                    <div class="field-zone" id="zone-1"></div>
+                    <div class="field-zone" id="zone-2"></div>
+                    <div class="field-zone" id="zone-3"></div>
+                </div>
+
+                <div id="ball-indicator"><div class="ball-shading"></div></div>
+
+            </div>
+        </main>
+
+        <div id="hud-layer">
+            
+            <div id="game-info-container">
+                <span id="game-info">Aguardando início...</span>
+            </div>
+
+            <div id="floating-action-menu" class="hidden">
+                <button class="btn-action btn-dribble" onclick="game.executeTurnAction('DRIBBLE')">
+                    <span class="btn-icon">⚡</span> DRIBLE
+                </button>
+                <button class="btn-action btn-pass" onclick="game.executeTurnAction('PASS')">
+                    <span class="btn-icon">⚽</span> PASSE
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="cards.js"></script>
+    <script src="game.js"></script>
+    
+    <script>
+        let selectedTeamColor = 'blue';
+        function selectTeam(color) {
+            selectedTeamColor = color;
+            document.querySelectorAll('.team-option').forEach(el => el.classList.remove('selected'));
+            document.getElementById(`select-team-${color}`).classList.add('selected');
+        }
+        function goToSquadScreen() {
+            window.game = new Game({ playerTeamColor: selectedTeamColor, playerName: "Treinador" });
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('squad-screen').classList.remove('hidden');
+            window.game.renderSquadScreen();
+        }
+        function goToMatch() {
+            document.getElementById('squad-screen').classList.add('hidden');
+            document.getElementById('main-game-wrapper').classList.remove('hidden');
+            window.game.initBoard();
+        }
+    </script>
+    <div id="coin-toss-overlay" style="display: none;">
+        <div class="coin-container">
+            <div id="coin" class="coin-spinning">
+                <div class="coin-face coin-front" id="coin-front-face">TIME JOGADOR</div>
+                <div class="coin-face coin-back" id="coin-back-face">TIME IA</div>
+            </div>
+        </div>
+        <h2 style="color: white; margin-top: 20px; text-shadow: 1px 1px 3px #000;">QUEM COMEÇA?</h2>
+    </div>
+
+    <div id="duel-stage-overlay" class="hidden">
+        <div class="duel-background"></div>
+        
+        <div class="duel-arena">
+            <div class="duel-fighter attacker-slot" id="fighter-att">
+            </div>
+
+            <div class="duel-vs-icon">VS</div>
+
+            <div class="duel-fighter defender-slot" id="fighter-def">
+            </div>
+        </div>
+
+        <div id="duel-result-panel" class="hidden">
+            <h2 id="duel-action-title">DRIBLE</h2>
+            <div class="result-numbers">
+                <div class="res-left"><span id="res-att-val">0</span></div>
+                <div class="res-right"><span id="res-def-val">0</span></div>
+            </div>
+            <div id="duel-outcome-text">VENCEDOR</div>
+        </div>
+    </div>
+</body>
+</html>

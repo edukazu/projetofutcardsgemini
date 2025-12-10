@@ -1,0 +1,782 @@
+/* style.css - Versão V41: Bola Branca e Placar Expandido */
+
+/* ========================================= */
+/* 1. RESET E BASE */
+/* ========================================= */
+* { box-sizing: border-box; }
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0; padding: 0; height: 100vh; width: 100vw;
+    background-color: #0d2e16; color: #fff;
+    overflow: hidden; position: relative;
+}
+
+.hidden { display: none !important; }
+.d-none { display: none !important; }
+
+/* ========================================= */
+/* 2. MENU SCREEN */
+/* ========================================= */
+#start-screen {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(circle at 50% 30%, #1b5e20 0%, #051b0a 70%);
+    z-index: 1000; display: flex; justify-content: center; align-items: center; overflow: hidden;
+}
+.menu-content { background: rgba(0, 20, 0, 0.6); backdrop-filter: blur(15px); padding: 50px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); text-align: center; box-shadow: 0 30px 80px rgba(0,0,0,0.8); max-width: 550px; width: 90%; position: relative; z-index: 10; }
+.game-title { font-family: 'Arial Black', Impact, sans-serif; font-size: 3.5rem; margin: 0; line-height: 0.9; text-transform: uppercase; background: linear-gradient(to bottom, #fff, #b0bec5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 5px 0px rgba(0,0,0,0.5)); }
+.highlight { color: #4CAF50; background: linear-gradient(to bottom, #66bb6a, #2e7d32); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.game-subtitle { color: #81c784; font-size: 1rem; margin-bottom: 40px; letter-spacing: 2px; text-transform: uppercase; opacity: 0.8; }
+.teams-grid { display: flex; gap: 20px; margin-bottom: 30px; }
+.team-option { flex: 1; background: rgba(255,255,255,0.05); border: 2px solid transparent; border-radius: 12px; cursor: pointer; overflow: hidden; transition: all 0.3s; padding-bottom: 15px; }
+.team-color-strip { width: 100%; height: 10px; margin-bottom: 15px; }
+.blue-strip { background: #e0e0e0; box-shadow: 0 0 10px #fff; }
+.red-strip { background: #004d98; box-shadow: 0 0 10px #004d98; }
+.team-option:hover { background: rgba(255,255,255,0.1); transform: translateY(-5px); }
+.team-option.selected { border-color: #ffd700; background: rgba(255, 215, 0, 0.05); box-shadow: 0 0 20px rgba(255, 215, 0, 0.2); }
+.team-info strong { display: block; font-size: 1.1rem; margin-bottom: 5px; }
+.team-info small { color: #ccc; font-size: 0.8rem; }
+.player-input-group { text-align: left; margin-bottom: 30px; }
+.player-input-group label { display: block; font-size: 0.7rem; font-weight: bold; color: #888; margin-bottom: 5px; margin-left: 10px; }
+.player-input-group input { width: 100%; padding: 15px 20px; border-radius: 30px; border: 2px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: #fff; font-size: 1.1rem; outline: none; transition: border-color 0.3s; }
+.player-input-group input:focus { border-color: #4CAF50; }
+#btn-start-game { width: 100%; padding: 18px; border-radius: 50px; border: none; background: linear-gradient(90deg, #4CAF50, #2E7D32); color: white; font-size: 1.3rem; font-weight: 800; letter-spacing: 1px; cursor: pointer; box-shadow: 0 10px 30px rgba(46, 125, 50, 0.4); transition: all 0.3s; text-transform: uppercase; }
+#btn-start-game:hover { transform: scale(1.02); box-shadow: 0 15px 40px rgba(46, 125, 50, 0.6); }
+.version { margin-top: 25px; color: #444; font-size: 0.7rem; }
+
+/* ========================================= */
+/* 3. SQUAD SCREEN */
+/* ========================================= */
+#squad-screen {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(circle at center, #263238 0%, #111 100%);
+    z-index: 900; display: flex; flex-direction: column;
+}
+.squad-header { height: 80px; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; background: rgba(0,0,0,0.3); border-bottom: 1px solid rgba(255,255,255,0.1); }
+.squad-header h2 { font-family: 'Arial Black'; letter-spacing: 1px; color: #eceff1; margin: 0; }
+.squad-stats { font-size: 1rem; color: #b0bec5; }
+.squad-stats span { margin-left: 20px; }
+.squad-stats b { color: #ffd700; }
+.squad-content { flex-grow: 1; display: flex; overflow: hidden; }
+.squad-grid-container { flex-grow: 1; padding: 40px; display: flex; flex-wrap: wrap; justify-content: center; align-content: center; gap: 30px; overflow-y: auto; }
+.player-details-panel { width: 350px; background: rgba(0,0,0,0.4); border-left: 1px solid rgba(255,255,255,0.1); padding: 30px; display: flex; flex-direction: column; align-items: center; }
+#detail-card-preview { transform: scale(1.3); margin-bottom: 50px; margin-top: 30px; pointer-events: none; }
+.detail-stats-box { width: 100%; text-align: left; }
+.detail-stats-box h3 { margin: 0 0 5px 0; color: #fff; font-size: 1.5rem; text-transform: uppercase; }
+.detail-stats-box p { color: #888; margin: 0 0 20px 0; font-style: italic; }
+.stat-row { display: flex; align-items: center; margin-bottom: 12px; }
+.stat-label { width: 50px; font-weight: bold; font-size: 0.9rem; color: #ccc; }
+.stat-bar-bg { flex-grow: 1; height: 8px; background: #444; border-radius: 4px; overflow: hidden; margin: 0 10px; }
+.stat-bar-fill { height: 100%; background: #4CAF50; width: 0%; transition: width 0.5s ease; }
+.stat-value { width: 30px; font-weight: bold; text-align: right; color: #fff; }
+.squad-footer { height: 80px; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: space-between; padding: 0 40px; }
+.btn-secondary { padding: 12px 30px; border: 1px solid #666; background: transparent; color: #ccc; border-radius: 30px; cursor: pointer; font-weight: bold; transition: all 0.2s; }
+.btn-secondary:hover { border-color: #fff; color: #fff; }
+.btn-primary { padding: 15px 50px; background: linear-gradient(90deg, #ffd700, #ffb300); color: #000; border: none; border-radius: 30px; cursor: pointer; font-weight: bold; font-size: 1.1rem; box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3); transition: transform 0.2s; }
+.btn-primary:hover { transform: scale(1.05); }
+
+/* ========================================= */
+/* 4. LAYOUT DO CAMPO (GEOMETRIA E GRAMADO) */
+/* ========================================= */
+
+#game-area {
+    width: 100vw;
+    height: 100vh;
+    background-color: #0d2e16; /* Fundo escuro da tela */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    /* Removemos paddings antigos, o flex centraliza tudo */
+    padding: 0; 
+}
+
+/* O GRAMADO */
+#pitch-container {
+    width: 90vw;
+    /* ALTURA AJUSTADA: 90vh (Sobra 5vh em cima, 5vh em baixo = 5% respiro) */
+    height: 90vh;
+    position: relative;
+    box-shadow: 0 50px 100px rgba(0,0,0,0.9);
+    border: 4px solid rgba(255,255,255,0.9);
+    
+    /* Efeito de Corte de Grama */
+    background-color: #43a047;
+    background-image: repeating-linear-gradient(
+        90deg,
+        #388e3c 0,
+        #388e3c 10%, 
+        #43a047 10%, 
+        #4caf50 20%
+    );
+}
+
+/* --- CAMADA 1: LINHAS (VETORIAL CSS) --- */
+#pitch-markings {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 0; opacity: 0.6;
+}
+
+.field-line, .field-box, .field-circle, .field-arc {
+    position: absolute;
+    border: 2px solid #fff;
+}
+
+.half-way-line {
+    top: 0; bottom: 0; left: 50%;
+    width: 0; border-right: 2px solid #fff;
+}
+.center-circle {
+    top: 50%; left: 50%; width: 18vh; height: 18vh; border-radius: 50%; 
+    transform: translate(-50%, -50%); 
+}
+.center-spot, .penalty-spot {
+    position: absolute; width: 8px; height: 8px; background: #fff; border-radius: 50%;
+    transform: translate(-50%, -50%);
+}
+.center-spot { top: 50%; left: 50%; }
+
+/* --- GEOMETRIA DAS ÁREAS (AJUSTE DE PROPORÇÃO) --- */
+
+/* Grande Área (Aumentada levemente para manter proporção) */
+.penalty-area { 
+    top: 50%; width: 16%; 
+    height: 55%; /* Aumentado de 50% para 55% */
+    transform: translateY(-50%); 
+    background: rgba(255,255,255,0.03); 
+}
+
+/* Pequena Área (Ajustada para o novo tamanho do gol) */
+.goal-area { 
+    top: 50%; width: 6%; 
+    height: 30%; /* Aumentado de 25% para 30% */
+    transform: translateY(-50%); 
+}
+
+.left-area { left: 0; } .left-goal-box { left: 0; } .left-spot { top: 50%; left: 12%; }
+.right-area { right: 0; } .right-goal-box { right: 0; } .right-spot { top: 50%; right: 12%; }
+
+/* Escanteios */
+.corner-arc { width: 3vh; height: 3vh; }
+.top-left { top: 0; left: 0; border-radius: 0 0 100% 0; border-left: 0; border-top: 0; }
+.bottom-left { bottom: 0; left: 0; border-radius: 0 100% 0 0; border-left: 0; border-bottom: 0; }
+.top-right { top: 0; right: 0; border-radius: 0 0 0 100%; border-right: 0; border-top: 0; }
+.bottom-right { bottom: 0; right: 0; border-radius: 100% 0 0 0; border-right: 0; border-bottom: 0; }
+
+/* --- ESTRUTURA DOS GOLS (MAIORES) --- */
+.goal-structure {
+    position: absolute; 
+    top: 50%; 
+    transform: translateY(-50%);
+    width: 6vw;
+    /* ALTURA AUMENTADA: De ~18vh para 25% da altura do campo */
+    height: 25%; 
+    border: 4px solid #fff;
+    z-index: 5;
+    background: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(255,255,255,0.2) 5px, rgba(255,255,255,0.2) 6px);
+    
+    /* Prepara para centralizar o goleiro na linha */
+    display: flex; align-items: center; visible: visible;
+}
+.goal-left-geometry { left: -6vw; border-right: none; }
+.goal-right-geometry { right: -6vw; border-left: none; }
+
+/* Container onde a carta do goleiro será injetada */
+.goal-zone-container {
+    width: 100%; height: 100%;
+    display: flex; justify-content: center; align-items: center;
+    /* Ajuste para virar o goleiro se necessário */
+}
+
+/* --- CAMADA 3: ZONAS DE JOGO (FLEX) --- */
+#zones-layer {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    display: flex; z-index: 10;
+}
+
+.field-zone {
+    flex: 1; /* Divide o campo em 3 fatias iguais */
+    display: flex; justify-content: center; align-items: center;
+    position: relative;
+    /* Debug: border: 1px dashed rgba(255,255,255,0.1); */
+}
+
+/* --- BOLA DE FUTEBOL REALISTA CORRIGIDA (BASE BRANCA) --- */
+#ball-indicator { 
+    position: absolute; top: 50%; width: 34px; height: 34px; 
+    border-radius: 50%; 
+    z-index: 20; 
+    transform: translate(-50%, -50%); 
+    transition: left 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+    
+    /* FIX: Base Sólida Branca (resolve transparência) */
+    background-color: #ffffff;
+    
+    /* Gomos Pretos sobre o branco */
+    background-image: 
+        radial-gradient(circle at 50% 10%, #000 15%, transparent 16%),
+        radial-gradient(circle at 10% 80%, #000 15%, transparent 16%),
+        radial-gradient(circle at 90% 80%, #000 15%, transparent 16%);
+    
+    background-size: 100% 100%;
+    
+    /* Sombreamento 3D */
+    box-shadow: inset -5px -5px 10px rgba(0,0,0,0.2), 2px 5px 15px rgba(0,0,0,0.6);
+    border: 1px solid #ddd;
+}
+
+/* ========================================= */
+/* 5. VISUAL DAS CARTAS (TOKEN vs FULL) */
+/* ========================================= */
+
+/* --- MODO DIORAMA: Cartas no Campo (Corrigido) --- */
+/* O "Slot" onde a carta fica. Força um tamanho pequeno no layout */
+.field-card-container {
+    width: 100px; /* Largura física reservada no campo */
+    height: 140px; /* Altura física reservada */
+    position: relative;
+    z-index: 10;
+    margin: 0 5px; /* Espacinho entre elas */
+    perspective: 600px; /* Prepara o 3D */
+    cursor: pointer; /* Garante que pareça clicável */
+    transition: all 0.4s ease-out;
+}
+
+/* A Carta em si (Filha do container) */
+.field-card-container .card-full {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    /* Reduz a carta e a centraliza no slot */
+    transform: translateX(-50%) scale(0.65);
+    transform-origin: bottom center;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.4);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    /* Importante: O clique vai no container pai, não aqui, para evitar bugs */
+    pointer-events: none;
+}
+
+/* --- ESTADO ATIVO (Com a bola ou mouse em cima) --- */
+.field-card-container:hover,
+.field-card-container.active-focus {
+    z-index: 100; /* Traz para frente */
+    transform: translateY(-10px); /* Levanta um pouco o slot */
+}
+
+.field-card-container:hover .card-full,
+.field-card-container.active-focus .card-full {
+    /* Aumenta para quase o tamanho original */
+    transform: translateX(-50%) scale(0.95) rotateX(0deg);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+    filter: brightness(1.1);
+}
+
+/* Ajuste da bola no modo Diorama */
+.field-card-container #ball-indicator {
+    width: 30px; height: 30px; bottom: 5px; left: 50%; /* Centraliza na carta */
+    transform: translate(-50%, 0); /* Ajuste fino */
+    z-index: 200;
+    pointer-events: none; /* Deixa o clique passar para a carta */
+}
+
+/* --- FULL PREMIUM CARD (MENU) --- */
+.card-full {
+    width: 180px; height: 260px; border-radius: 12px; border: 3px solid rgba(255,255,255,0.5);
+    background: linear-gradient(135deg, #333, #111); display: flex; flex-direction: column; position: relative; overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8); cursor: pointer; transition: transform 0.2s; color: #fff;
+}
+
+.card-full .card-content { display: flex; flex-direction: column; height: 100%; padding: 10px; z-index: 2; position: relative; }
+.card-full .card-header { display: flex; flex-direction: row; height: 65%; position: relative; }
+
+.card-full .card-left-col { 
+    display: flex; flex-direction: column; width: 30%; align-items: center; justify-content: flex-start; 
+    padding-top: 2px; gap: 4px; z-index: 5;
+}
+.card-full .card-ovr { font-family: 'Arial Black'; font-size: 1.8rem; line-height: 1; text-shadow: 2px 2px 0 #000; }
+.card-full .card-pos { font-size: 0.8rem; font-weight: bold; margin-bottom: 3px; }
+.card-full .card-flag-img { width: 30px; height: 20px; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.5); object-fit: cover; }
+.card-full .card-crest-icon { width: 45px; height: 45px; filter: drop-shadow(0 3px 3px rgba(0,0,0,0.5)); margin-top: 5px; }
+
+.card-full .card-image { position: absolute; right: -10px; top: 5px; width: 100px; height: 120px; z-index: 1; }
+.card-full .card-image svg { width: 100%; height: auto; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.6)); }
+
+.card-full .card-name-box { 
+    text-align: center; border-bottom: 1px solid rgba(255,255,255,0.3); 
+    margin-bottom: 5px; padding-bottom: 2px; z-index: 10; position: relative; margin-top: auto;
+    background: rgba(0,0,0,0.2); border-radius: 4px;
+}
+.card-full .card-name { font-family: 'Arial Black'; font-size: 0.95rem; letter-spacing: 0.5px; text-transform: uppercase; text-shadow: 1px 1px 2px black; }
+
+.card-full .card-stats-grid { width: 100%; margin-top: 2px; flex-shrink: 0; }
+.card-full .card-stats-row { display: flex; justify-content: space-between; padding: 0 5px; margin-bottom: 3px; }
+.card-full .stat-item { display: flex; align-items: baseline; gap: 4px; width: 48%; justify-content: center; }
+.card-full .stat-val { font-family: 'Arial Black', sans-serif; font-size: 1rem; font-weight: 900; color: #ffd700; line-height: 1; }
+.card-full .stat-label { font-family: 'Segoe UI', sans-serif; font-size: 0.7rem; font-weight: 600; opacity: 0.9; text-transform: uppercase; line-height: 1; }
+
+/* --- TEAM STYLES --- */
+.bg-royal { background: linear-gradient(135deg, #f5f5f5, #bdbdbd 40%, #d4af37 100%); color: #222 !important; }
+.bg-royal .card-ovr, .bg-royal .card-name { color: #111 !important; text-shadow: none !important; }
+.bg-royal .stat-val { color: #000 !important; }
+.bg-royal .stat-label { color: #444 !important; opacity: 1 !important; }
+.bg-royal .card-name-box { border-bottom-color: rgba(0,0,0,0.2) !important; }
+.bg-royal .card-crest-icon svg { stroke: #222; }
+
+.bg-catalonia { background: linear-gradient(135deg, #004d98, #1a237e 40%, #a50044 100%); color: #fff; }
+.bg-catalonia .card-image svg { fill: #fff; }
+.bg-catalonia .card-crest-icon { color: #fff; }
+
+.match-scoreboard {
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 50px;
+    padding: 10px 40px; /* Mais padding */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+    min-width: 450px; /* Largura mínima maior */
+    gap: 20px; /* Espaço entre os blocos */
+}
+
+/* Blocos de Time */
+.team-info-block { display: flex; align-items: center; gap: 15px; width: 45%; }
+.player-side { justify-content: flex-end; color: #64ffda; text-align: right; }
+.ia-side { justify-content: flex-start; color: #ffab91; text-align: left; }
+
+.team-info-block .team-name { 
+    font-size: 0.9rem; font-weight: 800; letter-spacing: 1px; 
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
+    max-width: 150px;
+}
+.team-info-block .score-digit { 
+    font-family: 'Courier New', monospace; font-size: 2.5rem; 
+    font-weight: bold; line-height: 1; text-shadow: 0 0 10px rgba(0,0,0,0.5); 
+}
+
+.score-divider { font-size: 1.5rem; color: #fff; opacity: 0.3; font-weight: 300; }
+
+#coin-overlay, #battle-overlay { display: none; }
+
+/* --- OVERLAY E MOEDA 3D GIGANTE --- */
+#coin-toss-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.85); /* Fundo escuro e opaco */
+    z-index: 2000; /* Fica acima de tudo */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    perspective: 1000px; /* Necessário para o efeito 3D */
+}
+.coin-container { width: 150px; height: 150px; }
+
+#coin {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d; /* Mantém as faces em 3D */
+}
+
+.coin-spinning {
+    animation: spin3DCoin 1s infinite linear;
+}
+
+.coin-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    backface-visibility: hidden; /* Esconde a parte de trás quando girada */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: white;
+    text-shadow: 1px 1px 2px #000;
+    border: 5px solid #ffd700; /* Borda dourada */
+    box-shadow: inset 0 0 15px rgba(0,0,0,0.5), 0 0 20px rgba(255, 215, 0, 0.4);
+}
+
+/* A frente é a cor do jogador */
+.coin-front {
+    transform: rotateY(0deg); /* Cor será injetada via JS */
+}
+
+/* O verso é a cor da IA (rotacionado 180deg para começar escondido) */
+.coin-back {
+    transform: rotateY(180deg); /* Cor será injetada via JS */
+}
+
+@keyframes spin3DCoin {
+    from { transform: rotateY(0deg); }
+    to { transform: rotateY(1800deg); } /* Gira muitas vezes rápido */
+}
+
+/* --- AJUSTE DE CAMPO (CONTAINER) --- */
+.cards-container {
+    display: flex;
+    /* MUDANÇA CRÍTICA: De space-around para center (Aproxima os times) */
+    justify-content: center;
+    align-items: center;
+    height: 100%; /* Usa toda a altura disponível */
+    padding: 40px 0; /* Mais respiro vertical nas zonas */
+    /* AJUSTE FINO: Aumentado de 40px para 60px para dar respiro ao hover */
+    gap: 100px; 
+    pointer-events: none;
+}
+
+/* ========================================= */
+/* 5. SISTEMA DE SLOTS DINÂMICOS (FLEX) */
+/* ========================================= */
+
+/* O CLUSTER: A coluna que segura os jogadores */
+.team-cluster {
+    display: flex; /* Volta a ser Flex */
+    flex-direction: column; /* Pilha Vertical */
+    
+    /* A MÁGICA: Distribui o espaço vazio IGUALMENTE entre as cartas */
+    /* Se tiver 2, centraliza as 2 espalhadas. Se tiver 5, espalha as 5. */
+    justify-content: space-evenly; 
+    
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Clique passa para as cartas */
+}
+
+/* O SLOT DA CARTA */
+.field-card-container {
+    /* Tamanho Fixo da Área da Carta (Hitbox) */
+    width: 100px;
+    height: 130px;
+    
+    /* Comportamento no Flex */
+    flex: 0 0 auto; /* Não estica, mantém o tamanho da carta */
+    
+    /* Margem Negativa Vertical: Permite sobreposição se faltar espaço */
+    /* Isso realiza sua visão de "Slots podem se sobrepor" */
+    margin: -5px 0; 
+    
+    position: relative;
+    z-index: 10;
+    transition: transform 0.15s ease-out; 
+    transform-origin: center center;
+    pointer-events: auto; /* Clicável */
+    
+    /* Centraliza o desenho da carta dentro do slot */
+    display: flex; justify-content: center; align-items: center;
+}
+
+/* Garante que a carta visual não bloqueie o clique do wrapper */
+.field-card-container .card-full {
+    pointer-events: none !important;
+}
+ 
+/* --- ESTILO ATHLETIC MATRICE (REVISADO) --- */
+/* Gradiente suave de Vermelho para um tom mais escuro/azulado no canto, similar ao Catalonia */
+.bg-matrice {
+    background: linear-gradient(135deg, #cb3524, #a92b1e 40%, #004D98 100%);
+    color: #fff !important; /* Força texto branco para contraste */
+}
+
+/* Garante que os ícones e o nome fiquem brancos/legíveis */
+.bg-matrice .card-image svg { fill: #fff; }
+.bg-matrice .card-crest-icon { color: #fff; }
+.bg-matrice .card-name-box { 
+    background: rgba(0,0,0,0.3); /* Fundo escuro transparente para o nome */
+    border-bottom: 1px solid rgba(255,255,255,0.3);
+}
+.bg-matrice .card-name { color: #fff !important; text-shadow: 1px 1px 2px black; }
+.bg-matrice .stat-val { color: #ffd700 !important; } /* Estatísticas douradas */
+.bg-matrice .stat-label { color: #ddd !important; opacity: 0.9 !important; }
+
+
+/* ========================================= */
+/* 13. INTERAÇÃO E DESTAQUES (RESET LIMPO) */
+/* ========================================= */
+
+/* --- 1. CORES TÁTICAS --- */
+.field-card-container.support-defender-highlight .card-full {
+    border-color: #ffd700 !important;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+}
+
+.field-card-container.valid-defender-highlight .card-full {
+    border-color: #ff3d00 !important;
+    box-shadow: 0 0 35px rgba(255, 61, 0, 0.9);
+    z-index: 50; 
+}
+
+/* --- 2. O MOUSE (LEVE E VERTICAL) --- */
+.field-card-container:hover {
+    z-index: 2000 !important;
+    /* MOVIMENTO SUAVE: Sobe apenas 8px e cresce 10% */
+    /* Como aumentamos o padding do topo, ela não vai mais ser cortada */
+    transform: translateY(-8px) scale(1.1) !important;
+    filter: brightness(1.1);
+}
+
+.field-card-container:hover .card-full {
+    border-color: #fff !important;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+}
+
+/* --- 3. CORREÇÃO DE ZONAS --- */
+.field-zone:has(.field-card-container:hover) {
+    z-index: 500 !important;
+    position: relative;
+}
+/* UI DE BATALHA */
+#action-panel { display: flex; gap: 15px; }
+
+.btn-action {
+    border: none; padding: 12px 25px; border-radius: 8px;
+    font-family: 'Arial Black', sans-serif; font-size: 1rem; cursor: pointer;
+    text-transform: uppercase; display: flex; align-items: center; gap: 10px;
+    color: white; transition: transform 0.1s;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.3);
+}
+.btn-action:active { transform: translateY(4px); box-shadow: none; }
+
+/* Cores Táticas */
+.btn-dribble { background: linear-gradient(#ff9800, #f57c00); border-bottom: 4px solid #e65100; }
+.btn-pass { background: linear-gradient(#2196f3, #1976d2); border-bottom: 4px solid #0d47a1; }
+
+/* ========================================= */
+/* 14. UI IMERSIVA (HUD SEM BARRA) */
+/* ========================================= */
+
+/* Removemos o estilo antigo do footer se ainda existir */
+#ui-footer { display: none !important; }
+
+/* Container da HUD (Sobreposição) */
+#hud-layer {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; /* Deixa clicar no campo */
+    z-index: 1500;
+    display: flex; flex-direction: column;
+    justify-content: space-between; align-items: center;
+    padding: 20px;
+}
+
+/* Info do Jogo (Toast no Topo) */
+#game-info-container {
+    margin-top: 10px;
+    background: rgba(0,0,0,0.5);
+    padding: 8px 20px;
+    border-radius: 20px;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+#game-info { color: #ccc; font-size: 0.9rem; }
+
+/* Menu de Ações (Botões Flutuantes) */
+#floating-action-menu {
+    pointer-events: auto; /* Permite clique nos botões */
+    display: flex; gap: 20px;
+    margin-bottom: 40px; /* Flutua acima da borda inferior */
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Animação de Entrada/Saída */
+#floating-action-menu.hidden {
+    transform: translateY(100px) scale(0.8);
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Estilo Refinado dos Botões */
+.btn-action {
+    padding: 12px 35px;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    border: 2px solid rgba(255,255,255,0.15);
+}
+.btn-action:hover {
+    transform: translateY(-5px);
+    filter: brightness(1.2);
+}
+.btn-action {
+    border: none; padding: 12px 25px; border-radius: 8px;
+    font-family: 'Arial Black', sans-serif; font-size: 1rem; cursor: pointer;
+    text-transform: uppercase; display: flex; align-items: center; gap: 10px;
+    color: white; transition: transform 0.1s;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.3);
+}
+.btn-action:active { transform: translateY(4px); box-shadow: none; }
+
+/* Cores Táticas */
+.btn-dribble { background: linear-gradient(#ff9800, #f57c00); border-bottom: 4px solid #e65100; }
+.btn-pass { background: linear-gradient(#2196f3, #1976d2); border-bottom: 4px solid #0d47a1; }
+
+/* ========================================= */
+/* 11. CENA DE DUELO (FOCUS MODE) */
+/* ========================================= */
+
+/* 1. O Fundo Escuro */
+#duel-scene-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.85); /* Bem escuro para focar nas cartas */
+    z-index: 1500; /* Acima do campo, abaixo do placar final se tiver */
+    display: flex; justify-content: center; align-items: center;
+    opacity: 0; transition: opacity 0.3s ease;
+    pointer-events: none; /* Deixa clicar se precisar */
+}
+#duel-scene-overlay.active { opacity: 1; pointer-events: auto; }
+#duel-scene-overlay.hidden { display: none; }
+
+/* 2. Destaque nas Cartas (Elas furam o overlay) */
+.duelist-focus {
+    z-index: 1600 !important; /* Fica acima do overlay escuro */
+    transform: scale(1.3) translateY(-10px) !important;
+    box-shadow: 0 0 50px rgba(255, 255, 255, 0.2);
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* 3. Painel de Resultado (Estilo Arcade) */
+#duel-result-box {
+    width: 600px; background: linear-gradient(135deg, #263238, #111);
+    border: 2px solid #546e7a; border-radius: 20px;
+    padding: 30px; text-align: center; color: white;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+    transform: scale(0.8); opacity: 0; transition: all 0.5s;
+}
+#duel-scene-overlay.show-result #duel-result-box {
+    transform: scale(1); opacity: 1;
+}
+
+.duel-comparison { display: flex; justify-content: space-between; align-items: center; margin: 20px 0; }
+.duel-side { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+.side-att { color: #64ffda; text-align: right; }
+.side-def { color: #ffab91; text-align: left; }
+
+.duel-score-box { font-family: 'Arial Black'; font-size: 3rem; line-height: 1; text-shadow: 0 0 20px currentColor; }
+.duel-score-box small { display: block; font-family: 'Segoe UI'; font-size: 0.9rem; color: #ccc; font-weight: normal; margin-top: 5px; }
+
+.duel-vs { font-size: 2rem; font-weight: bold; color: #555; margin: 0 20px; font-style: italic; }
+
+#duel-winner-label {
+    font-size: 2rem; font-weight: 900; letter-spacing: 5px; text-transform: uppercase;
+    color: #ffd700; margin-top: 20px; opacity: 0; transform: translateY(20px); transition: all 0.5s;
+}
+.show-winner #duel-winner-label { opacity: 1; transform: translateY(0); }
+
+/* ========================================= */
+/* 12. CENA DE BATALHA RPG (CINEMA MODE) */
+/* ========================================= */
+
+#duel-stage-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: #000; /* Fundo sólido para esconder o campo bagunçado */
+    z-index: 2000;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.2s;
+}
+#duel-stage-overlay.active { opacity: 1; pointer-events: auto; }
+
+/* Fundo com efeito de velocidade (Opcional, mas dá dinamismo) */
+.duel-background {
+    position: absolute; width: 100%; height: 100%;
+    background: radial-gradient(circle at center, #263238 0%, #000 90%);
+    opacity: 0.8;
+}
+
+.duel-arena {
+    display: flex; align-items: center; justify-content: center;
+    gap: 50px; z-index: 2100; perspective: 1000px;
+    width: 100%; height: 60%;
+}
+
+/* Slots dos Lutadores */
+.duel-fighter {
+    width: 220px; height: 320px; /* Cartas Gigantes */
+    display: flex; justify-content: center; align-items: center;
+}
+
+/* O clone da carta que será inserido */
+.cloned-card-visual {
+    width: 100%; height: 100%;
+    box-shadow: 0 0 50px rgba(0,0,0,0.8);
+    border-radius: 15px;
+}
+
+/* --- ANIMAÇÕES DE ENTRADA (O Pulo na Tela) --- */
+.animate-enter-left {
+    animation: slideInLeft 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+.animate-enter-right {
+    animation: slideInRight 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes slideInLeft {
+    0% { transform: translateX(-500px) rotateY(-30deg); opacity: 0; }
+    100% { transform: translateX(0) rotateY(0deg); opacity: 1; }
+}
+@keyframes slideInRight {
+    0% { transform: translateX(500px) rotateY(30deg); opacity: 0; }
+    100% { transform: translateX(0) rotateY(0deg); opacity: 1; }
+}
+
+/* --- ANIMAÇÃO DE COLISÃO (O Choque) --- */
+.clash-impact .duel-fighter {
+    animation: shakeImpact 0.3s ease-in-out;
+}
+@keyframes shakeImpact {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px) scale(1.1); }
+    50% { transform: translateX(10px) scale(1.1); }
+    75% { transform: translateX(-10px) scale(1.1); }
+}
+
+/* VS no meio */
+.duel-vs-icon {
+    font-family: 'Arial Black'; font-size: 3rem; color: #555;
+    text-shadow: 0 0 20px #fff; opacity: 0;
+    animation: fadeIn 1s 0.5s forwards;
+}
+@keyframes fadeIn { to { opacity: 1; } }
+
+/* Painel de Resultado Flutuante */
+#duel-result-panel {
+    position: absolute; bottom: 15%; z-index: 2200;
+    text-align: center; width: 100%;
+}
+#duel-result-panel.hidden { opacity: 0; transform: translateY(50px); }
+#duel-result-panel.show { opacity: 1; transform: translateY(0); transition: all 0.3s; }
+
+#duel-action-title { font-size: 3rem; color: #fff; text-transform: uppercase; margin: 0; text-shadow: 0 5px 10px #000; }
+.result-numbers { display: flex; justify-content: center; gap: 100px; margin: 10px 0; }
+.res-left, .res-right { font-family: 'Arial Black'; font-size: 4rem; color: #fff; text-shadow: 0 0 30px currentColor; }
+#duel-outcome-text { font-size: 2.5rem; font-weight: 900; color: #ffd700; letter-spacing: 5px; }
+
+/* Efeito de Vencedor/Perdedor nas Cartas */
+.winner-glow .cloned-card-visual { box-shadow: 0 0 60px #00e676; border: 4px solid #00e676; transform: scale(1.1); transition: all 0.5s; }
+.loser-gray .cloned-card-visual { filter: grayscale(1) brightness(0.5); transform: scale(0.9); transition: all 0.5s; }
+
+/* ========================================= */
+/* POSICIONAMENTO DO GOLEIRO (FIXO NA LINHA) */
+/* ========================================= */
+
+/* REFORÇO: Goleiros continuam fixos na linha */
+#zone-0 .team-cluster, 
+#zone-4 .team-cluster {
+    display: flex; 
+    justify-content: center; 
+    align-items: center;
+    width: 100%; height: 100%;
+}
+
+.goal-left-geometry .goal-zone-container {
+    position: absolute; right: 0; height: 100%; transform: translateX(50%); z-index: 20;
+}
+.goal-right-geometry .goal-zone-container {
+    position: absolute; left: 0; height: 100%; transform: translateX(-50%); z-index: 20;
+}
+
+/* Garante que a carta do goleiro não bugue com o tamanho do slot */
+.goal-zone-container .field-card-container {
+    width: 100px !important; /* Largura fixa para o goleiro não esticar */
+    height: 130px !important;
+}

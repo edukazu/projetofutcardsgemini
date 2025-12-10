@@ -1,33 +1,42 @@
 PROJETO: Fut Cards (Web Game)
-FASE ATUAL: Fase 2 - Gameplay Core (Visual de Duelo & Hierarquia)
-DATA: 09/12/2025
+FASE ATUAL: Fase 3.5 - Reboot Visual (Vertical Scrolling Field)
+DATA: 10/12/2025
 
-=== 1. STATUS GERAL ===
-O "Motor de Duelo" está funcional e visualmente polido.
-O fluxo atual é: Kickoff -> Seleção de Ação -> Identificação de Defesa (Cone) -> Animação de Duelo (Cinema Mode) -> Resultado Matemático.
-A hierarquia visual (Z-Index) foi blindada para garantir que cartas destacadas nunca fiquem escondidas.
+=== 1. STATUS GERAL (O NOVO CONCEITO) ===
+O projeto passou por um "Reboot Visual". Abandonamos o campo 2D estático e o 3D Tabletop.
+O novo padrão é **"Vertical Scene Scrolling"** (Estilo Soccer Spirits):
+* **Orientação:** Paisagem (Landscape/Widescreen).
+* **Navegação:** O campo é uma "Torre Vertical" dividida em 3 Cenas (Ataque, Meio, Defesa).
+* **Câmera:** A câmera viaja verticalmente (`translateY`) focando em apenas uma zona por vez.
+* **Estado Atual:** Temos um "Esqueleto Visual" funcional. A navegação funciona, as cartas renderizam, mas não há lógica de jogo conectada.
 
-=== 2. ÚLTIMAS IMPLEMENTAÇÕES (Visual & UX) ===
-* Cena de Duelo (Cinema Mode): Overlay escuro que clona as cartas, anima a entrada lateral e o impacto central. Substituiu os alerts.
-* Hierarquia Visual Absoluta:
-  - Uso do seletor `:has()` no CSS para trazer a ZONA inteira para frente quando uma carta é destacada.
-  - Correção de Z-Index: Mouse Hover > Destaque Principal > Suporte > Cartas Normais.
-* Fix de Interação: O bloqueio de cliques (pointer-events) foi ajustado para permitir selecionar cartas mesmo quando elas invadem visualmente outra zona.
-
-=== 3. ARQUITETURA TÉCNICA ===
-* `style.css`:
-  - `.field-zone:has(...)`: Correção crítica de empilhamento de contextos.
-  - `#duel-stage-overlay`: Camada de animação superior.
+=== 2. ARQUITETURA TÉCNICA (NOVA BASE) ===
+* `index.html`: Estrutura de `#app-frame` (Widescreen). O mundo é `#world-container` (Flex Column).
+    * Cada Cena (`.scene-zone`) contém duas linhas de batalha: `.enemy-line` (Topo) e `.player-line` (Baixo).
+* `style.css`: 
+    * Uso de `transform: translateY` para mover a câmera entre andares.
+    * Visual "Premium Dark" restaurado.
 * `game.js`:
-  - `animateDuelScene()`: Gerencia a clonagem de DOM e timing da animação.
-  - `resolveDuelMath()`: Agora chama a animação em vez de mostrar alert.
+    * Controlador de Câmera (`focusCamera`).
+    * Renderização espelhada (renderiza Inimigos no topo e Jogador embaixo em cada cena).
 
-=== 4. PENDÊNCIAS IMEDIATAS (Próximos Passos) ===
-1. [LÓGICA] Implementar a **Consequência do Duelo**.
-   - Atualmente, a animação termina e... nada acontece (apenas log).
-   - Precisamos mover a bola (se Ataque venceu) ou trocar a posse (se Defesa venceu).
-2. [DEBUG] Investigar os "pequenos problemas" visuais relatados (ajustes finos).
-3. [UI] Melhorar o feedback de "Quem ganhou" após a animação fechar (talvez um texto flutuante no campo).
+=== 3. PENDÊNCIAS IMEDIATAS (PRÓXIMOS PASSOS) ===
+Estas são as tarefas para o início da próxima sessão (Workflow: Arquiteto -> Construtor):
 
-=== 5. ESTADO DA MEMÓRIA ===
-* Backup realizado após correção da Hierarquia Visual. Código estável.
+1.  [CORREÇÃO UI] **Restaurar Navegação Manual:**
+    * Remover os botões de ação "Drible/Passe" (prematuros).
+    * Reimplementar botões de Debug/Navegação (Ir para Ataque, Ir para Defesa) para testar o fluxo sem depender de cliques nas cartas.
+
+2.  [LAYOUT] **Ajuste de Goleiros e Defensores:**
+    * Atualmente, Goleiros estão misturados na linha de zaga.
+    * Criar container visual separado ou lógica de posicionamento para destacar o Goleiro atrás da linha defensiva.
+
+3.  [LÓGICA] **Reconectar o Cérebro:**
+    * A lógica de `matchState`, `diceRoll` e `attributes` foi desligada para focar no visual.
+    * Precisamos reativar o `game.js` antigo dentro dessa nova estrutura visual.
+
+4.  [DADOS] **Adversários:**
+    * Garantir que a renderização dos adversários esteja puxando os dados corretos do `cards.js` (atualmente são ícones genéricos de debug em algumas partes).
+
+=== 4. OBSERVAÇÕES DE WORKFLOW ===
+* Manter arquivos limpos. Evitar acumular código comentado.
