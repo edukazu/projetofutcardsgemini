@@ -1,0 +1,104 @@
+📘 Manual: Stable Diffusion Local (Foco em Anime/Ecchi)
+Setup: Ryzen 5 7600x + RTX 4070 (12GB) | Interface: WebUI Forge
+
+🚀 Parte 1: Instalação e Inicialização
+O método que usamos (Stability Matrix) isola a instalação para não bagunçar seu Windows.
+
+Abrir o Gerenciador:
+
+Abra a pasta onde você extraiu o Stability Matrix.
+
+Execute o arquivo StabilityMatrix.exe.
+
+Iniciar a Interface:
+
+No menu lateral esquerdo, clique em Launch (ícone de Foguete).
+
+Clique no botão azul Launch dentro do card do "Stable Diffusion WebUI Forge".
+
+Aguarde a tela preta (console) carregar. O navegador abrirá automaticamente.
+
+⚙️ Parte 2: Configuração Essencial (Antes de Gerar)
+Para o modelo Pony Diffusion V6 XL funcionar bem, você DEVE ajustar estas configurações toda vez que abrir o programa:
+
+Checkpoint (Modelo):
+
+No topo esquerdo, certifique-se de que ponyDiffusionV6XL... está selecionado.
+
+Tamanho da Imagem (Resolution):
+
+⚠️ Nunca use 512x512 com este modelo (a imagem sairá borrada).
+
+Retrato (Celular): Width 832 | Height 1216 (Recomendado).
+
+Quadrado: Width 1024 | Height 1024.
+
+Parâmetros de Geração:
+
+Sampling Method: Euler a ou DPM++ 2M Karras.
+
+Sampling Steps: 25 a 30.
+
+CFG Scale: 7.
+
+📝 Parte 3: Como Escrever Prompts (A Receita)
+O modelo não lê frases, ele lê Etiquetas (Tags) separadas por vírgula. Use sempre em Inglês.
+
+Estrutura do Prompt Positivo (Caixa de Cima)
+O Pony V6 XL precisa de "códigos de qualidade" no início para ativar o estilo bonito.
+
+Copie e cole sempre este início:
+
+score_9, score_8_up, score_7_up, source_anime, masterpiece, best quality,
+
+Adicione o conteúdo depois (Exemplo):
+
+1girl, soccer player, striker, kicking ball, dynamic pose, sweat, glistening skin, heavy breathing, blush, wearing tight white soccer jersey, crop top, midriff, thighhighs, zettai ryouiki, stadium background, lens flare, looking at viewer
+
+Estrutura do Prompt Negativo (Caixa de Baixo)
+O que você NÃO quer na imagem.
+
+Padrão recomendado:
+
+score_6, score_5, score_4, source_pony, source_furry, 3d, photo, realistic, ugly, deformed, extra fingers, bad anatomy, worst quality, low quality, watermark, text, signature
+
+💎 Parte 4: Melhorando a Qualidade (Upscale)
+Para imagens com definição de "Wallpaper" e rosto perfeito.
+
+Gere uma imagem que você gostou.
+
+Trave a Semente (Seed):
+
+Clique no ícone de Reciclagem Verde (♻️) ao lado da caixa "Seed".
+
+O número -1 vai mudar para um número fixo. Isso garante que a personagem não mude.
+
+Ative o Hires. Fix:
+
+Marque a caixa ☑ Hires. fix.
+
+Upscaler: R-ESRGAN 4x+ Anime6B (ou Latent).
+
+Hires Steps: 10 a 20.
+
+Denoising Strength: ⚠️ 0.3 a 0.35. (Acima de 0.5 a imagem muda totalmente; abaixo disso, ela apenas melhora a definição).
+
+Upscale by: 1.5 ou 2.0.
+
+Clique em Generate novamente.
+
+📂 Parte 5: Onde estão minhas imagens?
+Você não precisa salvar manualmente. Tudo é salvo automático.
+
+Na interface do WebUI, logo abaixo da imagem gerada, clique no ícone de Pasta Amarela 📁.
+
+Isso abrirá a pasta do Windows com seu histórico do dia.
+
+💡 Dicas Finais
+Pele Suada/Sexy: Use tags como sweat, glistening skin, wet skin, heavy breathing.
+
+Foco na Roupa: Use tight clothes, form-fitting, clothes sticking to skin.
+
+Câmera: Use cowboy shot (até o joelho), full body (corpo todo), dutch angle (inclinado/ação).
+
+Facilitador: Instale a extensão "Booru Tag Autocomplete" (Aba Extensions) para o programa sugerir as palavras enquanto você digita.

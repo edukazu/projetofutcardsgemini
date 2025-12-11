@@ -11,13 +11,13 @@ const TEAMS_DATA = {
         colorSecondary: "#d4af37",
         players: [
             // GK: REF, HAN, SPD, POS
-            { id: "rmd_gk", name: "Court", role: "GK", ovr: 90, nation: "be", face: 1, skin: "#f5d0b0", ref: 90, han: 88, spd: 46, pos: 89, pas: 35, dri: 30, des: 20, fin: 25, sta: 99, zone: 4 },
+            { id: "rmd_gk", name: "Court", role: "GK", ovr: 90, nation: "be", faceImage: "court.png", face: 1, skin: "#f5d0b0", ref: 90, han: 88, spd: 46, pos: 89, pas: 35, dri: 30, des: 20, fin: 25, sta: 99, zone: 4 },
             
             // DEF: DES, INT, PAS, DRI (Sem STA)
             { id: "rmd_lb", name: "F. Mendonça", role: "DEF", ovr: 83, nation: "fr", face: 3, skin: "#5c3a2a", des: 80, int: 78, pas: 75, dri: 78, fin: 64, sta: 90, zone: 3 },
             { id: "rmd_cb1", name: "Rudolph", role: "DEF", ovr: 87, nation: "de", face: 2, skin: "#3e2723", des: 89, int: 88, pas: 70, dri: 65, fin: 40, sta: 85, zone: 3 },
             { id: "rmd_cb2", name: "E. Miles", role: "DEF", ovr: 86, nation: "br", face: 2, skin: "#8d5524", des: 87, int: 85, pas: 72, dri: 70, fin: 50, sta: 85, zone: 3 },
-            { id: "rmd_rb", name: "Carval", role: "DEF", ovr: 85, nation: "es", face: 1, skin: "#f5d0b0", des: 84, int: 82, pas: 79, dri: 75, fin: 55, sta: 88, zone: 3 },
+            { id: "rmd_rb", name: "Carval", role: "DEF", ovr: 85, nation: "es", faceImage: "carval.png", face: 1, skin: "#f5d0b0", des: 84, int: 82, pas: 79, dri: 75, fin: 55, sta: 88, zone: 3 },
 
             // MID: PAS, DRI, INT, FIN (Sem STA)
             { id: "rmd_cm1", name: "Valente", role: "MID", ovr: 88, nation: "uy", faceImage: "valente.png", face: 1, skin: "#e0ac69", pas: 85, dri: 82, des: 80, int: 82, fin: 79, sta: 95, zone: 2 },
