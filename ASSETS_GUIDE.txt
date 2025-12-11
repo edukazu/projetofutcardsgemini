@@ -1,0 +1,59 @@
+==============================================================================
+GUIA DE GERAÇÃO DE ASSETS - FUT CARDS (FULL ART)
+==============================================================================
+
+1. ESPECIFICAÇÕES TÉCNICAS (RESOLUÇÃO)
+------------------------------------------------------------------------------
+* Proporção (Aspect Ratio): 2:3 (Retrato)
+* Resolução Mínima: 512x768 pixels
+* Resolução Ideal: 1024x1536 pixels (Para telas Retina/High DPI)
+* Formato de Arquivo: JPG (80-90% qualidade) ou PNG.
+* Peso Ideal: Tente manter abaixo de 300kb por imagem.
+
+------------------------------------------------------------------------------
+2. ZONAS DE SEGURANÇA (ENQUADRAMENTO)
+------------------------------------------------------------------------------
+O layout da carta possui elementos fixos (HUD) sobre a imagem. 
+A imagem deve respeitar estes espaços para não cortar o rosto do personagem.
+
+[ TOPO (0% a 25%) ] -> ZONA DE DADOS
+* O que fica aqui: OVR (Esq), Bandeira e Escudo (Dir).
+* Conteúdo da Imagem: Céu, Refletores, Teto do Estádio ou Fundo desfocado.
+* REGRA: Não coloque o rosto aqui! Deixe "ar" acima da cabeça.
+
+[ MEIO (25% a 70%) ] -> ZONA DO PERSONAGEM
+* O que fica aqui: Cabeça, Tronco e Cintura do jogador.
+* REGRA: O rosto deve estar centralizado verticalmente nesta faixa.
+
+[ BASE (70% a 100%) ] -> ZONA DE STATS
+* O que fica aqui: Nome, Barra de Estamina, Atributos.
+* Conteúdo da Imagem: Pernas, Chuteiras, Bola, Gramado.
+* REGRA: Evite detalhes cruciais aqui, pois ficarão escurecidos pelo degradê.
+
+------------------------------------------------------------------------------
+3. A FÓRMULA DO PROMPT (COMO GERAR)
+------------------------------------------------------------------------------
+Para usar em IA (Midjourney, DALL-E 3, Leonardo.ai), use esta estrutura:
+
+[ENQUADRAMENTO TÉCNICO] + [DESCRIÇÃO DO PERSONAGEM] + [ESTILO ARTÍSTICO]
+
+--- PARTE 1: O ENQUADRAMENTO TÉCNICO (Sempre use isto primeiro) ---
+"knee-up shot, character centered, wide shot, empty space above head, stadium background, dynamic angle"
+
+--- PARTE 2: A DESCRIÇÃO (Você preenche) ---
+Ex: "female soccer player, dark skin, braided hair, wearing white and gold jersey, kicking a ball of fire, intense expression"
+
+--- PARTE 3: O ESTILO (Sempre use isto no final) ---
+"anime style, cel shaded, vibrant colors, dynamic lighting, high quality illustration, --ar 2:3"
+
+------------------------------------------------------------------------------
+4. EXEMPLOS PRONTOS
+------------------------------------------------------------------------------
+
+EXEMPLO 1 (Atacante / Vimi):
+"knee-up shot, character centered, wide shot, empty space above head, stadium background, female soccer player, tanned skin, long black ponytail, wearing dark blue jersey, kicking a soccer ball surrounded by energy effects, dynamic pose, anime style, cel shaded, vibrant colors, --ar 2:3"
+
+EXEMPLO 2 (Goleiro / Court):
+"knee-up shot, character centered, wide shot, empty space above head, stadium background, female goalkeeper, tall, blonde short hair, wearing green jersey and gloves, diving to catch a ball, explosion effect in background, anime style, detailed illustration, --ar 2:3"
+
+==============================================================================

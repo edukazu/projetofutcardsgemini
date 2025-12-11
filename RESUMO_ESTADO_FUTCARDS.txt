@@ -1,42 +1,40 @@
 PROJETO: Fut Cards (Web Game)
-FASE ATUAL: Fase 3.5 - Reboot Visual (Vertical Scrolling Field)
-DATA: 10/12/2025
+FASE ATUAL: Fase 4.0 - Identidade Visual Premium & Full Art
+DATA: 10/12/2025 (Atualizado)
 
-=== 1. STATUS GERAL (O NOVO CONCEITO) ===
-O projeto passou por um "Reboot Visual". Abandonamos o campo 2D estático e o 3D Tabletop.
-O novo padrão é **"Vertical Scene Scrolling"** (Estilo Soccer Spirits):
-* **Orientação:** Paisagem (Landscape/Widescreen).
-* **Navegação:** O campo é uma "Torre Vertical" dividida em 3 Cenas (Ataque, Meio, Defesa).
-* **Câmera:** A câmera viaja verticalmente (`translateY`) focando em apenas uma zona por vez.
-* **Estado Atual:** Temos um "Esqueleto Visual" funcional. A navegação funciona, as cartas renderizam, mas não há lógica de jogo conectada.
+=== 1. STATUS GERAL (O NOVO PATAMAR) ===
+O projeto evoluiu de um "protótipo tático" para um "Card Game Colecionável Premium".
+* **Identidade Visual:** Adotamos estilo Híbrido. Cartas comuns usam Vetores/SVG gerados via código. Cartas Especiais usam imagens "Full Art" (estilo Anime/Soccer Spirits).
+* **Navegação:** Implementado sistema "Vertical Drag & Snap". O jogador arrasta o campo verticalmente (Defesa <-> Meio <-> Ataque).
+* **Layout:** Abandonamos o posicionamento relativo. Agora usamos **Formações Fixas** (4-4-2, 4-3-3, 3-5-2) definidas em `formations.js`.
+* **Lore/Jurídico:** Decisão de design "Rule 63" (Versões alternativas/femininas dos craques) para evitar problemas de direito de imagem e criar identidade própria.
 
-=== 2. ARQUITETURA TÉCNICA (NOVA BASE) ===
-* `index.html`: Estrutura de `#app-frame` (Widescreen). O mundo é `#world-container` (Flex Column).
-    * Cada Cena (`.scene-zone`) contém duas linhas de batalha: `.enemy-line` (Topo) e `.player-line` (Baixo).
-* `style.css`: 
-    * Uso de `transform: translateY` para mover a câmera entre andares.
-    * Visual "Premium Dark" restaurado.
+=== 2. ARQUITETURA TÉCNICA (ATUALIZAÇÕES) ===
+* `index.html`:
+    * Placar movido para o topo esquerdo (HUD fixo).
+    * Removidos botões de debug antigos.
+* `style.css`:
+    * **Camadas (Z-Index):** Correção complexa para garantir que Hover se sobreponha a containers pais (`.gk-container:hover { z-index: 101 }`).
+    * **Full Art:** Nova classe `.is-full-art` que remove molduras e aplica imagem de fundo com sombras para leitura de texto.
+    * **Tamanho:** Upgrade de dimensão das cartas para **170x255px** (Big Cards).
 * `game.js`:
-    * Controlador de Câmera (`focusCamera`).
-    * Renderização espelhada (renderiza Inimigos no topo e Jogador embaixo em cada cena).
+    * **Input System:** Suporte a Mouse e Touch para arrastar o campo.
+    * **Render:** Nova lógica que lê `faceImage` do JSON. Se existir, renderiza Full Art; se não, gera SVG vetorial.
+    * **Stats:** Cálculo automático dos "Top 4 Atributos" para exibir na carta, mais barra de estamina dinâmica.
+* `formations.js` (Novo):
+    * Arquivo gabarito contendo as coordenadas X (left%) para cada formação tática.
 
-=== 3. PENDÊNCIAS IMEDIATAS (PRÓXIMOS PASSOS) ===
-Estas são as tarefas para o início da próxima sessão (Workflow: Arquiteto -> Construtor):
+=== 3. PENDÊNCIAS IMEDIATAS (ROADMAP TÉCNICO) ===
+1.  [ARTE/ASSETS] **Padronização Visual:**
+    * Gerar imagens (IA) para o restante do elenco titular seguindo o gabarito "Knee-up shot/Portrait".
+    * Atualizar `cards.js` com os caminhos das novas imagens.
+2.  [LÓGICA] **Reconectar o Gameplay:**
+    * O sistema de Duelos (D20, Comparação de Atributos) está desligado visualmente.
+    * Precisamos reimplementar o clique na carta para abrir o menu de ação (Passe/Drible/Chute) dentro da nova interface.
+3.  [UI] **Menu de Ação:**
+    * Criar um menu que não quebre a imersão (talvez um anel radial ou botões flutuantes sobre a carta Full Art).
 
-1.  [CORREÇÃO UI] **Restaurar Navegação Manual:**
-    * Remover os botões de ação "Drible/Passe" (prematuros).
-    * Reimplementar botões de Debug/Navegação (Ir para Ataque, Ir para Defesa) para testar o fluxo sem depender de cliques nas cartas.
-
-2.  [LAYOUT] **Ajuste de Goleiros e Defensores:**
-    * Atualmente, Goleiros estão misturados na linha de zaga.
-    * Criar container visual separado ou lógica de posicionamento para destacar o Goleiro atrás da linha defensiva.
-
-3.  [LÓGICA] **Reconectar o Cérebro:**
-    * A lógica de `matchState`, `diceRoll` e `attributes` foi desligada para focar no visual.
-    * Precisamos reativar o `game.js` antigo dentro dessa nova estrutura visual.
-
-4.  [DADOS] **Adversários:**
-    * Garantir que a renderização dos adversários esteja puxando os dados corretos do `cards.js` (atualmente são ícones genéricos de debug em algumas partes).
-
-=== 4. OBSERVAÇÕES DE WORKFLOW ===
-* Manter arquivos limpos. Evitar acumular código comentado.
+=== 4. OBSERVAÇÕES DE DESIGN ===
+* **Identidade:** O jogo assume a estética "Anime Sports Battle".
+* **Gabarito de Imagem:** Ar: 2:3. Enquadramento: Joelho para cima. Espaço livre acima da cabeça para o escudo.
+* **Performance:** Manter as imagens otimizadas (JPG/PNG leves) pois agora carregamos assets externos.

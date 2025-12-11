@@ -20,14 +20,14 @@ const TEAMS_DATA = {
             { id: "rmd_rb", name: "Carval", role: "DEF", ovr: 85, nation: "es", face: 1, skin: "#f5d0b0", des: 84, int: 82, pas: 79, dri: 75, fin: 55, sta: 88, zone: 3 },
 
             // MID: PAS, DRI, INT, FIN (Sem STA)
-            { id: "rmd_cm1", name: "Valente", role: "MID", ovr: 88, nation: "uy", face: 1, skin: "#e0ac69", pas: 85, dri: 82, des: 80, int: 82, fin: 79, sta: 95, zone: 2 },
+            { id: "rmd_cm1", name: "Valente", role: "MID", ovr: 88, nation: "uy", faceImage: "valente.png", face: 1, skin: "#e0ac69", pas: 85, dri: 82, des: 80, int: 82, fin: 79, sta: 95, zone: 2 },
             { id: "rmd_cm2", name: "J. Bells", role: "MID", ovr: 90, nation: "gb-eng", face: 2, skin: "#c68642", pas: 87, dri: 88, int: 78, des: 75, fin: 85, sta: 90, zone: 2 },
             { id: "rmd_cm3", name: "Tchou", role: "MID", ovr: 84, nation: "fr", face: 2, skin: "#3e2723", pas: 81, dri: 79, des: 84, int: 85, fin: 70, sta: 88, zone: 2 },
             { id: "rmd_cm4", name: "Cama V.", role: "MID", ovr: 83, nation: "fr", face: 4, skin: "#3e2723", pas: 81, dri: 84, des: 82, int: 80, fin: 68, sta: 87, zone: 2 },
 
             // ATT: FIN, DRI, PAS, INT (Sem STA)
-            { id: "rmd_lw", name: "Vimi", role: "ATT", ovr: 90, nation: "br", face: 4, skin: "#5c3a2a", dri: 92, fin: 85, pas: 80, int: 40, des: 35, sta: 85, zone: 1 },
-            { id: "rmd_st", name: "Kylian M.", role: "ATT", ovr: 91, nation: "fr", face: 3, skin: "#8d5524", dri: 93, fin: 91, pas: 80, int: 35, des: 40, sta: 88, zone: 1 }
+            { id: "rmd_lw", name: "Vimi J.", role: "ATT", ovr: 90, nation: "br", faceImage: "vimi_art.png", face: 4, skin: "#5c3a2a", dri: 92, fin: 85, pas: 80, int: 40, des: 35, sta: 85, zone: 1 },
+            { id: "rmd_st", name: "Kilayn M.", role: "ATT", ovr: 91, nation: "fr", face: 3, skin: "#8d5524", dri: 93, fin: 91, pas: 80, int: 35, des: 40, sta: 88, zone: 1 }
         ]
     },
     catalonia: {

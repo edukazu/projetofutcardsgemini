@@ -115,13 +115,22 @@ class Game {
         if (p.sta <= 70) staColor = '#ffea00'; // Amarelo
         if (p.sta <= 30) staColor = '#ff1744'; // Vermelho
 
+        // VERIFICAÇÃO FULL ART
+        const hasImage = p.faceImage && p.faceImage.length > 0;
+        const fullArtClass = hasImage ? 'is-full-art' : '';
+        
         const card = document.createElement('div');
-        card.className = `card-unit is-${side} card-premium`;
+        card.className = `card-unit is-${side} card-premium ${fullArtClass}`;
         
         // Injetamos as cores do time como variáveis CSS locais
         // Variáveis de cor
+        // Se tiver imagem, aplica no background. Se não, usa as cores do time.
+        if (hasImage) {
+            card.style.backgroundImage = `url('${p.faceImage}')`;
+        } else {
+            card.style.background = `radial-gradient(circle at 50% 30%, ${color1}, #111 90%)`;
+        }
         card.style.setProperty('--team-c1', color1);
-        card.style.setProperty('--team-c2', color2);
 
         card.innerHTML = `
             <div class="cp-header">
@@ -137,7 +146,7 @@ class Game {
             </div>
 
             <div class="cp-visual">
-                ${this.generateFaceSVG(p.face, p.skin)}
+                ${!hasImage ? this.generateFaceSVG(p.face, p.skin) : ''}
             </div>
 
             <div class="cp-name">${p.name}</div>

@@ -1,0 +1,11 @@
+🤖 Como fazer isso (O "Prompt Mestre"):
+Suba o arquivo ASSETS_GUIDE.txt no chat da IA.
+
+Digite o seguinte comando:
+
+"Leia este arquivo de guia. A partir de agora, você é o Diretor de Arte do projeto 'Fut Cards'. Eu vou te dar apenas a descrição visual do personagem (ex: 'Goleiro com braço mecânico'), e você deve gerar a imagem seguindo RIGOROSAMENTE as regras técnicas de enquadramento, proporção e estilo definidas no arquivo anexo. Você entendeu?"
+
+O Resultado:
+Depois disso, você só precisará dizer: "Gere o atacante Vimi" ou "Gere o zagueiro Rudolph". A IA vai olhar o gabarito, lembrar que precisa deixar espaço livre na cabeça, que precisa ser estilo anime e que o corte é no joelho, e vai gerar a imagem perfeita.
+
+Isso garante que todas as cartas tenham a mesma "cara", como se tivessem sido desenhadas pelo mesmo artista.

@@ -114,7 +114,8 @@ body {
    CARTAS PREMIUM (VISUAL)
    ========================================= */
 .card-premium {
-    width: 140px; height: 200px;
+    width: 170px;  /* Era 140px */
+    height: 255px; /* Era 200px */
     border-radius: 10px;
     position: relative;
     overflow: hidden;
@@ -134,14 +135,15 @@ body {
 
 /* Cabeçalho Dividido */
 .cp-header {
-    height: 55px; padding: 6px 10px;
+    height: 60px; /* Era 55px */
+    padding: 8px 12px;
     display: flex; justify-content: space-between; align-items: flex-start;
     z-index: 2;
 }
 
 .cp-col-left { display: flex; flex-direction: column; align-items: flex-start; }
 .cp-ovr { 
-    font-size: 1.8rem; font-weight: 900; line-height: 0.9; 
+    font-size: 2rem; /* Maior */ font-weight: 900; line-height: 0.9; 
     text-shadow: 0 2px 4px rgba(0,0,0,0.8); 
 }
 .cp-role { 
@@ -153,9 +155,9 @@ body {
 
 /* Correção das Bandeiras SVG */
 .cp-nation { 
-    width: 24px;   /* Largura fixa */
-    height: 16px;  /* Altura fixa (proporção bandeira) */
-    
+    width: 28px;   /* Largura fixa */
+    height: 18px;  /* Altura fixa (proporção bandeira) */
+
     /* Removemos font-size e color, pois agora é SVG */
     display: block;
     box-shadow: 0 2px 4px rgba(0,0,0,0.5); /* Sombra suave */
@@ -171,7 +173,7 @@ body {
 }
 
 .cp-team-badge {
-    width: 26px; height: 26px;
+    width: 32px; height: 32px;
     filter: drop-shadow(0 3px 3px rgba(0,0,0,0.6));
 }
 .cp-team-badge svg { width: 100%; height: 100%; overflow: visible; }
@@ -193,6 +195,19 @@ body {
     
     /* Ajuste de posição: Encaixa no pescoço da carta */
     transform: translateY(4px);
+}
+
+/* Estilo para quando usamos IMAGEM PNG/JPG */
+.cp-face-img {
+    width: 100px; /* Um pouco maior que o SVG para preencher bem */
+    height: 100px;
+    object-fit: contain; /* Garante que a imagem inteira apareça sem distorcer */
+    z-index: 2;
+    
+    /* Sombra e Posição iguais ao SVG */
+    filter: drop-shadow(0 5px 10px rgba(0,0,0,0.6));
+    transform: translateY(4px); 
+    margin-bottom: 5px;
 }
 
 /* Nome */
@@ -306,3 +321,95 @@ body {
 .gk-container, .battle-line {
     transition: z-index 0s linear; 
 }
+
+/* === REGRAS FULL ART (GARANTIA DE VISIBILIDADE) === */
+
+/* 1. O Palco (Imagem de Fundo) */
+.card-premium.is-full-art {
+    background-color: #000;
+    background-size: cover;
+    background-position: center top; /* Foca no rosto/corpo superior */
+    border: 2px solid #fff;
+}
+
+/* Identidade de cor na borda (Brilha para identificar o time) */
+.is-full-art.is-player { border-color: #ffd700; box-shadow: 0 0 15px rgba(255, 215, 0, 0.4); }
+.is-full-art.is-enemy { border-color: #ff5252; box-shadow: 0 0 15px rgba(255, 82, 82, 0.4); }
+
+/* 2. O Teto Escuro (Protege Bandeira, Escudo e OVR) */
+/* Cria um degradê preto no topo para os ícones saltarem */
+.is-full-art .cp-header {
+    background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 60%, transparent 100%);
+    z-index: 5; /* Garante que fique acima da imagem */
+    padding-top: 8px; /* Pequeno ajuste de respiro */
+}
+
+/* Força sombra nos textos/ícones do topo para leitura máxima */
+.is-full-art .cp-ovr, 
+.is-full-art .cp-role,
+.is-full-art .cp-nation,
+.is-full-art .cp-team-badge {
+    filter: drop-shadow(0 2px 4px #000); /* Sombra preta dura atrás dos elementos */
+}
+
+/* 3. O Chão Escuro (Protege Nome, Estamina e Stats) */
+.is-full-art::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; width: 100%; height: 50%;
+    background: linear-gradient(to top, #000 10%, rgba(0,0,0,0.8) 40%, transparent 100%);
+    z-index: 1; /* Fica entre a imagem e os textos */
+    pointer-events: none;
+}
+
+.is-full-art .cp-visual { display: none; }
+
+/* 4. Reposicionamento dos Dados Inferiores */
+.is-full-art .cp-name {
+    background: transparent;
+    text-shadow: 0 2px 4px #000, 0 0 8px #000;
+    position: absolute; bottom: 60px; /* Sobe um pouco junto com a altura */ width: 100%;
+    font-size: 1rem; /* Nome mais legível */ letter-spacing: 1px;
+    z-index: 5;
+}
+
+.is-full-art .cp-stamina-container {
+    position: absolute; bottom: 52px; left: 10%; width: 80%;
+    box-shadow: 0 0 5px #000; /* Contorno preto na barra */
+    z-index: 5;
+}
+
+.is-full-art .cp-stats {
+    background: transparent; border: none;
+    position: absolute; bottom: 0; width: 100%;
+    padding-bottom: 8px;
+    z-index: 5;
+}
+
+/* Deixa os labels (PAS, DRI) mais brilhantes */
+.is-full-art .s-label { color: #ddd; text-shadow: 0 1px 3px #000; font-weight: 900; }
+.is-full-art .s-val { text-shadow: 0 1px 3px #000; font-size: 0.85rem; }
+.is-full-art .cp-visual { display: none; }
+
+/* Texto e Stats flutuando sobre a arte */
+.is-full-art .cp-name {
+    background: transparent; /* Remove tarja preta */
+    text-shadow: 0 2px 4px #000, 0 0 10px #000; /* Sombra forte para leitura */
+    font-size: 0.9rem; margin-bottom: 2px;
+    z-index: 2;
+    position: absolute; bottom: 55px; width: 100%; /* Posicionamento fixo */
+}
+
+.is-full-art .cp-stamina-container {
+    z-index: 2; position: absolute; bottom: 48px; left: 7.5%;
+}
+
+.is-full-art .cp-stats {
+    background: transparent; border: none;
+    z-index: 2;
+    position: absolute; bottom: 0; width: 100%;
+    padding-bottom: 5px;
+}
+
+.is-full-art .s-label { color: #ddd; text-shadow: 0 1px 2px #000; }
+.is-full-art .s-val { text-shadow: 0 1px 2px #000; font-size: 0.8rem; }
