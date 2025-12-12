@@ -1,0 +1,10 @@
+🎬 Roteiro Visual: A Muralha de Ébano Serena
+Tema do Lote: Tenjou Tenge / Oh! Great Style (High School Martial Arts x Soccer)
+
+[Estilo Artístico: Oh! great / Manga Seinen High-End | Câmera: Dynamic Dutch Angle (Câmera Inclinada) a nível do solo]
+
+"Esta imagem é um caos congelado de um duelo defensivo brutal, ancorado pela calma inacreditável da zagueira alemã. Sua pele escura é rica e profunda, coberta de uma mistura de suor e terra que a faz brilhar sob os refletores, realçando uma musculatura extremamente definida, digna de uma fisiculturista. Seus cabelos estão presos em um coque alto complexo e estiloso, com algumas mechas trançadas soltas devido à ação.
+
+[O Traje - Vibe Tenjou Tenge x Tactical Minimalism]: Ela leva o termo 'revelador' ao limite do estilo 'Oh! great'. Ela veste apenas um micro-biquíni tático preto com detalhes em vermelho carmesim e fivelas metálicas, que parece mais um equipamento de contenção do que roupa de banho. As tiras finas cortam suas coxas e torso musculoso, deixando quase nada para a imaginação e enfatizando sua potência física crua. Luvas de goleiro sem dedos e caneleiras pesadas são seus únicos outros acessórios.
+
+[A Ação & Emoção]: Ela acabou de realizar um desarme devastador. A câmera inclinada captura o momento em que ela está deslizando no chão, levantando uma onda de grama e terra. Uma oponente borrada está sendo arremessada para fora do quadro pelo impacto. O poder de 'recuperação' é visível em sua postura: mesmo ainda deslizando, seu tronco já está ereto, pronto para se levantar. Sua expressão é o ponto focal: calma sobrenatural, quase entediada. Olhos amendoados serenos, boca fechada sem tensão, olhando para a frente, já calculando o próximo movimento enquanto o mundo explode ao redor dela."
