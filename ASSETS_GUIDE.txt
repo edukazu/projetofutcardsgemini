@@ -33,27 +33,9 @@ A imagem deve respeitar estes espaços para não cortar o rosto do personagem.
 ------------------------------------------------------------------------------
 3. A FÓRMULA DO PROMPT (COMO GERAR)
 ------------------------------------------------------------------------------
-Para usar em IA (Midjourney, DALL-E 3, Leonardo.ai), use esta estrutura:
+Para usar em IA, use esta estrutura:
 
-[ENQUADRAMENTO TÉCNICO] + [DESCRIÇÃO DO PERSONAGEM] + [ESTILO ARTÍSTICO]
+[ENQUADRAMENTO TÉCNICO]
 
---- PARTE 1: O ENQUADRAMENTO TÉCNICO (Sempre use isto primeiro) ---
+--- O ENQUADRAMENTO TÉCNICO (Sempre use isto primeiro) ---
 "knee-up shot, character centered, wide shot, empty space above head, stadium background, dynamic angle"
-
---- PARTE 2: A DESCRIÇÃO (Você preenche) ---
-Ex: "female soccer player, dark skin, braided hair, wearing white and gold jersey, kicking a ball of fire, intense expression"
-
---- PARTE 3: O ESTILO (Sempre use isto no final) ---
-"anime style, cel shaded, vibrant colors, dynamic lighting, high quality illustration, --ar 2:3"
-
-------------------------------------------------------------------------------
-4. EXEMPLOS PRONTOS
-------------------------------------------------------------------------------
-
-EXEMPLO 1 (Atacante / Vimi):
-"knee-up shot, character centered, wide shot, empty space above head, stadium background, female soccer player, tanned skin, long black ponytail, wearing dark blue jersey, kicking a soccer ball surrounded by energy effects, dynamic pose, anime style, cel shaded, vibrant colors, --ar 2:3"
-
-EXEMPLO 2 (Goleiro / Court):
-"knee-up shot, character centered, wide shot, empty space above head, stadium background, female goalkeeper, tall, blonde short hair, wearing green jersey and gloves, diving to catch a ball, explosion effect in background, anime style, detailed illustration, --ar 2:3"
-
-==============================================================================
